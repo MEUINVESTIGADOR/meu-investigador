@@ -2341,12 +2341,32 @@ function abrirModulo(modulo) {
 
   if (modulo === "imoveis") {
 
-    alert("Módulo Imóveis — em construção.");
+    document.getElementById("investigacaoScreen").style.display = "none";
+
+    document.getElementById("imoveisScreen").style.display = "block";
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
 
   }
 
 }
-verificarSessao();
+
+
+function voltarDaTelaImoveis() {
+
+  document.getElementById("imoveisScreen").style.display = "none";
+
+  document.getElementById("investigacaoScreen").style.display = "block";
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+
+};
 
 </script>
 
