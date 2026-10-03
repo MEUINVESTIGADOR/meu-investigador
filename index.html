@@ -1,12 +1,16 @@
-```html
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
+
 <meta charset="UTF-8">
+
 <meta name="viewport" content="width=device-width,initial-scale=1">
+
 <title>Meu Investigador</title>
 
 <style>
+
 :root{
   --bg:#f5f7fb;
   --card:#fff;
@@ -16,9 +20,12 @@
   --primary:#315bea;
   --primary2:#2448c7;
   --dark:#111827;
+  --danger:#b42318;
 }
 
-*{box-sizing:border-box}
+*{
+  box-sizing:border-box;
+}
 
 body{
   margin:0;
@@ -27,7 +34,9 @@ body{
   color:var(--text);
 }
 
-/* LOGIN */
+/* =========================
+   LOGIN
+========================= */
 
 #loginScreen{
   min-height:100vh;
@@ -106,7 +115,9 @@ body{
   font-size:13px;
 }
 
-/* APP */
+/* =========================
+   APP
+========================= */
 
 .app{
   display:flex;
@@ -207,6 +218,26 @@ body{
 .btn:hover{
   background:var(--primary2);
 }
+
+.btn-secondary{
+  background:#64748b;
+}
+
+.btn-secondary:hover{
+  background:#475569;
+}
+
+.btn-danger{
+  background:#b42318;
+}
+
+.btn-danger:hover{
+  background:#8f1d14;
+}
+
+/* =========================
+   DASHBOARD
+========================= */
 
 .stats{
   display:grid;
@@ -352,6 +383,141 @@ input{
   color:#b42318;
 }
 
+/* =========================
+   TELA DA INVESTIGAÇÃO
+========================= */
+
+#investigacaoScreen{
+  display:none;
+}
+
+.investigacao-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:20px;
+  margin-bottom:24px;
+}
+
+.investigacao-header h1{
+  margin:0;
+  font-size:28px;
+}
+
+.investigacao-header p{
+  margin:7px 0 0;
+  color:var(--muted);
+}
+
+.investigacao-actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.investigacao-grid{
+  display:grid;
+  grid-template-columns:2fr 1fr;
+  gap:20px;
+}
+
+.info-card{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:22px;
+}
+
+.info-card h2{
+  margin:0 0 18px;
+  font-size:18px;
+}
+
+.info-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+}
+
+.info-box{
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:14px;
+}
+
+.info-box.full{
+  grid-column:1/-1;
+}
+
+.info-label{
+  font-size:12px;
+  color:var(--muted);
+  margin-bottom:5px;
+}
+
+.info-value{
+  font-size:15px;
+  font-weight:700;
+  word-break:break-word;
+}
+
+.source-list{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+
+.source-tag{
+  background:#edf1ff;
+  color:#2947a5;
+  border-radius:8px;
+  padding:8px 10px;
+  font-size:13px;
+  font-weight:600;
+}
+
+.empty-source{
+  color:var(--muted);
+  font-size:14px;
+}
+
+.future-list{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.future-item{
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:14px;
+}
+
+.future-item strong{
+  display:block;
+  margin-bottom:4px;
+}
+
+.future-item span{
+  color:var(--muted);
+  font-size:13px;
+}
+
+.badge{
+  display:inline-block;
+  margin-top:12px;
+  padding:6px 9px;
+  border-radius:7px;
+  background:#ecfdf3;
+  color:#087443;
+  font-size:12px;
+  font-weight:700;
+}
+
+/* =========================
+   RESPONSIVO
+========================= */
+
 @media(max-width:900px){
 
   .stats{
@@ -361,6 +527,11 @@ input{
   .layout{
     grid-template-columns:1fr;
   }
+
+  .investigacao-grid{
+    grid-template-columns:1fr;
+  }
+
 }
 
 @media(max-width:650px){
@@ -410,13 +581,31 @@ input{
   .full{
     grid-column:auto;
   }
+
+  .info-grid{
+    grid-template-columns:1fr;
+  }
+
+  .info-box.full{
+    grid-column:auto;
+  }
+
+  .investigacao-header{
+    flex-direction:column;
+  }
+
 }
+
 </style>
+
 </head>
 
 <body>
 
-<!-- LOGIN -->
+
+<!-- =========================
+     LOGIN
+========================= -->
 
 <div id="loginScreen">
 
@@ -472,13 +661,20 @@ input{
 </div>
 
 
-<!-- DASHBOARD -->
+<!-- =========================
+     APP
+========================= -->
 
 <div
   class="app"
   id="app"
   style="display:none"
 >
+
+
+  <!-- =========================
+       SIDEBAR
+  ========================= -->
 
   <aside class="sidebar">
 
@@ -488,15 +684,25 @@ input{
 
     <nav class="nav">
 
-      <a class="active" href="#">
+      <a
+        class="active"
+        href="#"
+        onclick="mostrarDashboard(); return false;"
+      >
         ▣ &nbsp; Dashboard
       </a>
 
-      <a href="#nova">
+      <a
+        href="#nova"
+        onclick="mostrarDashboard(); setTimeout(()=>document.getElementById('nome').focus(),100);"
+      >
         ＋ &nbsp; Nova investigação
       </a>
 
-      <a href="#recentes">
+      <a
+        href="#recentes"
+        onclick="mostrarDashboard();"
+      >
         ◷ &nbsp; Investigações
       </a>
 
@@ -518,232 +724,474 @@ input{
     </button>
 
     <small>
-      Versão 5.0 — API + D1
+      Versão 6.0 — API + D1
     </small>
 
   </aside>
 
 
+  <!-- =========================
+       CONTEÚDO
+  ========================= -->
+
   <section class="content">
 
-    <div class="top">
 
-      <div>
+    <!-- =========================
+         DASHBOARD
+    ========================= -->
 
-        <h1>Dashboard</h1>
+    <div id="dashboardScreen">
 
-        <p>
-          Central de investigações patrimoniais
-        </p>
+      <div class="top">
+
+        <div>
+
+          <h1>Dashboard</h1>
+
+          <p>
+            Central de investigações patrimoniais
+          </p>
+
+        </div>
+
+        <button
+          class="btn"
+          onclick="document.getElementById('nome').focus()"
+        >
+          + Nova investigação
+        </button>
 
       </div>
 
-      <button
-        class="btn"
-        onclick="document.getElementById('nome').focus()"
-      >
-        + Nova investigação
-      </button>
+
+      <!-- ESTATÍSTICAS -->
+
+      <div class="stats">
+
+        <div class="stat">
+
+          <div class="label">
+            Investigações
+          </div>
+
+          <div
+            class="number"
+            id="total"
+          >
+            0
+          </div>
+
+        </div>
+
+
+        <div class="stat">
+
+          <div class="label">
+            Em andamento
+          </div>
+
+          <div
+            class="number"
+            id="andamento"
+          >
+            0
+          </div>
+
+        </div>
+
+
+        <div class="stat">
+
+          <div class="label">
+            Fontes pesquisadas
+          </div>
+
+          <div
+            class="number"
+            id="fontes"
+          >
+            0
+          </div>
+
+        </div>
+
+
+        <div class="stat">
+
+          <div class="label">
+            Relatórios
+          </div>
+
+          <div class="number">
+            0
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- FORMULÁRIO + LISTA -->
+
+      <div class="layout">
+
+
+        <!-- NOVA INVESTIGAÇÃO -->
+
+        <div
+          class="panel"
+          id="nova"
+        >
+
+          <h2>
+            Nova investigação
+          </h2>
+
+
+          <div class="formgrid">
+
+
+            <div>
+
+              <label>
+                Investigado
+              </label>
+
+              <input
+                id="nome"
+                placeholder="Nome completo"
+              >
+
+            </div>
+
+
+            <div>
+
+              <label>
+                CPF / CNPJ
+              </label>
+
+              <input
+                id="documento"
+                placeholder="Documento"
+              >
+
+            </div>
+
+
+            <div>
+
+              <label>
+                Número do processo
+              </label>
+
+              <input
+                id="processo"
+                placeholder="0000000-00.0000.0.00.0000"
+              >
+
+            </div>
+
+
+            <div>
+
+              <label>
+                Advogado responsável
+              </label>
+
+              <input
+                id="advogado"
+                placeholder="Nome do advogado"
+              >
+
+            </div>
+
+
+            <div class="full">
+
+              <label>
+                Fontes / diligências
+              </label>
+
+
+              <div class="sources">
+
+                <label class="check">
+
+                  <input
+                    type="checkbox"
+                    value="Imóveis"
+                  >
+
+                  Imóveis
+
+                </label>
+
+
+                <label class="check">
+
+                  <input
+                    type="checkbox"
+                    value="Empresas"
+                  >
+
+                  Empresas
+
+                </label>
+
+
+                <label class="check">
+
+                  <input
+                    type="checkbox"
+                    value="Veículos"
+                  >
+
+                  Veículos
+
+                </label>
+
+
+                <label class="check">
+
+                  <input
+                    type="checkbox"
+                    value="Processos judiciais"
+                  >
+
+                  Processos judiciais
+
+                </label>
+
+
+                <label class="check">
+
+                  <input
+                    type="checkbox"
+                    value="Redes sociais / OSINT"
+                  >
+
+                  Redes sociais / OSINT
+
+                </label>
+
+
+                <label class="check">
+
+                  <input
+                    type="checkbox"
+                    value="Outras fontes"
+                  >
+
+                  Outras fontes
+
+                </label>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <button
+            class="btn"
+            onclick="salvar()"
+          >
+            Salvar investigação
+          </button>
+
+
+          <button
+            class="btn btn-secondary"
+            style="margin-left:6px"
+            onclick="limpar()"
+          >
+            Limpar
+          </button>
+
+
+          <div
+            class="status"
+            id="status"
+          ></div>
+
+        </div>
+
+
+        <!-- INVESTIGAÇÕES RECENTES -->
+
+        <div
+          class="panel"
+          id="recentes"
+        >
+
+          <h2>
+            Investigações recentes
+          </h2>
+
+          <div
+            class="recent"
+            id="lista"
+          ></div>
+
+        </div>
+
+      </div>
 
     </div>
 
 
-    <div class="stats">
+    <!-- =========================
+         TELA DA INVESTIGAÇÃO
+    ========================= -->
 
-      <div class="stat">
+    <div id="investigacaoScreen">
 
-        <div class="label">
-          Investigações
+
+      <div class="investigacao-header">
+
+        <div>
+
+          <h1 id="investigacaoTitulo">
+            Investigação
+          </h1>
+
+          <p id="investigacaoSubtitulo">
+            Dados da investigação
+          </p>
+
         </div>
 
-        <div
-          class="number"
-          id="total"
-        >
-          0
-        </div>
 
-      </div>
+        <div class="investigacao-actions">
 
+          <button
+            class="btn btn-secondary"
+            onclick="mostrarDashboard()"
+          >
+            ← Voltar
+          </button>
 
-      <div class="stat">
+          <button
+            class="btn btn-danger"
+            id="botaoExcluirInvestigacao"
+          >
+            Excluir
+          </button>
 
-        <div class="label">
-          Em andamento
-        </div>
-
-        <div
-          class="number"
-          id="andamento"
-        >
-          0
-        </div>
-
-      </div>
-
-
-      <div class="stat">
-
-        <div class="label">
-          Fontes pesquisadas
-        </div>
-
-        <div
-          class="number"
-          id="fontes"
-        >
-          0
         </div>
 
       </div>
 
 
-      <div class="stat">
-
-        <div class="label">
-          Relatórios
-        </div>
-
-        <div class="number">
-          0
-        </div>
-
-      </div>
-
-    </div>
+      <div class="investigacao-grid">
 
 
-    <div class="layout">
+        <!-- DADOS BÁSICOS -->
 
-      <div
-        class="panel"
-        id="nova"
-      >
+        <div class="info-card">
 
-        <h2>
-          Nova investigação
-        </h2>
+          <h2>
+            Dados da investigação
+          </h2>
 
 
-        <div class="formgrid">
-
-          <div>
-
-            <label>
-              Investigado
-            </label>
-
-            <input
-              id="nome"
-              placeholder="Nome completo"
-            >
-
-          </div>
+          <div class="info-grid">
 
 
-          <div>
+            <div class="info-box">
 
-            <label>
-              CPF / CNPJ
-            </label>
+              <div class="info-label">
+                Investigado
+              </div>
 
-            <input
-              id="documento"
-              placeholder="Documento"
-            >
+              <div
+                class="info-value"
+                id="detalheNome"
+              >
+                —
+              </div>
 
-          </div>
-
-
-          <div>
-
-            <label>
-              Número do processo
-            </label>
-
-            <input
-              id="processo"
-              placeholder="0000000-00.0000.0.00.0000"
-            >
-
-          </div>
+            </div>
 
 
-          <div>
+            <div class="info-box">
 
-            <label>
-              Advogado responsável
-            </label>
+              <div class="info-label">
+                CPF / CNPJ
+              </div>
 
-            <input
-              id="advogado"
-              placeholder="Nome do advogado"
-            >
+              <div
+                class="info-value"
+                id="detalheDocumento"
+              >
+                —
+              </div>
 
-          </div>
-
-
-          <div class="full">
-
-            <label>
-              Fontes / diligências
-            </label>
+            </div>
 
 
-            <div class="sources">
+            <div class="info-box">
 
-              <label class="check">
-                <input
-                  type="checkbox"
-                  value="Imóveis"
-                >
-                Imóveis
-              </label>
+              <div class="info-label">
+                Número do processo
+              </div>
 
+              <div
+                class="info-value"
+                id="detalheProcesso"
+              >
+                —
+              </div>
 
-              <label class="check">
-                <input
-                  type="checkbox"
-                  value="Empresas"
-                >
-                Empresas
-              </label>
+            </div>
 
 
-              <label class="check">
-                <input
-                  type="checkbox"
-                  value="Veículos"
-                >
-                Veículos
-              </label>
+            <div class="info-box">
+
+              <div class="info-label">
+                Advogado responsável
+              </div>
+
+              <div
+                class="info-value"
+                id="detalheAdvogado"
+              >
+                —
+              </div>
+
+            </div>
 
 
-              <label class="check">
-                <input
-                  type="checkbox"
-                  value="Processos judiciais"
-                >
-                Processos judiciais
-              </label>
+            <div class="info-box full">
+
+              <div class="info-label">
+                Data de criação
+              </div>
+
+              <div
+                class="info-value"
+                id="detalheData"
+              >
+                —
+              </div>
+
+            </div>
 
 
-              <label class="check">
-                <input
-                  type="checkbox"
-                  value="Redes sociais / OSINT"
-                >
-                Redes sociais / OSINT
-              </label>
+            <div class="info-box full">
 
+              <div class="info-label">
+                Fontes / diligências selecionadas
+              </div>
 
-              <label class="check">
-                <input
-                  type="checkbox"
-                  value="Outras fontes"
-                >
-                Outras fontes
-              </label>
+              <div
+                class="source-list"
+                id="detalheFontes"
+              >
+              </div>
 
             </div>
 
@@ -752,48 +1200,122 @@ input{
         </div>
 
 
-        <button
-          class="btn"
-          onclick="salvar()"
-        >
-          Salvar investigação
-        </button>
+        <!-- MÓDULOS FUTUROS -->
+
+        <div class="info-card">
+
+          <h2>
+            Módulos da investigação
+          </h2>
 
 
-        <button
-          class="btn"
-          style="background:#64748b;margin-left:6px"
-          onclick="limpar()"
-        >
-          Limpar
-        </button>
+          <div class="future-list">
 
 
-        <div
-          class="status"
-          id="status"
-        ></div>
+            <div class="future-item">
 
-      </div>
+              <strong>
+                🏠 Imóveis
+              </strong>
+
+              <span>
+                Levantamento patrimonial imobiliário
+              </span>
+
+            </div>
 
 
-      <div
-        class="panel"
-        id="recentes"
-      >
+            <div class="future-item">
 
-        <h2>
-          Investigações recentes
-        </h2>
+              <strong>
+                🚗 Veículos
+              </strong>
 
-        <div
-          class="recent"
-          id="lista"
-        ></div>
+              <span>
+                Pesquisa de veículos vinculados
+              </span>
+
+            </div>
+
+
+            <div class="future-item">
+
+              <strong>
+                🏢 Empresas
+              </strong>
+
+              <span>
+                Participações e vínculos empresariais
+              </span>
+
+            </div>
+
+
+            <div class="future-item">
+
+              <strong>
+                ⚖️ Processos judiciais
+              </strong>
+
+              <span>
+                Levantamento de processos
+              </span>
+
+            </div>
+
+
+            <div class="future-item">
+
+              <strong>
+                🔎 OSINT
+              </strong>
+
+              <span>
+                Inteligência e fontes abertas
+              </span>
+
+            </div>
+
+
+            <div class="future-item">
+
+              <strong>
+                📎 Documentos
+              </strong>
+
+              <span>
+                Documentos e evidências
+              </span>
+
+            </div>
+
+
+            <div class="future-item">
+
+              <strong>
+                📝 Anotações
+              </strong>
+
+              <span>
+                Observações da investigação
+              </span>
+
+            </div>
+
+          </div>
+
+
+          <div class="badge">
+            Estrutura preparada para as próximas etapas
+          </div>
+
+        </div>
+
 
       </div>
 
     </div>
+
 
   </section>
 
@@ -802,10 +1324,18 @@ input{
 
 <script>
 
+
+/* =========================
+   API
+========================= */
+
 const API =
   "https://api.meuinvestigador.com.br";
 
+
 let investigacoes = [];
+
+let investigacaoAtual = null;
 
 
 /* =========================
@@ -816,44 +1346,60 @@ async function entrar(event){
 
   event.preventDefault();
 
+
   const email =
-    document.getElementById("loginEmail")
-      .value.trim();
+    document
+      .getElementById("loginEmail")
+      .value
+      .trim();
+
 
   const senha =
-    document.getElementById("loginSenha")
+    document
+      .getElementById("loginSenha")
       .value;
 
+
   const botao =
-    document.getElementById("loginButton");
+    document
+      .getElementById("loginButton");
+
 
   const status =
-    document.getElementById("loginStatus");
+    document
+      .getElementById("loginStatus");
+
 
   botao.disabled = true;
+
   botao.textContent = "Entrando...";
 
   status.style.display = "none";
 
+
   try{
 
+
     const resposta =
-      await fetch(API + "/login",{
+      await fetch(
+        API + "/login",
+        {
 
-        method:"POST",
+          method:"POST",
 
-        headers:{
-          "Content-Type":"application/json"
-        },
+          headers:{
+            "Content-Type":"application/json"
+          },
 
-        credentials:"include",
+          credentials:"include",
 
-        body:JSON.stringify({
-          email,
-          senha
-        })
+          body:JSON.stringify({
+            email,
+            senha
+          })
 
-      });
+        }
+      );
 
 
     const resultado =
@@ -870,28 +1416,36 @@ async function entrar(event){
     }
 
 
-    document.getElementById("loginScreen")
+    document
+      .getElementById("loginScreen")
       .style.display = "none";
 
-    document.getElementById("app")
+
+    document
+      .getElementById("app")
       .style.display = "flex";
 
 
     await carregar();
 
+
   }catch(erro){
 
     console.error(erro);
+
 
     status.textContent =
       erro.message ||
       "Não foi possível entrar.";
 
+
     status.style.display = "block";
+
 
   }finally{
 
     botao.disabled = false;
+
     botao.textContent = "Entrar";
 
   }
@@ -906,6 +1460,7 @@ async function entrar(event){
 async function verificarSessao(){
 
   try{
+
 
     const resposta =
       await fetch(
@@ -922,13 +1477,19 @@ async function verificarSessao(){
       investigacoes =
         await resposta.json();
 
-      document.getElementById("loginScreen")
+
+      document
+        .getElementById("loginScreen")
         .style.display = "none";
 
-      document.getElementById("app")
+
+      document
+        .getElementById("app")
         .style.display = "flex";
 
+
       render();
+
 
       return;
 
@@ -936,6 +1497,7 @@ async function verificarSessao(){
 
 
     mostrarLogin();
+
 
   }catch(erro){
 
@@ -948,12 +1510,19 @@ async function verificarSessao(){
 }
 
 
+/* =========================
+   MOSTRAR LOGIN
+========================= */
+
 function mostrarLogin(){
 
-  document.getElementById("loginScreen")
+  document
+    .getElementById("loginScreen")
     .style.display = "flex";
 
-  document.getElementById("app")
+
+  document
+    .getElementById("app")
     .style.display = "none";
 
 }
@@ -963,23 +1532,39 @@ function mostrarLogin(){
    SAIR
 ========================= */
 
-function sair(){
+async function sair(){
 
-  /*
-   * Neste momento o Worker não possui
-   * uma rota /logout.
-   *
-   * Portanto, apenas voltamos para
-   * a tela de login.
-   */
+  try{
+
+    await fetch(
+      API + "/logout",
+      {
+        method:"POST",
+        credentials:"include"
+      }
+    );
+
+  }catch(erro){
+
+    console.error(erro);
+
+  }
+
 
   investigacoes = [];
 
-  document.getElementById("loginEmail")
+  investigacaoAtual = null;
+
+
+  document
+    .getElementById("loginEmail")
     .value = "";
 
-  document.getElementById("loginSenha")
+
+  document
+    .getElementById("loginSenha")
     .value = "";
+
 
   mostrarLogin();
 
@@ -993,20 +1578,24 @@ function sair(){
 function msg(texto, erro=false){
 
   const elemento =
-    document.getElementById("status");
+    document
+      .getElementById("status");
 
-  elemento.style.display="block";
 
-  elemento.textContent=texto;
+  elemento.style.display = "block";
+
+  elemento.textContent = texto;
+
 
   elemento.classList.toggle(
     "error",
     erro
   );
 
+
   setTimeout(()=>{
 
-    elemento.style.display="none";
+    elemento.style.display = "none";
 
   },3000);
 
@@ -1025,10 +1614,12 @@ function limpar(){
     "processo",
     "advogado"
   ]
+
   .forEach(id=>{
 
-    document.getElementById(id)
-      .value="";
+    document
+      .getElementById(id)
+      .value = "";
 
   });
 
@@ -1037,7 +1628,7 @@ function limpar(){
     .querySelectorAll(".check input")
     .forEach(x=>{
 
-      x.checked=false;
+      x.checked = false;
 
     });
 
@@ -1052,14 +1643,21 @@ function formatarData(data){
 
   if(!data) return "";
 
+
   const d =
     new Date(data);
 
-  if(Number.isNaN(d.getTime())){
+
+  if(
+    Number.isNaN(
+      d.getTime()
+    )
+  ){
 
     return data;
 
   }
+
 
   return d.toLocaleDateString(
     "pt-BR"
@@ -1081,7 +1679,7 @@ function fontesArray(fontes){
   }
 
 
-  if(typeof fontes==="string"){
+  if(typeof fontes === "string"){
 
     try{
 
@@ -1108,6 +1706,7 @@ function fontesArray(fontes){
 async function carregar(){
 
   try{
+
 
     const resposta =
       await fetch(
@@ -1143,9 +1742,11 @@ async function carregar(){
 
     render();
 
+
   }catch(erro){
 
     console.error(erro);
+
 
     msg(
       "Não foi possível carregar as investigações.",
@@ -1166,7 +1767,8 @@ async function salvar(){
   const nome =
     document
       .getElementById("nome")
-      .value.trim();
+      .value
+      .trim();
 
 
   if(!nome){
@@ -1217,6 +1819,7 @@ async function salvar(){
 
   try{
 
+
     const resposta =
       await fetch(
         API + "/investigacoes",
@@ -1263,6 +1866,7 @@ async function salvar(){
 
     limpar();
 
+
     await carregar();
 
 
@@ -1274,6 +1878,7 @@ async function salvar(){
   }catch(erro){
 
     console.error(erro);
+
 
     msg(
       erro.message ||
@@ -1287,7 +1892,7 @@ async function salvar(){
 
 
 /* =========================
-   ABRIR
+   ABRIR INVESTIGAÇÃO
 ========================= */
 
 function abrir(id){
@@ -1302,45 +1907,142 @@ function abrir(id){
   if(!x) return;
 
 
-  document.getElementById("nome")
-    .value =
-      x.nome || "";
+  investigacaoAtual = x;
 
 
-  document.getElementById("documento")
-    .value =
-      x.documento || "";
+  document
+    .getElementById("dashboardScreen")
+    .style.display = "none";
 
 
-  document.getElementById("processo")
-    .value =
-      x.processo || "";
+  document
+    .getElementById("investigacaoScreen")
+    .style.display = "block";
 
 
-  document.getElementById("advogado")
-    .value =
-      x.advogado || "";
+  document
+    .getElementById("investigacaoTitulo")
+    .textContent =
+      x.nome || "Investigação";
+
+
+  document
+    .getElementById("investigacaoSubtitulo")
+    .textContent =
+      "Investigação #" +
+      x.id +
+      " · criada em " +
+      formatarData(x.data_criacao);
+
+
+  document
+    .getElementById("detalheNome")
+    .textContent =
+      x.nome || "Não informado";
+
+
+  document
+    .getElementById("detalheDocumento")
+    .textContent =
+      x.documento || "Não informado";
+
+
+  document
+    .getElementById("detalheProcesso")
+    .textContent =
+      x.processo || "Não informado";
+
+
+  document
+    .getElementById("detalheAdvogado")
+    .textContent =
+      x.advogado || "Não informado";
+
+
+  document
+    .getElementById("detalheData")
+    .textContent =
+      formatarData(x.data_criacao) ||
+      "Não informado";
 
 
   const fontes =
     fontesArray(x.fontes);
 
 
+  const container =
+    document
+      .getElementById("detalheFontes");
+
+
+  if(!fontes.length){
+
+    container.innerHTML =
+      '<div class="empty-source">' +
+      'Nenhuma fonte ou diligência selecionada.' +
+      '</div>';
+
+  }else{
+
+    container.innerHTML =
+      fontes
+        .map(
+          fonte =>
+            '<span class="source-tag">' +
+            esc(fonte) +
+            '</span>'
+        )
+        .join("");
+
+  }
+
+
   document
-    .querySelectorAll(".check input")
-    .forEach(c=>{
+    .getElementById(
+      "botaoExcluirInvestigacao"
+    )
+    .onclick =
+      function(){
 
-      c.checked =
-        fontes.includes(c.value);
+        excluir(x.id);
 
-    });
+      };
+
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
+
+}
+
+
+/* =========================
+   VOLTAR AO DASHBOARD
+========================= */
+
+function mostrarDashboard(){
+
+  investigacaoAtual = null;
 
 
   document
-    .getElementById("nova")
-    .scrollIntoView({
-      behavior:"smooth"
-    });
+    .getElementById("investigacaoScreen")
+    .style.display = "none";
+
+
+  document
+    .getElementById("dashboardScreen")
+    .style.display = "block";
+
+
+  render();
+
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
 
 }
 
@@ -1371,6 +2073,7 @@ async function excluir(id){
 
 
   try{
+
 
     const resposta =
       await fetch(
@@ -1408,7 +2111,20 @@ async function excluir(id){
     }
 
 
+    investigacaoAtual = null;
+
+
     await carregar();
+
+
+    document
+      .getElementById("investigacaoScreen")
+      .style.display = "none";
+
+
+    document
+      .getElementById("dashboardScreen")
+      .style.display = "block";
 
 
     msg(
@@ -1419,6 +2135,7 @@ async function excluir(id){
   }catch(erro){
 
     console.error(erro);
+
 
     msg(
       erro.message ||
@@ -1480,21 +2197,22 @@ function render(){
 
   document
     .getElementById("total")
-    .textContent=total;
+    .textContent = total;
 
 
   document
     .getElementById("andamento")
-    .textContent=total;
+    .textContent = total;
 
 
   document
     .getElementById("fontes")
-    .textContent=fontes;
+    .textContent = fontes;
 
 
   const lista =
-    document.getElementById("lista");
+    document
+      .getElementById("lista");
 
 
   if(!investigacoes.length){
@@ -1505,6 +2223,7 @@ function render(){
       'Comece criando uma nova.' +
       '</div>';
 
+
     return;
 
   }
@@ -1514,6 +2233,7 @@ function render(){
     investigacoes
       .slice(0,8)
       .map(x=>{
+
 
         const processo =
           x.processo
@@ -1577,5 +2297,5 @@ verificarSessao();
 </script>
 
 </body>
+
 </html>
-```
