@@ -1348,18 +1348,281 @@ input{
 
     <div class="card">
 
-      <h2>Adicionar imóvel</h2>
+  <h2>🏠 Cadastro do imóvel</h2>
 
-      <p>
-        Em breve, vamos cadastrar e organizar aqui os imóveis
-        encontrados durante a investigação.
-      </p>
+  <p>
+    Cadastre os dados do imóvel encontrado durante a investigação.
+  </p>
 
-      <div class="badge">
-        Módulo em construção
-      </div>
+
+  <div class="form-grid">
+
+    <div class="form-group">
+
+      <label for="imovelTipo">
+        Tipo do imóvel
+      </label>
+
+      <select id="imovelTipo">
+
+        <option value="">
+          Selecione
+        </option>
+
+        <option value="Casa">
+          Casa
+        </option>
+
+        <option value="Apartamento">
+          Apartamento
+        </option>
+
+        <option value="Terreno">
+          Terreno
+        </option>
+
+        <option value="Sala comercial">
+          Sala comercial
+        </option>
+
+        <option value="Galpão">
+          Galpão
+        </option>
+
+        <option value="Outro">
+          Outro
+        </option>
+
+      </select>
 
     </div>
+
+
+    <div class="form-group">
+
+      <label for="imovelMatricula">
+        Matrícula
+      </label>
+
+      <input
+        type="text"
+        id="imovelMatricula"
+        placeholder="Ex.: 12345"
+      >
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label for="imovelCartorio">
+        Cartório
+      </label>
+
+      <input
+        type="text"
+        id="imovelCartorio"
+        placeholder="Ex.: 14º Cartório de Registro de Imóveis"
+      >
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label for="imovelCep">
+        CEP
+      </label>
+
+      <input
+        type="text"
+        id="imovelCep"
+        placeholder="00000-000"
+      >
+
+    </div>
+
+
+    <div class="form-group form-group-full">
+
+      <label for="imovelEndereco">
+        Endereço
+      </label>
+
+      <input
+        type="text"
+        id="imovelEndereco"
+        placeholder="Rua, avenida, estrada..."
+      >
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label for="imovelNumero">
+        Número
+      </label>
+
+      <input
+        type="text"
+        id="imovelNumero"
+        placeholder="Número"
+      >
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label for="imovelComplemento">
+        Complemento
+      </label>
+
+      <input
+        type="text"
+        id="imovelComplemento"
+        placeholder="Apartamento, bloco, sala..."
+      >
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label for="imovelBairro">
+        Bairro
+      </label>
+
+      <input
+        type="text"
+        id="imovelBairro"
+        placeholder="Bairro"
+      >
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label for="imovelCidade">
+        Cidade
+      </label>
+
+      <input
+        type="text"
+        id="imovelCidade"
+        placeholder="Cidade"
+      >
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label for="imovelUf">
+        UF
+      </label>
+
+      <select id="imovelUf">
+
+        <option value="">
+          Selecione
+        </option>
+
+        <option>AC</option>
+        <option>AL</option>
+        <option>AP</option>
+        <option>AM</option>
+        <option>BA</option>
+        <option>CE</option>
+        <option>DF</option>
+        <option>ES</option>
+        <option>GO</option>
+        <option>MA</option>
+        <option>MT</option>
+        <option>MS</option>
+        <option>MG</option>
+        <option>PA</option>
+        <option>PB</option>
+        <option>PR</option>
+        <option>PE</option>
+        <option>PI</option>
+        <option>RJ</option>
+        <option>RN</option>
+        <option>RS</option>
+        <option>RO</option>
+        <option>RR</option>
+        <option>SC</option>
+        <option>SP</option>
+        <option>SE</option>
+        <option>TO</option>
+
+      </select>
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label for="imovelValor">
+        Valor aproximado
+      </label>
+
+      <input
+        type="text"
+        id="imovelValor"
+        placeholder="R$ 0,00"
+      >
+
+    </div>
+
+
+    <div class="form-group form-group-full">
+
+      <label for="imovelFonte">
+        Fonte da informação
+      </label>
+
+      <input
+        type="text"
+        id="imovelFonte"
+        placeholder="Ex.: matrícula, processo, consulta pública..."
+      >
+
+    </div>
+
+
+    <div class="form-group form-group-full">
+
+      <label for="imovelObservacoes">
+        Observações
+      </label>
+
+      <textarea
+        id="imovelObservacoes"
+        rows="5"
+        placeholder="Informações adicionais sobre o imóvel..."
+      ></textarea>
+
+    </div>
+
+  </div>
+
+
+  <div style="margin-top: 24px;">
+
+    <button
+      type="button"
+      class="btn-primary"
+      onclick="alert('Cadastro do imóvel — próxima etapa.')"
+    >
+      💾 Salvar imóvel
+    </button>
+
+  </div>
+
+</div>
 
 
   </section>
