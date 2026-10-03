@@ -1,9 +1,10 @@
+```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Investigador — Dashboard</title>
+<title>Meu Investigador</title>
 
 <style>
 :root{
@@ -14,7 +15,7 @@
   --line:#e6eaf0;
   --primary:#315bea;
   --primary2:#2448c7;
-  --dark:#111827
+  --dark:#111827;
 }
 
 *{box-sizing:border-box}
@@ -23,12 +24,93 @@ body{
   margin:0;
   font-family:Inter,Arial,sans-serif;
   background:var(--bg);
-  color:var(--text)
+  color:var(--text);
 }
+
+/* LOGIN */
+
+#loginScreen{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:var(--bg);
+}
+
+.login-card{
+  width:100%;
+  max-width:420px;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:32px;
+  box-shadow:0 10px 30px rgba(0,0,0,.08);
+}
+
+.login-logo{
+  text-align:center;
+  font-size:25px;
+  font-weight:800;
+  margin-bottom:8px;
+}
+
+.login-logo span{
+  color:#315bea;
+}
+
+.login-subtitle{
+  text-align:center;
+  color:var(--muted);
+  margin-bottom:28px;
+}
+
+.login-card label{
+  display:block;
+  font-size:13px;
+  font-weight:700;
+  margin-bottom:6px;
+}
+
+.login-card input{
+  width:100%;
+  padding:12px;
+  border:1px solid #d5dbe5;
+  border-radius:8px;
+  font-size:14px;
+  margin-bottom:16px;
+}
+
+.login-button{
+  width:100%;
+  border:0;
+  border-radius:9px;
+  padding:12px 16px;
+  background:var(--primary);
+  color:#fff;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.login-button:hover{
+  background:var(--primary2);
+}
+
+.login-status{
+  display:none;
+  margin-top:15px;
+  padding:10px;
+  border-radius:8px;
+  background:#fff0f0;
+  color:#b42318;
+  font-size:13px;
+}
+
+/* APP */
 
 .app{
   display:flex;
-  min-height:100vh
+  min-height:100vh;
 }
 
 .sidebar{
@@ -37,16 +119,18 @@ body{
   color:#fff;
   padding:24px 16px;
   position:fixed;
-  inset:0 auto 0 0
+  inset:0 auto 0 0;
 }
 
 .logo{
   font-size:20px;
   font-weight:800;
-  padding:8px 12px 28px
+  padding:8px 12px 28px;
 }
 
-.logo span{color:#7da0ff}
+.logo span{
+  color:#7da0ff;
+}
 
 .nav a{
   display:block;
@@ -54,43 +138,60 @@ body{
   text-decoration:none;
   padding:12px 14px;
   border-radius:9px;
-  margin:4px 0
+  margin:4px 0;
 }
 
 .nav a.active,
 .nav a:hover{
   background:#202b42;
-  color:#fff
+  color:#fff;
 }
 
 .sidebar small{
   position:absolute;
   bottom:20px;
   left:28px;
-  color:#7f8ba0
+  color:#7f8ba0;
+}
+
+.logout{
+  position:absolute;
+  bottom:52px;
+  left:16px;
+  right:16px;
+  border:0;
+  background:#202b42;
+  color:#fff;
+  padding:10px;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+.logout:hover{
+  background:#2b3852;
 }
 
 .content{
   margin-left:245px;
   width:calc(100% - 245px);
-  padding:28px 34px
+  padding:28px 34px;
 }
 
 .top{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  margin-bottom:25px
+  margin-bottom:25px;
 }
 
 .top h1{
   margin:0;
-  font-size:26px
+  font-size:26px;
 }
 
 .top p{
   margin:5px 0 0;
-  color:var(--muted)
+  color:var(--muted);
 }
 
 .btn{
@@ -100,18 +201,18 @@ body{
   background:var(--primary);
   color:#fff;
   font-weight:700;
-  cursor:pointer
+  cursor:pointer;
 }
 
 .btn:hover{
-  background:var(--primary2)
+  background:var(--primary2);
 }
 
 .stats{
   display:grid;
   grid-template-columns:repeat(4,1fr);
   gap:16px;
-  margin-bottom:22px
+  margin-bottom:22px;
 }
 
 .stat,
@@ -119,42 +220,42 @@ body{
   background:var(--card);
   border:1px solid var(--line);
   border-radius:14px;
-  padding:20px
+  padding:20px;
 }
 
 .stat .label{
   color:var(--muted);
-  font-size:13px
+  font-size:13px;
 }
 
 .stat .number{
   font-size:28px;
   font-weight:800;
-  margin-top:8px
+  margin-top:8px;
 }
 
 .layout{
   display:grid;
   grid-template-columns:1.35fr .65fr;
-  gap:20px
+  gap:20px;
 }
 
 .panel h2{
   font-size:17px;
-  margin:0 0 18px
+  margin:0 0 18px;
 }
 
 .formgrid{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:14px
+  gap:14px;
 }
 
 label{
   font-size:13px;
   font-weight:700;
   display:block;
-  margin-bottom:6px
+  margin-bottom:6px;
 }
 
 input{
@@ -162,18 +263,18 @@ input{
   padding:11px;
   border:1px solid #d5dbe5;
   border-radius:8px;
-  font-size:14px
+  font-size:14px;
 }
 
 .full{
-  grid-column:1/-1
+  grid-column:1/-1;
 }
 
 .sources{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:8px;
-  margin-top:10px
+  margin-top:10px;
 }
 
 .check{
@@ -181,39 +282,39 @@ input{
   padding:10px;
   border-radius:8px;
   font-size:13px;
-  color:#465066
+  color:#465066;
 }
 
 .check input{
   width:auto;
-  margin-right:7px
+  margin-right:7px;
 }
 
 .recent{
   display:flex;
   flex-direction:column;
-  gap:10px
+  gap:10px;
 }
 
 .item{
   border:1px solid var(--line);
   border-radius:10px;
-  padding:13px
+  padding:13px;
 }
 
 .item strong{
-  display:block
+  display:block;
 }
 
 .item span{
   font-size:12px;
-  color:var(--muted)
+  color:var(--muted);
 }
 
 .item-actions{
   margin-top:10px;
   display:flex;
-  gap:7px
+  gap:7px;
 }
 
 .mini{
@@ -223,17 +324,17 @@ input{
   cursor:pointer;
   background:#edf1ff;
   color:#2947a5;
-  font-size:12px
+  font-size:12px;
 }
 
 .mini.del{
   background:#fff0f0;
-  color:#b42318
+  color:#b42318;
 }
 
 .empty{
   color:var(--muted);
-  font-size:14px
+  font-size:14px;
 }
 
 .status{
@@ -243,68 +344,71 @@ input{
   border-radius:8px;
   background:#ecfdf3;
   color:#087443;
-  font-size:13px
+  font-size:13px;
 }
 
 .status.error{
   background:#fff0f0;
-  color:#b42318
+  color:#b42318;
 }
 
 @media(max-width:900px){
+
   .stats{
-    grid-template-columns:1fr 1fr
+    grid-template-columns:1fr 1fr;
   }
 
   .layout{
-    grid-template-columns:1fr
+    grid-template-columns:1fr;
   }
 }
 
 @media(max-width:650px){
+
   .sidebar{
     width:70px;
-    padding:15px 8px
+    padding:15px 8px;
   }
 
   .logo{
     font-size:0;
-    padding:8px
+    padding:8px;
   }
 
   .logo span{
-    font-size:18px
+    font-size:18px;
   }
 
   .nav a{
     font-size:0;
-    text-align:center
+    text-align:center;
   }
 
   .nav a:first-letter{
-    font-size:18px
+    font-size:18px;
   }
 
-  .sidebar small{
-    display:none
+  .sidebar small,
+  .logout{
+    display:none;
   }
 
   .content{
     margin-left:70px;
     width:calc(100% - 70px);
-    padding:20px
+    padding:20px;
   }
 
   .stats{
-    grid-template-columns:1fr 1fr
+    grid-template-columns:1fr 1fr;
   }
 
   .formgrid{
-    grid-template-columns:1fr
+    grid-template-columns:1fr;
   }
 
   .full{
-    grid-column:auto
+    grid-column:auto;
   }
 }
 </style>
@@ -312,171 +416,579 @@ input{
 
 <body>
 
-<div class="app">
+<!-- LOGIN -->
 
-<aside class="sidebar">
+<div id="loginScreen">
 
-<div class="logo">
-INVESTIGADOR<span>.</span>
-</div>
+  <div class="login-card">
 
-<nav class="nav">
-<a class="active" href="#">▣ &nbsp; Dashboard</a>
-<a href="#nova">＋ &nbsp; Nova investigação</a>
-<a href="#recentes">◷ &nbsp; Investigações</a>
-<a href="#">▤ &nbsp; Relatórios</a>
-<a href="#">⚙ &nbsp; Configurações</a>
-</nav>
+    <div class="login-logo">
+      INVESTIGADOR<span>.</span>
+    </div>
 
-<small>Versão 4.0 — API + D1</small>
+    <div class="login-subtitle">
+      Acesse sua área de investigações
+    </div>
 
-</aside>
+    <form onsubmit="entrar(event)">
 
-<section class="content">
+      <label>E-mail</label>
 
-<div class="top">
+      <input
+        id="loginEmail"
+        type="email"
+        placeholder="seu@email.com"
+        autocomplete="email"
+        required
+      >
 
-<div>
-<h1>Dashboard</h1>
-<p>Central de investigações patrimoniais</p>
-</div>
+      <label>Senha</label>
 
-<button class="btn" onclick="document.getElementById('nome').focus()">
-+ Nova investigação
-</button>
+      <input
+        id="loginSenha"
+        type="password"
+        placeholder="Sua senha"
+        autocomplete="current-password"
+        required
+      >
 
-</div>
+      <button
+        class="login-button"
+        type="submit"
+        id="loginButton"
+      >
+        Entrar
+      </button>
 
-<div class="stats">
+    </form>
 
-<div class="stat">
-<div class="label">Investigações</div>
-<div class="number" id="total">0</div>
-</div>
+    <div
+      class="login-status"
+      id="loginStatus">
+    </div>
 
-<div class="stat">
-<div class="label">Em andamento</div>
-<div class="number" id="andamento">0</div>
-</div>
-
-<div class="stat">
-<div class="label">Fontes pesquisadas</div>
-<div class="number" id="fontes">0</div>
-</div>
-
-<div class="stat">
-<div class="label">Relatórios</div>
-<div class="number">0</div>
-</div>
+  </div>
 
 </div>
 
-<div class="layout">
 
-<div class="panel" id="nova">
+<!-- DASHBOARD -->
 
-<h2>Nova investigação</h2>
+<div
+  class="app"
+  id="app"
+  style="display:none"
+>
 
-<div class="formgrid">
+  <aside class="sidebar">
 
-<div>
-<label>Investigado</label>
-<input id="nome" placeholder="Nome completo">
+    <div class="logo">
+      INVESTIGADOR<span>.</span>
+    </div>
+
+    <nav class="nav">
+
+      <a class="active" href="#">
+        ▣ &nbsp; Dashboard
+      </a>
+
+      <a href="#nova">
+        ＋ &nbsp; Nova investigação
+      </a>
+
+      <a href="#recentes">
+        ◷ &nbsp; Investigações
+      </a>
+
+      <a href="#">
+        ▤ &nbsp; Relatórios
+      </a>
+
+      <a href="#">
+        ⚙ &nbsp; Configurações
+      </a>
+
+    </nav>
+
+    <button
+      class="logout"
+      onclick="sair()"
+    >
+      Sair
+    </button>
+
+    <small>
+      Versão 5.0 — API + D1
+    </small>
+
+  </aside>
+
+
+  <section class="content">
+
+    <div class="top">
+
+      <div>
+
+        <h1>Dashboard</h1>
+
+        <p>
+          Central de investigações patrimoniais
+        </p>
+
+      </div>
+
+      <button
+        class="btn"
+        onclick="document.getElementById('nome').focus()"
+      >
+        + Nova investigação
+      </button>
+
+    </div>
+
+
+    <div class="stats">
+
+      <div class="stat">
+
+        <div class="label">
+          Investigações
+        </div>
+
+        <div
+          class="number"
+          id="total"
+        >
+          0
+        </div>
+
+      </div>
+
+
+      <div class="stat">
+
+        <div class="label">
+          Em andamento
+        </div>
+
+        <div
+          class="number"
+          id="andamento"
+        >
+          0
+        </div>
+
+      </div>
+
+
+      <div class="stat">
+
+        <div class="label">
+          Fontes pesquisadas
+        </div>
+
+        <div
+          class="number"
+          id="fontes"
+        >
+          0
+        </div>
+
+      </div>
+
+
+      <div class="stat">
+
+        <div class="label">
+          Relatórios
+        </div>
+
+        <div class="number">
+          0
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="layout">
+
+      <div
+        class="panel"
+        id="nova"
+      >
+
+        <h2>
+          Nova investigação
+        </h2>
+
+
+        <div class="formgrid">
+
+          <div>
+
+            <label>
+              Investigado
+            </label>
+
+            <input
+              id="nome"
+              placeholder="Nome completo"
+            >
+
+          </div>
+
+
+          <div>
+
+            <label>
+              CPF / CNPJ
+            </label>
+
+            <input
+              id="documento"
+              placeholder="Documento"
+            >
+
+          </div>
+
+
+          <div>
+
+            <label>
+              Número do processo
+            </label>
+
+            <input
+              id="processo"
+              placeholder="0000000-00.0000.0.00.0000"
+            >
+
+          </div>
+
+
+          <div>
+
+            <label>
+              Advogado responsável
+            </label>
+
+            <input
+              id="advogado"
+              placeholder="Nome do advogado"
+            >
+
+          </div>
+
+
+          <div class="full">
+
+            <label>
+              Fontes / diligências
+            </label>
+
+
+            <div class="sources">
+
+              <label class="check">
+                <input
+                  type="checkbox"
+                  value="Imóveis"
+                >
+                Imóveis
+              </label>
+
+
+              <label class="check">
+                <input
+                  type="checkbox"
+                  value="Empresas"
+                >
+                Empresas
+              </label>
+
+
+              <label class="check">
+                <input
+                  type="checkbox"
+                  value="Veículos"
+                >
+                Veículos
+              </label>
+
+
+              <label class="check">
+                <input
+                  type="checkbox"
+                  value="Processos judiciais"
+                >
+                Processos judiciais
+              </label>
+
+
+              <label class="check">
+                <input
+                  type="checkbox"
+                  value="Redes sociais / OSINT"
+                >
+                Redes sociais / OSINT
+              </label>
+
+
+              <label class="check">
+                <input
+                  type="checkbox"
+                  value="Outras fontes"
+                >
+                Outras fontes
+              </label>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <button
+          class="btn"
+          onclick="salvar()"
+        >
+          Salvar investigação
+        </button>
+
+
+        <button
+          class="btn"
+          style="background:#64748b;margin-left:6px"
+          onclick="limpar()"
+        >
+          Limpar
+        </button>
+
+
+        <div
+          class="status"
+          id="status"
+        ></div>
+
+      </div>
+
+
+      <div
+        class="panel"
+        id="recentes"
+      >
+
+        <h2>
+          Investigações recentes
+        </h2>
+
+        <div
+          class="recent"
+          id="lista"
+        ></div>
+
+      </div>
+
+    </div>
+
+  </section>
+
 </div>
 
-<div>
-<label>CPF / CNPJ</label>
-<input id="documento" placeholder="Documento">
-</div>
-
-<div>
-<label>Número do processo</label>
-<input id="processo" placeholder="0000000-00.0000.0.00.0000">
-</div>
-
-<div>
-<label>Advogado responsável</label>
-<input id="advogado" placeholder="Nome do advogado">
-</div>
-
-<div class="full">
-
-<label>Fontes / diligências</label>
-
-<div class="sources">
-
-<label class="check">
-<input type="checkbox" value="Imóveis">
-Imóveis
-</label>
-
-<label class="check">
-<input type="checkbox" value="Empresas">
-Empresas
-</label>
-
-<label class="check">
-<input type="checkbox" value="Veículos">
-Veículos
-</label>
-
-<label class="check">
-<input type="checkbox" value="Processos judiciais">
-Processos judiciais
-</label>
-
-<label class="check">
-<input type="checkbox" value="Redes sociais / OSINT">
-Redes sociais / OSINT
-</label>
-
-<label class="check">
-<input type="checkbox" value="Outras fontes">
-Outras fontes
-</label>
-
-</div>
-
-</div>
-
-</div>
-
-<button class="btn" onclick="salvar()">
-Salvar investigação
-</button>
-
-<button
-class="btn"
-style="background:#64748b;margin-left:6px"
-onclick="limpar()">
-Limpar
-</button>
-
-<div class="status" id="status"></div>
-
-</div>
-
-<div class="panel" id="recentes">
-
-<h2>Investigações recentes</h2>
-
-<div class="recent" id="lista"></div>
-
-</div>
-
-</div>
-
-</section>
-
-</div>
 
 <script>
 
 const API =
-const API = "https://api.meuinvestigador.com.br";
+  "https://api.meuinvestigador.com.br";
 
 let investigacoes = [];
 
+
+/* =========================
+   LOGIN
+========================= */
+
+async function entrar(event){
+
+  event.preventDefault();
+
+  const email =
+    document.getElementById("loginEmail")
+      .value.trim();
+
+  const senha =
+    document.getElementById("loginSenha")
+      .value;
+
+  const botao =
+    document.getElementById("loginButton");
+
+  const status =
+    document.getElementById("loginStatus");
+
+  botao.disabled = true;
+  botao.textContent = "Entrando...";
+
+  status.style.display = "none";
+
+  try{
+
+    const resposta =
+      await fetch(API + "/login",{
+
+        method:"POST",
+
+        headers:{
+          "Content-Type":"application/json"
+        },
+
+        credentials:"include",
+
+        body:JSON.stringify({
+          email,
+          senha
+        })
+
+      });
+
+
+    const resultado =
+      await resposta.json();
+
+
+    if(!resposta.ok){
+
+      throw new Error(
+        resultado.erro ||
+        "E-mail ou senha inválidos."
+      );
+
+    }
+
+
+    document.getElementById("loginScreen")
+      .style.display = "none";
+
+    document.getElementById("app")
+      .style.display = "flex";
+
+
+    await carregar();
+
+  }catch(erro){
+
+    console.error(erro);
+
+    status.textContent =
+      erro.message ||
+      "Não foi possível entrar.";
+
+    status.style.display = "block";
+
+  }finally{
+
+    botao.disabled = false;
+    botao.textContent = "Entrar";
+
+  }
+
+}
+
+
+/* =========================
+   VERIFICAR SESSÃO
+========================= */
+
+async function verificarSessao(){
+
+  try{
+
+    const resposta =
+      await fetch(
+        API + "/investigacoes",
+        {
+          method:"GET",
+          credentials:"include"
+        }
+      );
+
+
+    if(resposta.ok){
+
+      investigacoes =
+        await resposta.json();
+
+      document.getElementById("loginScreen")
+        .style.display = "none";
+
+      document.getElementById("app")
+        .style.display = "flex";
+
+      render();
+
+      return;
+
+    }
+
+
+    mostrarLogin();
+
+  }catch(erro){
+
+    console.error(erro);
+
+    mostrarLogin();
+
+  }
+
+}
+
+
+function mostrarLogin(){
+
+  document.getElementById("loginScreen")
+    .style.display = "flex";
+
+  document.getElementById("app")
+    .style.display = "none";
+
+}
+
+
+/* =========================
+   SAIR
+========================= */
+
+function sair(){
+
+  /*
+   * Neste momento o Worker não possui
+   * uma rota /logout.
+   *
+   * Portanto, apenas voltamos para
+   * a tela de login.
+   */
+
+  investigacoes = [];
+
+  document.getElementById("loginEmail")
+    .value = "";
+
+  document.getElementById("loginSenha")
+    .value = "";
+
+  mostrarLogin();
+
+}
+
+
+/* =========================
+   MENSAGENS
+========================= */
 
 function msg(texto, erro=false){
 
@@ -484,78 +996,150 @@ function msg(texto, erro=false){
     document.getElementById("status");
 
   elemento.style.display="block";
+
   elemento.textContent=texto;
 
-  elemento.classList.toggle("error", erro);
+  elemento.classList.toggle(
+    "error",
+    erro
+  );
 
   setTimeout(()=>{
+
     elemento.style.display="none";
+
   },3000);
+
 }
 
 
+/* =========================
+   LIMPAR
+========================= */
+
 function limpar(){
 
-  ["nome","documento","processo","advogado"]
-    .forEach(id=>{
-      document.getElementById(id).value="";
-    });
+  [
+    "nome",
+    "documento",
+    "processo",
+    "advogado"
+  ]
+  .forEach(id=>{
+
+    document.getElementById(id)
+      .value="";
+
+  });
+
 
   document
     .querySelectorAll(".check input")
     .forEach(x=>{
+
       x.checked=false;
+
     });
+
 }
 
+
+/* =========================
+   DATA
+========================= */
 
 function formatarData(data){
 
   if(!data) return "";
 
-  const d = new Date(data);
+  const d =
+    new Date(data);
 
   if(Number.isNaN(d.getTime())){
+
     return data;
+
   }
 
-  return d.toLocaleDateString("pt-BR");
+  return d.toLocaleDateString(
+    "pt-BR"
+  );
+
 }
 
+
+/* =========================
+   FONTES
+========================= */
 
 function fontesArray(fontes){
 
   if(Array.isArray(fontes)){
+
     return fontes;
+
   }
+
 
   if(typeof fontes==="string"){
 
     try{
+
       return JSON.parse(fontes);
+
     }catch(e){
+
       return [];
+
     }
 
   }
 
+
   return [];
+
 }
 
+
+/* =========================
+   CARREGAR INVESTIGAÇÕES
+========================= */
 
 async function carregar(){
 
   try{
 
     const resposta =
-      await fetch(API + "/investigacoes");
+      await fetch(
+        API + "/investigacoes",
+        {
+          method:"GET",
+          credentials:"include"
+        }
+      );
+
+
+    if(resposta.status === 401){
+
+      mostrarLogin();
+
+      return;
+
+    }
+
 
     if(!resposta.ok){
-      throw new Error("Erro ao carregar investigações.");
+
+      throw new Error(
+        "Erro ao carregar investigações."
+      );
+
     }
+
 
     investigacoes =
       await resposta.json();
+
 
     render();
 
@@ -573,11 +1157,17 @@ async function carregar(){
 }
 
 
+/* =========================
+   SALVAR
+========================= */
+
 async function salvar(){
 
   const nome =
-    document.getElementById("nome")
+    document
+      .getElementById("nome")
       .value.trim();
+
 
   if(!nome){
 
@@ -587,12 +1177,16 @@ async function salvar(){
     );
 
     return;
+
   }
+
 
   const fontes =
     [
       ...document
-        .querySelectorAll(".check input:checked")
+        .querySelectorAll(
+          ".check input:checked"
+        )
     ]
     .map(x=>x.value);
 
@@ -602,13 +1196,19 @@ async function salvar(){
     nome,
 
     documento:
-      document.getElementById("documento").value,
+      document
+        .getElementById("documento")
+        .value,
 
     processo:
-      document.getElementById("processo").value,
+      document
+        .getElementById("processo")
+        .value,
 
     advogado:
-      document.getElementById("advogado").value,
+      document
+        .getElementById("advogado")
+        .value,
 
     fontes
 
@@ -618,17 +1218,24 @@ async function salvar(){
   try{
 
     const resposta =
-      await fetch(API + "/investigacoes",{
+      await fetch(
+        API + "/investigacoes",
+        {
 
-        method:"POST",
+          method:"POST",
 
-        headers:{
-          "Content-Type":"application/json"
-        },
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
 
-        body:JSON.stringify(dados)
+          credentials:"include",
 
-      });
+          body:
+            JSON.stringify(dados)
+
+        }
+      );
 
 
     const resultado =
@@ -636,6 +1243,15 @@ async function salvar(){
 
 
     if(!resposta.ok){
+
+      if(resposta.status === 401){
+
+        mostrarLogin();
+
+        return;
+
+      }
+
 
       throw new Error(
         resultado.erro ||
@@ -648,6 +1264,7 @@ async function salvar(){
     limpar();
 
     await carregar();
+
 
     msg(
       "Investigação criada com sucesso."
@@ -669,27 +1286,40 @@ async function salvar(){
 }
 
 
+/* =========================
+   ABRIR
+========================= */
+
 function abrir(id){
 
   const x =
     investigacoes.find(
-      item=>Number(item.id)===Number(id)
+      item =>
+        Number(item.id) === Number(id)
     );
+
 
   if(!x) return;
 
 
-  document.getElementById("nome").value =
-    x.nome || "";
+  document.getElementById("nome")
+    .value =
+      x.nome || "";
 
-  document.getElementById("documento").value =
-    x.documento || "";
 
-  document.getElementById("processo").value =
-    x.processo || "";
+  document.getElementById("documento")
+    .value =
+      x.documento || "";
 
-  document.getElementById("advogado").value =
-    x.advogado || "";
+
+  document.getElementById("processo")
+    .value =
+      x.processo || "";
+
+
+  document.getElementById("advogado")
+    .value =
+      x.advogado || "";
 
 
   const fontes =
@@ -699,8 +1329,10 @@ function abrir(id){
   document
     .querySelectorAll(".check input")
     .forEach(c=>{
+
       c.checked =
         fontes.includes(c.value);
+
     });
 
 
@@ -713,18 +1345,28 @@ function abrir(id){
 }
 
 
+/* =========================
+   EXCLUIR
+========================= */
+
 async function excluir(id){
 
   const x =
     investigacoes.find(
-      item=>Number(item.id)===Number(id)
+      item =>
+        Number(item.id) === Number(id)
     );
+
 
   if(!x) return;
 
 
-  if(!confirm("Excluir " + x.nome + "?")){
+  if(!confirm(
+    "Excluir " + x.nome + "?"
+  )){
+
     return;
+
   }
 
 
@@ -734,13 +1376,26 @@ async function excluir(id){
       await fetch(
         API + "/investigacoes/" + id,
         {
-          method:"DELETE"
+
+          method:"DELETE",
+
+          credentials:"include"
+
         }
       );
 
 
     const resultado =
       await resposta.json();
+
+
+    if(resposta.status === 401){
+
+      mostrarLogin();
+
+      return;
+
+    }
 
 
     if(!resposta.ok){
@@ -754,6 +1409,7 @@ async function excluir(id){
 
 
     await carregar();
+
 
     msg(
       "Investigação excluída com sucesso."
@@ -775,22 +1431,34 @@ async function excluir(id){
 }
 
 
+/* =========================
+   ESCAPE HTML
+========================= */
+
 function esc(s){
 
   return String(s || "")
     .replace(
       /[&<>"']/g,
+
       m=>({
+
         "&":"&amp;",
         "<":"&lt;",
         ">":"&gt;",
         '"':"&quot;",
         "'":"&#039;"
+
       }[m])
+
     );
 
 }
 
+
+/* =========================
+   RENDER
+========================= */
 
 function render(){
 
@@ -800,19 +1468,28 @@ function render(){
 
   const fontes =
     investigacoes.reduce(
+
       (s,x)=>
-        s + fontesArray(x.fontes).length,
+        s +
+        fontesArray(x.fontes).length,
+
       0
+
     );
 
 
-  document.getElementById("total")
+  document
+    .getElementById("total")
     .textContent=total;
 
-  document.getElementById("andamento")
+
+  document
+    .getElementById("andamento")
     .textContent=total;
 
-  document.getElementById("fontes")
+
+  document
+    .getElementById("fontes")
     .textContent=fontes;
 
 
@@ -829,6 +1506,7 @@ function render(){
       '</div>';
 
     return;
+
   }
 
 
@@ -839,11 +1517,13 @@ function render(){
 
         const processo =
           x.processo
-          ? "Processo: " + esc(x.processo)
-          : "Sem processo";
+            ? "Processo: " +
+              esc(x.processo)
+            : "Sem processo";
 
 
         return `
+
           <div class="item">
 
             <strong>
@@ -853,26 +1533,33 @@ function render(){
             <span>
               ${processo}
               ·
-              ${esc(formatarData(x.data_criacao))}
+              ${esc(
+                formatarData(
+                  x.data_criacao
+                )
+              )}
             </span>
 
             <div class="item-actions">
 
               <button
                 class="mini"
-                onclick="abrir(${x.id})">
+                onclick="abrir(${x.id})"
+              >
                 Abrir
               </button>
 
               <button
                 class="mini del"
-                onclick="excluir(${x.id})">
+                onclick="excluir(${x.id})"
+              >
                 Excluir
               </button>
 
             </div>
 
           </div>
+
         `;
 
       })
@@ -881,9 +1568,14 @@ function render(){
 }
 
 
-carregar();
+/* =========================
+   INÍCIO DO SITE
+========================= */
+
+verificarSessao();
 
 </script>
 
 </body>
 </html>
+```
