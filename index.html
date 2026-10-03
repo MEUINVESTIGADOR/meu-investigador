@@ -4,7 +4,6 @@
 <head>
 
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
 <title>Meu Investigador</title>
@@ -221,6 +220,11 @@ body{
 
 .btn-secondary{
   background:#64748b;
+  color:#fff;
+  border:0;
+  border-radius:9px;
+  padding:11px 16px;
+  cursor:pointer;
 }
 
 .btn-secondary:hover{
@@ -491,6 +495,11 @@ input{
   border:1px solid var(--line);
   border-radius:10px;
   padding:14px;
+  cursor:pointer;
+}
+
+.future-item:hover{
+  background:#f8faff;
 }
 
 .future-item strong{
@@ -515,6 +524,73 @@ input{
 }
 
 /* =========================
+   MÓDULO IMÓVEIS
+========================= */
+
+#imoveisScreen{
+  display:none;
+  width:100%;
+  box-sizing:border-box;
+}
+
+#imoveisScreen .investigacao-header{
+  width:100%;
+  margin-bottom:24px;
+}
+
+#imoveisScreen .imoveis-card{
+  width:100%;
+  box-sizing:border-box;
+}
+
+#imoveisScreen .form-grid{
+  width:100%;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:20px;
+  box-sizing:border-box;
+}
+
+#imoveisScreen .form-group{
+  width:100%;
+  min-width:0;
+}
+
+#imoveisScreen .form-group-full{
+  grid-column:1/-1;
+}
+
+#imoveisScreen .form-group label{
+  display:block;
+  margin-bottom:6px;
+}
+
+#imoveisScreen .form-group input,
+#imoveisScreen .form-group select,
+#imoveisScreen .form-group textarea{
+  width:100%;
+  box-sizing:border-box;
+}
+
+#imoveisScreen textarea{
+  resize:vertical;
+}
+
+#imoveisScreen .btn-primary{
+  border:0;
+  border-radius:9px;
+  padding:11px 16px;
+  background:var(--primary);
+  color:#fff;
+  font-weight:700;
+  cursor:pointer;
+}
+
+#imoveisScreen .btn-primary:hover{
+  background:var(--primary2);
+}
+
+/* =========================
    RESPONSIVO
 ========================= */
 
@@ -530,6 +606,18 @@ input{
 
   .investigacao-grid{
     grid-template-columns:1fr;
+  }
+
+}
+
+@media(max-width:700px){
+
+  #imoveisScreen .form-grid{
+    grid-template-columns:1fr;
+  }
+
+  #imoveisScreen .form-group-full{
+    grid-column:auto;
   }
 
 }
@@ -595,115 +683,8 @@ input{
   }
 
 }
-.form-grid {
-  width: 100%;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 20px;
-}
 
-.form-group {
-  width: 100%;
-}
-
-.form-group-full {
-  grid-column: 1 / -1;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 600;
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-  width: 100%;
-  box-sizing: border-box;
-}
-
-@media (max-width: 700px) {
-
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .form-group-full {
-    grid-column: auto;
-  }
-
-}
-#imoveisScreen {
-  width: 100%;
-  max-width: 1100px;
-  margin: 0 auto;
-  box-sizing: border-box;
-  padding: 0 24px 40px;
-}
-
-#imoveisScreen .investigacao-header {
-  width: 100%;
-  box-sizing: border-box;
-}
-
-#imoveisScreen .card {
-  width: 100%;
-  max-width: 100%;
-  margin: 24px auto 0;
-  box-sizing: border-box;
-}
-
-#imoveisScreen .form-grid {
-  width: 100%;
-  box-sizing: border-box;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 20px;
-}
-
-#imoveisScreen .form-group {
-  width: 100%;
-  box-sizing: border-box;
-}
-
-#imoveisScreen .form-group-full {
-  grid-column: 1 / -1;
-}
-
-#imoveisScreen input,
-#imoveisScreen select,
-#imoveisScreen textarea {
-  width: 100%;
-  box-sizing: border-box;
-}
-
-@media (max-width: 700px) {
-
-  #imoveisScreen {
-    padding-left: 16px;
-    padding-right: 16px;
-  }
-
-  #imoveisScreen .form-grid {
-    grid-template-columns: 1fr;
-  }
-
-  #imoveisScreen .form-group-full {
-    grid-column: auto;
-  }
-
-}
-
-  #imoveisScreen .form-grid {
-    grid-template-columns: 1fr;
-  }
-
-  #imoveisScreen .form-group-full {
-    grid-column: auto;
-  }
-
-}</style>
+</style>
 
 </head>
 
@@ -778,11 +759,6 @@ input{
   style="display:none"
 >
 
-
-  <!-- =========================
-       SIDEBAR
-  ========================= -->
-
   <aside class="sidebar">
 
     <div class="logo">
@@ -837,10 +813,6 @@ input{
   </aside>
 
 
-  <!-- =========================
-       CONTEÚDO
-  ========================= -->
-
   <section class="content">
 
 
@@ -871,8 +843,6 @@ input{
 
       </div>
 
-
-      <!-- ESTATÍSTICAS -->
 
       <div class="stats">
 
@@ -939,8 +909,6 @@ input{
       </div>
 
 
-      <!-- FORMULÁRIO + LISTA -->
-
       <div class="layout">
 
 
@@ -955,9 +923,7 @@ input{
             Nova investigação
           </h2>
 
-
           <div class="formgrid">
-
 
             <div>
 
@@ -1021,78 +987,54 @@ input{
                 Fontes / diligências
               </label>
 
-
               <div class="sources">
 
                 <label class="check">
-
                   <input
                     type="checkbox"
                     value="Imóveis"
                   >
-
                   Imóveis
-
                 </label>
 
-
                 <label class="check">
-
                   <input
                     type="checkbox"
                     value="Empresas"
                   >
-
                   Empresas
-
                 </label>
 
-
                 <label class="check">
-
                   <input
                     type="checkbox"
                     value="Veículos"
                   >
-
                   Veículos
-
                 </label>
 
-
                 <label class="check">
-
                   <input
                     type="checkbox"
                     value="Processos judiciais"
                   >
-
                   Processos judiciais
-
                 </label>
 
-
                 <label class="check">
-
                   <input
                     type="checkbox"
                     value="Redes sociais / OSINT"
                   >
-
                   Redes sociais / OSINT
-
                 </label>
 
-
                 <label class="check">
-
                   <input
                     type="checkbox"
                     value="Outras fontes"
                   >
-
                   Outras fontes
-
                 </label>
 
               </div>
@@ -1109,7 +1051,6 @@ input{
             Salvar investigação
           </button>
 
-
           <button
             class="btn btn-secondary"
             style="margin-left:6px"
@@ -1117,7 +1058,6 @@ input{
           >
             Limpar
           </button>
-
 
           <div
             class="status"
@@ -1156,7 +1096,6 @@ input{
 
     <div id="investigacaoScreen">
 
-
       <div class="investigacao-header">
 
         <div>
@@ -1170,7 +1109,6 @@ input{
           </p>
 
         </div>
-
 
         <div class="investigacao-actions">
 
@@ -1195,18 +1133,13 @@ input{
 
       <div class="investigacao-grid">
 
-
-        <!-- DADOS BÁSICOS -->
-
         <div class="info-card">
 
           <h2>
             Dados da investigação
           </h2>
 
-
           <div class="info-grid">
-
 
             <div class="info-box">
 
@@ -1297,8 +1230,7 @@ input{
               <div
                 class="source-list"
                 id="detalheFontes"
-              >
-              </div>
+              ></div>
 
             </div>
 
@@ -1307,29 +1239,26 @@ input{
         </div>
 
 
-        <!-- MÓDULOS FUTUROS -->
-
         <div class="info-card">
 
           <h2>
             Módulos da investigação
           </h2>
 
-
           <div class="future-list">
 
+            <div
+              class="future-item"
+              onclick="abrirModulo('imoveis')"
+            >
 
-           <div class="future-item" onclick="abrirModulo('imoveis')">
+              <strong>
+                🏠 Imóveis
+              </strong>
 
-  <strong>
-    🏠 Imóveis
-  </strong>
-
-  <span>
-    Levantamento patrimonial imobiliário
-  </span>
-
-</div>
+              <span>
+                Levantamento patrimonial imobiliário
+              </span>
 
             </div>
 
@@ -1413,333 +1342,338 @@ input{
 
           </div>
 
-
           <div class="badge">
             Estrutura preparada para as próximas etapas
           </div>
 
         </div>
 
+      </div>
+
+    </div>
+
+
+    <!-- =========================
+         TELA DO MÓDULO IMÓVEIS
+    ========================= -->
+
+    <section
+      id="imoveisScreen"
+      style="display:none;"
+    >
+
+      <div class="investigacao-header">
+
+        <div>
+
+          <button
+            type="button"
+            onclick="voltarDaTelaImoveis()"
+            class="btn-secondary"
+          >
+            ← Voltar para investigação
+          </button>
+
+          <h1>
+            🏠 Imóveis
+          </h1>
+
+          <p>
+            Levantamento patrimonial imobiliário
+          </p>
+
+        </div>
 
       </div>
 
-      </section>
 
+      <div class="info-card imoveis-card">
 
-  <!-- TELA DO MÓDULO IMÓVEIS -->
-
-  <section id="imoveisScreen" class="investigacao-screen" style="display:none;">
-
-    <div class="investigacao-header">
-
-      <div>
-
-        <button
-          type="button"
-          onclick="voltarDaTelaImoveis()"
-          class="btn-secondary"
-        >
-          ← Voltar para investigação
-        </button>
-
-        <h1>🏠 Imóveis</h1>
+        <h2>
+          🏠 Cadastro do imóvel
+        </h2>
 
         <p>
-          Levantamento patrimonial imobiliário
+          Cadastre os dados do imóvel encontrado durante a investigação.
         </p>
+
+
+        <div class="form-grid">
+
+
+          <div class="form-group">
+
+            <label for="imovelTipo">
+              Tipo do imóvel
+            </label>
+
+            <select id="imovelTipo">
+
+              <option value="">
+                Selecione
+              </option>
+
+              <option value="Casa">
+                Casa
+              </option>
+
+              <option value="Apartamento">
+                Apartamento
+              </option>
+
+              <option value="Terreno">
+                Terreno
+              </option>
+
+              <option value="Sala comercial">
+                Sala comercial
+              </option>
+
+              <option value="Galpão">
+                Galpão
+              </option>
+
+              <option value="Outro">
+                Outro
+              </option>
+
+            </select>
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="imovelMatricula">
+              Matrícula
+            </label>
+
+            <input
+              type="text"
+              id="imovelMatricula"
+              placeholder="Ex.: 12345"
+            >
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="imovelCartorio">
+              Cartório
+            </label>
+
+            <input
+              type="text"
+              id="imovelCartorio"
+              placeholder="Ex.: 14º Cartório de Registro de Imóveis"
+            >
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="imovelCep">
+              CEP
+            </label>
+
+            <input
+              type="text"
+              id="imovelCep"
+              placeholder="00000-000"
+            >
+
+          </div>
+
+
+          <div class="form-group form-group-full">
+
+            <label for="imovelEndereco">
+              Endereço
+            </label>
+
+            <input
+              type="text"
+              id="imovelEndereco"
+              placeholder="Rua, avenida, estrada..."
+            >
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="imovelNumero">
+              Número
+            </label>
+
+            <input
+              type="text"
+              id="imovelNumero"
+              placeholder="Número"
+            >
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="imovelComplemento">
+              Complemento
+            </label>
+
+            <input
+              type="text"
+              id="imovelComplemento"
+              placeholder="Apartamento, bloco, sala..."
+            >
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="imovelBairro">
+              Bairro
+            </label>
+
+            <input
+              type="text"
+              id="imovelBairro"
+              placeholder="Bairro"
+            >
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="imovelCidade">
+              Cidade
+            </label>
+
+            <input
+              type="text"
+              id="imovelCidade"
+              placeholder="Cidade"
+            >
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="imovelUf">
+              UF
+            </label>
+
+            <select id="imovelUf">
+
+              <option value="">
+                Selecione
+              </option>
+
+              <option>AC</option>
+              <option>AL</option>
+              <option>AP</option>
+              <option>AM</option>
+              <option>BA</option>
+              <option>CE</option>
+              <option>DF</option>
+              <option>ES</option>
+              <option>GO</option>
+              <option>MA</option>
+              <option>MT</option>
+              <option>MS</option>
+              <option>MG</option>
+              <option>PA</option>
+              <option>PB</option>
+              <option>PR</option>
+              <option>PE</option>
+              <option>PI</option>
+              <option>RJ</option>
+              <option>RN</option>
+              <option>RS</option>
+              <option>RO</option>
+              <option>RR</option>
+              <option>SC</option>
+              <option>SP</option>
+              <option>SE</option>
+              <option>TO</option>
+
+            </select>
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="imovelValor">
+              Valor aproximado
+            </label>
+
+            <input
+              type="text"
+              id="imovelValor"
+              placeholder="R$ 0,00"
+            >
+
+          </div>
+
+
+          <div class="form-group form-group-full">
+
+            <label for="imovelFonte">
+              Fonte da informação
+            </label>
+
+            <input
+              type="text"
+              id="imovelFonte"
+              placeholder="Ex.: matrícula, processo, consulta pública..."
+            >
+
+          </div>
+
+
+          <div class="form-group form-group-full">
+
+            <label for="imovelObservacoes">
+              Observações
+            </label>
+
+            <textarea
+              id="imovelObservacoes"
+              rows="5"
+              placeholder="Informações adicionais sobre o imóvel..."
+            ></textarea>
+
+          </div>
+
+        </div>
+
+
+        <div style="margin-top:24px;">
+
+          <button
+            type="button"
+            class="btn-primary"
+            onclick="alert('Cadastro do imóvel — próxima etapa.')"
+          >
+            💾 Salvar imóvel
+          </button>
+
+        </div>
 
       </div>
 
-    </div>
-
-
-    <div class="card">
-
-  <h2>🏠 Cadastro do imóvel</h2>
-
-  <p>
-    Cadastre os dados do imóvel encontrado durante a investigação.
-  </p>
-
-
-  <div class="form-grid">
-
-    <div class="form-group">
-
-      <label for="imovelTipo">
-        Tipo do imóvel
-      </label>
-
-      <select id="imovelTipo">
-
-        <option value="">
-          Selecione
-        </option>
-
-        <option value="Casa">
-          Casa
-        </option>
-
-        <option value="Apartamento">
-          Apartamento
-        </option>
-
-        <option value="Terreno">
-          Terreno
-        </option>
-
-        <option value="Sala comercial">
-          Sala comercial
-        </option>
-
-        <option value="Galpão">
-          Galpão
-        </option>
-
-        <option value="Outro">
-          Outro
-        </option>
-
-      </select>
-
-    </div>
-
-
-    <div class="form-group">
-
-      <label for="imovelMatricula">
-        Matrícula
-      </label>
-
-      <input
-        type="text"
-        id="imovelMatricula"
-        placeholder="Ex.: 12345"
-      >
-
-    </div>
-
-
-    <div class="form-group">
-
-      <label for="imovelCartorio">
-        Cartório
-      </label>
-
-      <input
-        type="text"
-        id="imovelCartorio"
-        placeholder="Ex.: 14º Cartório de Registro de Imóveis"
-      >
-
-    </div>
-
-
-    <div class="form-group">
-
-      <label for="imovelCep">
-        CEP
-      </label>
-
-      <input
-        type="text"
-        id="imovelCep"
-        placeholder="00000-000"
-      >
-
-    </div>
-
-
-    <div class="form-group form-group-full">
-
-      <label for="imovelEndereco">
-        Endereço
-      </label>
-
-      <input
-        type="text"
-        id="imovelEndereco"
-        placeholder="Rua, avenida, estrada..."
-      >
-
-    </div>
-
-
-    <div class="form-group">
-
-      <label for="imovelNumero">
-        Número
-      </label>
-
-      <input
-        type="text"
-        id="imovelNumero"
-        placeholder="Número"
-      >
-
-    </div>
-
-
-    <div class="form-group">
-
-      <label for="imovelComplemento">
-        Complemento
-      </label>
-
-      <input
-        type="text"
-        id="imovelComplemento"
-        placeholder="Apartamento, bloco, sala..."
-      >
-
-    </div>
-
-
-    <div class="form-group">
-
-      <label for="imovelBairro">
-        Bairro
-      </label>
-
-      <input
-        type="text"
-        id="imovelBairro"
-        placeholder="Bairro"
-      >
-
-    </div>
-
-
-    <div class="form-group">
-
-      <label for="imovelCidade">
-        Cidade
-      </label>
-
-      <input
-        type="text"
-        id="imovelCidade"
-        placeholder="Cidade"
-      >
-
-    </div>
-
-
-    <div class="form-group">
-
-      <label for="imovelUf">
-        UF
-      </label>
-
-      <select id="imovelUf">
-
-        <option value="">
-          Selecione
-        </option>
-
-        <option>AC</option>
-        <option>AL</option>
-        <option>AP</option>
-        <option>AM</option>
-        <option>BA</option>
-        <option>CE</option>
-        <option>DF</option>
-        <option>ES</option>
-        <option>GO</option>
-        <option>MA</option>
-        <option>MT</option>
-        <option>MS</option>
-        <option>MG</option>
-        <option>PA</option>
-        <option>PB</option>
-        <option>PR</option>
-        <option>PE</option>
-        <option>PI</option>
-        <option>RJ</option>
-        <option>RN</option>
-        <option>RS</option>
-        <option>RO</option>
-        <option>RR</option>
-        <option>SC</option>
-        <option>SP</option>
-        <option>SE</option>
-        <option>TO</option>
-
-      </select>
-
-    </div>
-
-
-    <div class="form-group">
-
-      <label for="imovelValor">
-        Valor aproximado
-      </label>
-
-      <input
-        type="text"
-        id="imovelValor"
-        placeholder="R$ 0,00"
-      >
-
-    </div>
-
-
-    <div class="form-group form-group-full">
-
-      <label for="imovelFonte">
-        Fonte da informação
-      </label>
-
-      <input
-        type="text"
-        id="imovelFonte"
-        placeholder="Ex.: matrícula, processo, consulta pública..."
-      >
-
-    </div>
-
-
-    <div class="form-group form-group-full">
-
-      <label for="imovelObservacoes">
-        Observações
-      </label>
-
-      <textarea
-        id="imovelObservacoes"
-        rows="5"
-        placeholder="Informações adicionais sobre o imóvel..."
-      ></textarea>
-
-    </div>
-
-  </div>
-
-
-  <div style="margin-top: 24px;">
-
-    <button
-      type="button"
-      class="btn-primary"
-      onclick="alert('Cadastro do imóvel — próxima etapa.')"
-    >
-      💾 Salvar imóvel
-    </button>
-
-  </div>
-
-</div>
-
+    </section>
 
   </section>
 
-
 </div>
-
-
 <script>
-
 
 /* =========================
    API
@@ -1762,45 +1696,36 @@ async function entrar(event){
 
   event.preventDefault();
 
-
   const email =
     document
       .getElementById("loginEmail")
       .value
       .trim();
 
-
   const senha =
     document
       .getElementById("loginSenha")
       .value;
 
-
   const botao =
     document
       .getElementById("loginButton");
-
 
   const status =
     document
       .getElementById("loginStatus");
 
-
   botao.disabled = true;
-
   botao.textContent = "Entrando...";
-
   status.style.display = "none";
 
 
   try{
 
-
     const resposta =
       await fetch(
         API + "/login",
         {
-
           method:"POST",
 
           headers:{
@@ -1813,7 +1738,6 @@ async function entrar(event){
             email,
             senha
           })
-
         }
       );
 
@@ -1849,11 +1773,9 @@ async function entrar(event){
 
     console.error(erro);
 
-
     status.textContent =
       erro.message ||
       "Não foi possível entrar.";
-
 
     status.style.display = "block";
 
@@ -1861,7 +1783,6 @@ async function entrar(event){
   }finally{
 
     botao.disabled = false;
-
     botao.textContent = "Entrar";
 
   }
@@ -1876,7 +1797,6 @@ async function entrar(event){
 async function verificarSessao(){
 
   try{
-
 
     const resposta =
       await fetch(
@@ -1905,7 +1825,6 @@ async function verificarSessao(){
 
 
       render();
-
 
       return;
 
@@ -1997,11 +1916,9 @@ function msg(texto, erro=false){
     document
       .getElementById("status");
 
-
   elemento.style.display = "block";
 
   elemento.textContent = texto;
-
 
   elemento.classList.toggle(
     "error",
@@ -2058,7 +1975,6 @@ function limpar(){
 function formatarData(data){
 
   if(!data) return "";
-
 
   const d =
     new Date(data);
@@ -2123,7 +2039,6 @@ async function carregar(){
 
   try{
 
-
     const resposta =
       await fetch(
         API + "/investigacoes",
@@ -2162,7 +2077,6 @@ async function carregar(){
   }catch(erro){
 
     console.error(erro);
-
 
     msg(
       "Não foi possível carregar as investigações.",
@@ -2235,7 +2149,6 @@ async function salvar(){
 
   try{
 
-
     const resposta =
       await fetch(
         API + "/investigacoes",
@@ -2295,7 +2208,6 @@ async function salvar(){
 
     console.error(erro);
 
-
     msg(
       erro.message ||
       "Erro ao salvar investigação.",
@@ -2334,6 +2246,11 @@ function abrir(id){
   document
     .getElementById("investigacaoScreen")
     .style.display = "block";
+
+
+  document
+    .getElementById("imoveisScreen")
+    .style.display = "none";
 
 
   document
@@ -2443,6 +2360,11 @@ function mostrarDashboard(){
 
 
   document
+    .getElementById("imoveisScreen")
+    .style.display = "none";
+
+
+  document
     .getElementById("investigacaoScreen")
     .style.display = "none";
 
@@ -2490,16 +2412,12 @@ async function excluir(id){
 
   try{
 
-
     const resposta =
       await fetch(
         API + "/investigacoes/" + id,
         {
-
           method:"DELETE",
-
           credentials:"include"
-
         }
       );
 
@@ -2539,6 +2457,11 @@ async function excluir(id){
 
 
     document
+      .getElementById("imoveisScreen")
+      .style.display = "none";
+
+
+    document
       .getElementById("dashboardScreen")
       .style.display = "block";
 
@@ -2551,7 +2474,6 @@ async function excluir(id){
   }catch(erro){
 
     console.error(erro);
-
 
     msg(
       erro.message ||
@@ -2639,7 +2561,6 @@ function render(){
       'Comece criando uma nova.' +
       '</div>';
 
-
     return;
 
   }
@@ -2649,7 +2570,6 @@ function render(){
     investigacoes
       .slice(0,8)
       .map(x=>{
-
 
         const processo =
           x.processo
@@ -2702,22 +2622,32 @@ function render(){
       .join("");
 
 }
-
-
-/* =========================
-   INÍCIO DO SITE
+  /* =========================
+   MÓDULO IMÓVEIS
 ========================= */
-function abrirModulo(modulo) {
 
-  if (modulo === "imoveis") {
+function abrirModulo(modulo){
 
-    document.getElementById("investigacaoScreen").style.display = "none";
+  if(modulo === "imoveis"){
 
-    document.getElementById("imoveisScreen").style.display = "block";
+    document
+      .getElementById("dashboardScreen")
+      .style.display = "none";
+
+
+    document
+      .getElementById("investigacaoScreen")
+      .style.display = "none";
+
+
+    document
+      .getElementById("imoveisScreen")
+      .style.display = "block";
+
 
     window.scrollTo({
-      top: 0,
-      behavior: "smooth"
+      top:0,
+      behavior:"smooth"
     });
 
   }
@@ -2725,18 +2655,31 @@ function abrirModulo(modulo) {
 }
 
 
-function voltarDaTelaImoveis() {
+function voltarDaTelaImoveis(){
 
-  document.getElementById("imoveisScreen").style.display = "none";
+  document
+    .getElementById("imoveisScreen")
+    .style.display = "none";
 
-  document.getElementById("investigacaoScreen").style.display = "block";
+
+  document
+    .getElementById("investigacaoScreen")
+    .style.display = "block";
+
 
   window.scrollTo({
-    top: 0,
-    behavior: "smooth"
+    top:0,
+    behavior:"smooth"
   });
 
-};
+}
+
+
+/* =========================
+   INÍCIO
+========================= */
+
+verificarSessao();
 
 </script>
 
