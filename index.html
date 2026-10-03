@@ -634,7 +634,54 @@ input{
   }
 
 }
-</style>
+#imoveisScreen {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#imoveisScreen .card {
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+#imoveisScreen .form-grid {
+  width: 100%;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+#imoveisScreen .form-group {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#imoveisScreen .form-group-full {
+  grid-column: 1 / -1;
+}
+
+#imoveisScreen input,
+#imoveisScreen select,
+#imoveisScreen textarea {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 700px) {
+
+  #imoveisScreen .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  #imoveisScreen .form-group-full {
+    grid-column: auto;
+  }
+
+}</style>
 
 </head>
 
