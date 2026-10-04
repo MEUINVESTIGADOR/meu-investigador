@@ -2688,6 +2688,203 @@ function voltarDaTelaImoveis(){
   });
 
 }
+  /* =========================
+   CARREGAR IMÓVEIS
+========================= */
+
+async function carregarImoveis(){
+
+  if(!investigacaoAtual){
+
+    return;
+
+  }
+
+
+  const lista =
+    document.getElementById(
+      "listaImoveis"
+    );
+
+
+  lista.innerHTML =
+    '<div class="empty">Carregando imóveis...</div>';
+
+
+  try{
+
+    const resposta =
+      await fetch(
+        API +
+        "/imoveis?investigacao_id=" +
+        encodeURIComponent(
+          investigacaoAtual.id
+        ),
+        {
+          method:"GET",
+          credentials:"include"
+        }
+      );
+
+
+    const resultado =
+      await resposta.json();
+
+
+    if(resposta.status === 401){
+
+      mostrarLogin();
+
+      return;
+
+    }
+
+
+    if(!resposta.ok){
+
+      throw new Error(
+        resultado.erro ||
+        "Erro ao carregar imóveis."
+      );
+
+    }
+
+
+    if(!Array.isArray(resultado) ||
+       resultado.length === 0){
+
+      lista.innerHTML =
+        '<div class="empty">' +
+        'Nenhum imóvel cadastrado.' +
+        '</div>';
+
+      return;
+
+    }
+
+
+    lista.innerHTML =
+      resultado
+        .map(imovel => {
+
+          const enderecoCompleto =
+            [
+              imovel.endereco,
+              imovel.numero,
+              imovel.complemento
+            ]
+            .filter(Boolean)
+            .join(", ");
+
+
+          const localidade =
+            [
+              imovel.bairro,
+              imovel.cidade,
+              imovel.uf
+            ]
+            .filter(Boolean)
+            .join(" — ");
+
+
+          return `
+
+            <div class="item">
+
+              <strong>
+                🏠 ${esc(
+                  imovel.tipo ||
+                  "Imóvel"
+                )}
+              </strong>
+
+              ${
+                imovel.matricula
+                  ? `
+                    <span>
+                      Matrícula:
+                      ${esc(imovel.matricula)}
+                    </span>
+                  `
+                  : ""
+              }
+
+              ${
+                enderecoCompleto
+                  ? `
+                    <span>
+                      ${esc(enderecoCompleto)}
+                    </span>
+                  `
+                  : ""
+              }
+
+              ${
+                localidade
+                  ? `
+                    <span>
+                      ${esc(localidade)}
+                    </span>
+                  `
+                  : ""
+              }
+
+              ${
+                imovel.valor
+                  ? `
+                    <span>
+                      Valor:
+                      ${esc(imovel.valor)}
+                    </span>
+                  `
+                  : ""
+              }
+
+              ${
+                imovel.fonte
+                  ? `
+                    <span>
+                      Fonte:
+                      ${esc(imovel.fonte)}
+                    </span>
+                  `
+                  : ""
+              }
+
+              ${
+                imovel.observacoes
+                  ? `
+                    <span>
+                      Observações:
+                      ${esc(imovel.observacoes)}
+                    </span>
+                  `
+                  : ""
+              }
+
+            </div>
+
+          `;
+
+        })
+        .join("");
+
+
+  }catch(erro){
+
+    console.error(erro);
+
+    lista.innerHTML =
+      '<div class="empty">' +
+      esc(
+        erro.message ||
+        "Erro ao carregar imóveis."
+      ) +
+      '</div>';
+
+  }
+
+}
 /* =========================
    SALVAR IMÓVEL
 ========================= */
