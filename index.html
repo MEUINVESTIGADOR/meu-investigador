@@ -2690,12 +2690,122 @@ function voltarDaTelaImoveis(){
   });
 
 }
-  /* =========================
+
+
+/* =========================
+   ABRIR IMÓVEL
+========================= */
+
+function abrirImovel(id){
+
+  if(!investigacaoAtual){
+    return;
+  }
+
+  fetch(
+    API +
+    "/imoveis?investigacao_id=" +
+    encodeURIComponent(
+      investigacaoAtual.id
+    ),
+    {
+      method:"GET",
+      credentials:"include"
+    }
+  )
+  .then(resposta => {
+
+    if(!resposta.ok){
+      throw new Error(
+        "Não foi possível carregar o imóvel."
+      );
+    }
+
+    return resposta.json();
+
+  })
+  .then(imoveis => {
+
+    const imovel =
+      imoveis.find(
+        x => Number(x.id) === Number(id)
+      );
+
+    if(!imovel){
+
+      alert("Imóvel não encontrado.");
+
+      return;
+
+    }
+
+    const endereco = [
+      imovel.endereco,
+      imovel.numero,
+      imovel.complemento
+    ]
+    .filter(Boolean)
+    .join(", ");
+
+    const localidade = [
+      imovel.bairro,
+      imovel.cidade,
+      imovel.uf
+    ]
+    .filter(Boolean)
+    .join(" — ");
+
+    alert(
+      "🏠 IMÓVEL\n\n" +
+
+      "Tipo: " +
+      (imovel.tipo || "Não informado") +
+
+      "\n\nMatrícula: " +
+      (imovel.matricula || "Não informado") +
+
+      "\n\nCartório: " +
+      (imovel.cartorio || "Não informado") +
+
+      "\n\nEndereço: " +
+      (endereco || "Não informado") +
+
+      "\n\nLocalidade: " +
+      (localidade || "Não informado") +
+
+      "\n\nCEP: " +
+      (imovel.cep || "Não informado") +
+
+      "\n\nValor: " +
+      (imovel.valor || "Não informado") +
+
+      "\n\nFonte: " +
+      (imovel.fonte || "Não informado") +
+
+      "\n\nObservações: " +
+      (imovel.observacoes || "Nenhuma")
+    );
+
+  })
+  .catch(erro => {
+
+    console.error(erro);
+
+    alert(
+      erro.message ||
+      "Erro ao abrir imóvel."
+    );
+
+  });
+
+}
+
+
+/* =========================
    CARREGAR IMÓVEIS
 ========================= */
 
 async function carregarImoveis(){
-
   if(!investigacaoAtual){
 
     return;
