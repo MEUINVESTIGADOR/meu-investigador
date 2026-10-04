@@ -342,8 +342,10 @@ input{
 }
 
 .item span{
+  display:block;
   font-size:12px;
   color:var(--muted);
+  margin-top:4px;
 }
 
 .item-actions{
@@ -527,18 +529,20 @@ input{
    MÓDULO IMÓVEIS
 ========================= */
 
-#imoveisScreen{
+#imoveisScreen,
+#imovelDetalhesScreen{
   display:none;
   width:100%;
   box-sizing:border-box;
 }
 
-#imoveisScreen .investigacao-header{
+#imoveisScreen .investigacao-header,
+#imovelDetalhesScreen .investigacao-header{
   width:100%;
   margin-bottom:24px;
 }
 
-#imoveisScreen .imoveis-card{
+.imoveis-card{
   width:100%;
   box-sizing:border-box;
 }
@@ -576,7 +580,7 @@ input{
   resize:vertical;
 }
 
-#imoveisScreen .btn-primary{
+.btn-primary{
   border:0;
   border-radius:9px;
   padding:11px 16px;
@@ -586,8 +590,46 @@ input{
   cursor:pointer;
 }
 
-#imoveisScreen .btn-primary:hover{
+.btn-primary:hover{
   background:var(--primary2);
+}
+
+/* =========================
+   DETALHES DO IMÓVEL
+========================= */
+
+.detalhes-imovel-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+}
+
+.detalhes-imovel-box{
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:14px;
+}
+
+.detalhes-imovel-box.full{
+  grid-column:1/-1;
+}
+
+.detalhes-imovel-label{
+  font-size:12px;
+  color:var(--muted);
+  margin-bottom:6px;
+}
+
+.detalhes-imovel-value{
+  font-size:15px;
+  font-weight:700;
+  word-break:break-word;
+}
+
+.observacoes-box{
+  white-space:pre-wrap;
+  line-height:1.6;
+  font-weight:400;
 }
 
 /* =========================
@@ -606,6 +648,14 @@ input{
 
   .investigacao-grid{
     grid-template-columns:1fr;
+  }
+
+  .detalhes-imovel-grid{
+    grid-template-columns:1fr;
+  }
+
+  .detalhes-imovel-box.full{
+    grid-column:auto;
   }
 
 }
@@ -1359,7 +1409,6 @@ input{
 
     <section
       id="imoveisScreen"
-      style="display:none;"
     >
 
       <div class="investigacao-header">
@@ -1657,40 +1706,46 @@ input{
         <div style="margin-top:24px;">
 
           <button
-  type="button"
-  class="btn-primary"
-  onclick="salvarImovel()"
->
-  💾 Salvar imóvel
-</button>
+            type="button"
+            class="btn-primary"
+            onclick="salvarImovel()"
+          >
+            💾 Salvar imóvel
+          </button>
 
         </div>
 
       </div>
-<div style="margin-top:32px;">
 
-  <h2>
-    🏠 Imóveis cadastrados
-  </h2>
 
-  <div
-    id="listaImoveis"
-    class="recent"
-  >
-    <div class="empty">
-      Nenhum imóvel cadastrado.
-    </div>
-  </div>
+      <div style="margin-top:32px;">
+
+        <h2>
+          🏠 Imóveis cadastrados
+        </h2>
+
+        <div
+          id="listaImoveis"
+          class="recent"
+        >
+
+          <div class="empty">
+            Nenhum imóvel cadastrado.
+          </div>
+
+        </div>
+
+      </div>
 
     </section>
 
+
     <!-- =========================
          TELA DE DETALHES DO IMÓVEL
-    ========================== -->
+    ========================= -->
 
     <section
       id="imovelDetalhesScreen"
-      style="display:none;"
     >
 
       <div class="investigacao-header">
@@ -1705,7 +1760,9 @@ input{
             ← Voltar para imóveis
           </button>
 
-          <h1>🏠 Detalhes do imóvel</h1>
+          <h1>
+            🏠 Detalhes do imóvel
+          </h1>
 
           <p>
             Informações do imóvel encontrado durante a investigação.
@@ -1718,52 +1775,56 @@ input{
 
       <div class="info-card imoveis-card">
 
-        <h2>📋 Identificação</h2>
+        <h2>
+          📋 Identificação
+        </h2>
 
-        <div id="detalhesImovelIdentificacao">
-
-          Carregando...
-
-        </div>
-
-      </div>
-
-
-      <div class="info-card imoveis-card">
-
-        <h2>📍 Localização</h2>
-
-        <div id="detalhesImovelLocalizacao">
-
-          Carregando...
-
-        </div>
+        <div
+          class="detalhes-imovel-grid"
+          id="detalhesImovelIdentificacao"
+        ></div>
 
       </div>
 
 
       <div class="info-card imoveis-card">
 
-        <h2>💰 Informações patrimoniais</h2>
+        <h2>
+          📍 Localização
+        </h2>
 
-        <div id="detalhesImovelPatrimonial">
-
-          Carregando...
-
-        </div>
+        <div
+          class="detalhes-imovel-grid"
+          id="detalhesImovelLocalizacao"
+        ></div>
 
       </div>
 
 
       <div class="info-card imoveis-card">
 
-        <h2>📝 Observações</h2>
+        <h2>
+          💰 Informações patrimoniais
+        </h2>
 
-        <div id="detalhesImovelObservacoes">
+        <div
+          class="detalhes-imovel-grid"
+          id="detalhesImovelPatrimonial"
+        ></div>
 
-          Carregando...
+      </div>
 
-        </div>
+
+      <div class="info-card imoveis-card">
+
+        <h2>
+          📝 Observações
+        </h2>
+
+        <div
+          class="detalhes-imovel-box observacoes-box"
+          id="detalhesImovelObservacoes"
+        ></div>
 
       </div>
 
@@ -1772,6 +1833,8 @@ input{
   </section>
 
 </div>
+
+
 <script>
 
 /* =========================
@@ -2188,7 +2251,7 @@ async function carregar(){
 
 
 /* =========================
-   SALVAR
+   SALVAR INVESTIGAÇÃO
 ========================= */
 
 async function salvar(){
@@ -2294,7 +2357,6 @@ async function salvar(){
 
     limpar();
 
-
     await carregar();
 
 
@@ -2349,6 +2411,11 @@ function abrir(id){
 
   document
     .getElementById("imoveisScreen")
+    .style.display = "none";
+
+
+  document
+    .getElementById("imovelDetalhesScreen")
     .style.display = "none";
 
 
@@ -2464,6 +2531,11 @@ function mostrarDashboard(){
 
 
   document
+    .getElementById("imovelDetalhesScreen")
+    .style.display = "none";
+
+
+  document
     .getElementById("investigacaoScreen")
     .style.display = "none";
 
@@ -2557,6 +2629,11 @@ async function excluir(id){
 
     document
       .getElementById("imoveisScreen")
+      .style.display = "none";
+
+
+    document
+      .getElementById("imovelDetalhesScreen")
       .style.display = "none";
 
 
@@ -2721,13 +2798,22 @@ function render(){
       .join("");
 
 }
-  /* =========================
+
+
+/* =========================
    MÓDULO IMÓVEIS
 ========================= */
 
 function abrirModulo(modulo){
 
   if(modulo === "imoveis"){
+
+    if(!investigacaoAtual){
+
+      return;
+
+    }
+
 
     document
       .getElementById("dashboardScreen")
@@ -2740,11 +2826,17 @@ function abrirModulo(modulo){
 
 
     document
+      .getElementById("imovelDetalhesScreen")
+      .style.display = "none";
+
+
+    document
       .getElementById("imoveisScreen")
       .style.display = "block";
 
-    carregarImoveis();  
- 
+
+    carregarImoveis();
+
 
     window.scrollTo({
       top:0,
@@ -2756,10 +2848,19 @@ function abrirModulo(modulo){
 }
 
 
+/* =========================
+   VOLTAR DA TELA IMÓVEIS
+========================= */
+
 function voltarDaTelaImoveis(){
 
   document
     .getElementById("imoveisScreen")
+    .style.display = "none";
+
+
+  document
+    .getElementById("imovelDetalhesScreen")
     .style.display = "none";
 
 
@@ -2777,101 +2878,295 @@ function voltarDaTelaImoveis(){
 
 
 /* =========================
-   ABRIR IMÓVEL
+   ABRIR DETALHES DO IMÓVEL
 ========================= */
 
-function abrirImovel(id){
+async function abrirImovel(id){
 
   if(!investigacaoAtual){
+
     return;
+
   }
 
-  fetch(
-    API +
-    "/imoveis?investigacao_id=" +
-    encodeURIComponent(
-      investigacaoAtual.id
-    ),
-    {
-      method:"GET",
-      credentials:"include"
-    }
-  )
-  .then(resposta => {
+
+  try{
+
+    const resposta =
+      await fetch(
+        API +
+        "/imoveis?investigacao_id=" +
+        encodeURIComponent(
+          investigacaoAtual.id
+        ),
+        {
+          method:"GET",
+          credentials:"include"
+        }
+      );
+
 
     if(!resposta.ok){
+
       throw new Error(
         "Não foi possível carregar o imóvel."
       );
+
     }
 
-    return resposta.json();
 
-  })
-  .then(imoveis => {
+    const imoveis =
+      await resposta.json();
+
 
     const imovel =
       imoveis.find(
-        x => Number(x.id) === Number(id)
+        x =>
+          Number(x.id) === Number(id)
       );
+
 
     if(!imovel){
 
-      alert("Imóvel não encontrado.");
+      alert(
+        "Imóvel não encontrado."
+      );
 
       return;
 
     }
 
-    const endereco = [
-      imovel.endereco,
-      imovel.numero,
-      imovel.complemento
-    ]
-    .filter(Boolean)
-    .join(", ");
 
-    const localidade = [
-      imovel.bairro,
-      imovel.cidade,
-      imovel.uf
-    ]
-    .filter(Boolean)
-    .join(" — ");
+    /* IDENTIFICAÇÃO */
 
-    alert(
-      "🏠 IMÓVEL\n\n" +
+    document
+      .getElementById(
+        "detalhesImovelIdentificacao"
+      )
+      .innerHTML = `
 
-      "Tipo: " +
-      (imovel.tipo || "Não informado") +
+        <div class="detalhes-imovel-box">
 
-      "\n\nMatrícula: " +
-      (imovel.matricula || "Não informado") +
+          <div class="detalhes-imovel-label">
+            Tipo do imóvel
+          </div>
 
-      "\n\nCartório: " +
-      (imovel.cartorio || "Não informado") +
+          <div class="detalhes-imovel-value">
+            ${esc(
+              imovel.tipo ||
+              "Não informado"
+            )}
+          </div>
 
-      "\n\nEndereço: " +
-      (endereco || "Não informado") +
+        </div>
 
-      "\n\nLocalidade: " +
-      (localidade || "Não informado") +
 
-      "\n\nCEP: " +
-      (imovel.cep || "Não informado") +
+        <div class="detalhes-imovel-box">
 
-      "\n\nValor: " +
-      (imovel.valor || "Não informado") +
+          <div class="detalhes-imovel-label">
+            Matrícula
+          </div>
 
-      "\n\nFonte: " +
-      (imovel.fonte || "Não informado") +
+          <div class="detalhes-imovel-value">
+            ${esc(
+              imovel.matricula ||
+              "Não informado"
+            )}
+          </div>
 
-      "\n\nObservações: " +
-      (imovel.observacoes || "Nenhuma")
-    );
+        </div>
 
-  })
-  .catch(erro => {
+
+        <div class="detalhes-imovel-box full">
+
+          <div class="detalhes-imovel-label">
+            Cartório
+          </div>
+
+          <div class="detalhes-imovel-value">
+            ${esc(
+              imovel.cartorio ||
+              "Não informado"
+            )}
+          </div>
+
+        </div>
+
+      `;
+
+
+    /* LOCALIZAÇÃO */
+
+    const endereco =
+      [
+        imovel.endereco,
+        imovel.numero,
+        imovel.complemento
+      ]
+      .filter(Boolean)
+      .join(", ");
+
+
+    document
+      .getElementById(
+        "detalhesImovelLocalizacao"
+      )
+      .innerHTML = `
+
+        <div class="detalhes-imovel-box full">
+
+          <div class="detalhes-imovel-label">
+            Endereço
+          </div>
+
+          <div class="detalhes-imovel-value">
+            ${esc(
+              endereco ||
+              "Não informado"
+            )}
+          </div>
+
+        </div>
+
+
+        <div class="detalhes-imovel-box">
+
+          <div class="detalhes-imovel-label">
+            Bairro
+          </div>
+
+          <div class="detalhes-imovel-value">
+            ${esc(
+              imovel.bairro ||
+              "Não informado"
+            )}
+          </div>
+
+        </div>
+
+
+        <div class="detalhes-imovel-box">
+
+          <div class="detalhes-imovel-label">
+            Cidade
+          </div>
+
+          <div class="detalhes-imovel-value">
+            ${esc(
+              imovel.cidade ||
+              "Não informado"
+            )}
+          </div>
+
+        </div>
+
+
+        <div class="detalhes-imovel-box">
+
+          <div class="detalhes-imovel-label">
+            UF
+          </div>
+
+          <div class="detalhes-imovel-value">
+            ${esc(
+              imovel.uf ||
+              "Não informado"
+            )}
+          </div>
+
+        </div>
+
+
+        <div class="detalhes-imovel-box">
+
+          <div class="detalhes-imovel-label">
+            CEP
+          </div>
+
+          <div class="detalhes-imovel-value">
+            ${esc(
+              imovel.cep ||
+              "Não informado"
+            )}
+          </div>
+
+        </div>
+
+      `;
+
+
+    /* PATRIMONIAL */
+
+    document
+      .getElementById(
+        "detalhesImovelPatrimonial"
+      )
+      .innerHTML = `
+
+        <div class="detalhes-imovel-box">
+
+          <div class="detalhes-imovel-label">
+            Valor aproximado
+          </div>
+
+          <div class="detalhes-imovel-value">
+            ${esc(
+              imovel.valor ||
+              "Não informado"
+            )}
+          </div>
+
+        </div>
+
+
+        <div class="detalhes-imovel-box">
+
+          <div class="detalhes-imovel-label">
+            Fonte da informação
+          </div>
+
+          <div class="detalhes-imovel-value">
+            ${esc(
+              imovel.fonte ||
+              "Não informado"
+            )}
+          </div>
+
+        </div>
+
+      `;
+
+
+    /* OBSERVAÇÕES */
+
+    document
+      .getElementById(
+        "detalhesImovelObservacoes"
+      )
+      .textContent =
+        imovel.observacoes ||
+        "Nenhuma observação registrada.";
+
+
+    /* TROCAR TELA */
+
+    document
+      .getElementById("imoveisScreen")
+      .style.display = "none";
+
+
+    document
+      .getElementById("imovelDetalhesScreen")
+      .style.display = "block";
+
+
+    window.scrollTo({
+      top:0,
+      behavior:"smooth"
+    });
+
+
+  }catch(erro){
 
     console.error(erro);
 
@@ -2880,6 +3175,37 @@ function abrirImovel(id){
       "Erro ao abrir imóvel."
     );
 
+  }
+
+}
+
+
+/* =========================
+   VOLTAR DOS DETALHES
+========================= */
+
+function voltarDosDetalhesDoImovel(){
+
+  document
+    .getElementById(
+      "imovelDetalhesScreen"
+    )
+    .style.display = "none";
+
+
+  document
+    .getElementById(
+      "imoveisScreen"
+    )
+    .style.display = "block";
+
+
+  carregarImoveis();
+
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
   });
 
 }
@@ -2890,6 +3216,7 @@ function abrirImovel(id){
 ========================= */
 
 async function carregarImoveis(){
+
   if(!investigacaoAtual){
 
     return;
@@ -2946,8 +3273,10 @@ async function carregarImoveis(){
     }
 
 
-    if(!Array.isArray(resultado) ||
-       resultado.length === 0){
+    if(
+      !Array.isArray(resultado) ||
+      resultado.length === 0
+    ){
 
       lista.innerHTML =
         '<div class="empty">' +
@@ -2994,69 +3323,88 @@ async function carregarImoveis(){
                 )}
               </strong>
 
+
               ${
                 imovel.matricula
                   ? `
                     <span>
                       Matrícula:
-                      ${esc(imovel.matricula)}
+                      ${esc(
+                        imovel.matricula
+                      )}
                     </span>
                   `
                   : ""
               }
+
 
               ${
                 enderecoCompleto
                   ? `
                     <span>
-                      ${esc(enderecoCompleto)}
+                      ${esc(
+                        enderecoCompleto
+                      )}
                     </span>
                   `
                   : ""
               }
 
+
               ${
                 localidade
                   ? `
                     <span>
-                      ${esc(localidade)}
+                      ${esc(
+                        localidade
+                      )}
                     </span>
                   `
                   : ""
               }
+
 
               ${
                 imovel.valor
                   ? `
                     <span>
                       Valor:
-                      ${esc(imovel.valor)}
+                      ${esc(
+                        imovel.valor
+                      )}
                     </span>
                   `
                   : ""
               }
+
 
               ${
                 imovel.fonte
                   ? `
                     <span>
                       Fonte:
-                      ${esc(imovel.fonte)}
+                      ${esc(
+                        imovel.fonte
+                      )}
                     </span>
                   `
                   : ""
               }
 
-                           ${
+
+              ${
                 imovel.observacoes
                   ? `
                     <span>
                       Observações:
-                      ${esc(imovel.observacoes)}
+                      ${esc(
+                        imovel.observacoes
+                      )}
                     </span>
                   `
                   : ""
               }
+
 
               <div class="item-actions">
 
@@ -3093,6 +3441,8 @@ async function carregarImoveis(){
   }
 
 }
+
+
 /* =========================
    SALVAR IMÓVEL
 ========================= */
@@ -3101,11 +3451,14 @@ async function salvarImovel(){
 
   if(!investigacaoAtual){
 
-    alert("Nenhuma investigação está selecionada.");
+    alert(
+      "Nenhuma investigação está selecionada."
+    );
 
     return;
 
   }
+
 
   const dados = {
 
@@ -3226,6 +3579,7 @@ async function salvarImovel(){
 
       }
 
+
       throw new Error(
         resultado.erro ||
         "Erro ao salvar imóvel."
@@ -3240,6 +3594,9 @@ async function salvarImovel(){
 
 
     limparFormularioImovel();
+
+
+    await carregarImoveis();
 
 
   }catch(erro){
@@ -3289,6 +3646,7 @@ function limparFormularioImovel(){
   document.getElementById("imovelObservacoes").value = "";
 
 }
+
 
 /* =========================
    INÍCIO
