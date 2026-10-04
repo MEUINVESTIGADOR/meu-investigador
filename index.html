@@ -2673,7 +2673,202 @@ function voltarDaTelaImoveis(){
   });
 
 }
+/* =========================
+   SALVAR IMÓVEL
+========================= */
 
+async function salvarImovel(){
+
+  if(!investigacaoAtual){
+
+    alert("Nenhuma investigação está selecionada.");
+
+    return;
+
+  }
+
+  const dados = {
+
+    investigacao_id:
+      investigacaoAtual.id,
+
+    tipo:
+      document
+        .getElementById("imovelTipo")
+        .value,
+
+    matricula:
+      document
+        .getElementById("imovelMatricula")
+        .value
+        .trim(),
+
+    cartorio:
+      document
+        .getElementById("imovelCartorio")
+        .value
+        .trim(),
+
+    cep:
+      document
+        .getElementById("imovelCep")
+        .value
+        .trim(),
+
+    endereco:
+      document
+        .getElementById("imovelEndereco")
+        .value
+        .trim(),
+
+    numero:
+      document
+        .getElementById("imovelNumero")
+        .value
+        .trim(),
+
+    complemento:
+      document
+        .getElementById("imovelComplemento")
+        .value
+        .trim(),
+
+    bairro:
+      document
+        .getElementById("imovelBairro")
+        .value
+        .trim(),
+
+    cidade:
+      document
+        .getElementById("imovelCidade")
+        .value
+        .trim(),
+
+    uf:
+      document
+        .getElementById("imovelUf")
+        .value,
+
+    valor:
+      document
+        .getElementById("imovelValor")
+        .value
+        .trim(),
+
+    fonte:
+      document
+        .getElementById("imovelFonte")
+        .value
+        .trim(),
+
+    observacoes:
+      document
+        .getElementById("imovelObservacoes")
+        .value
+        .trim()
+
+  };
+
+
+  try{
+
+    const resposta =
+      await fetch(
+        API + "/imoveis",
+        {
+          method:"POST",
+
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
+
+          credentials:"include",
+
+          body:
+            JSON.stringify(dados)
+        }
+      );
+
+
+    const resultado =
+      await resposta.json();
+
+
+    if(!resposta.ok){
+
+      if(resposta.status === 401){
+
+        mostrarLogin();
+
+        return;
+
+      }
+
+      throw new Error(
+        resultado.erro ||
+        "Erro ao salvar imóvel."
+      );
+
+    }
+
+
+    alert(
+      "Imóvel salvo com sucesso."
+    );
+
+
+    limparFormularioImovel();
+
+
+  }catch(erro){
+
+    console.error(erro);
+
+    alert(
+      erro.message ||
+      "Erro ao salvar imóvel."
+    );
+
+  }
+
+}
+
+
+/* =========================
+   LIMPAR FORMULÁRIO IMÓVEL
+========================= */
+
+function limparFormularioImovel(){
+
+  document.getElementById("imovelTipo").value = "";
+
+  document.getElementById("imovelMatricula").value = "";
+
+  document.getElementById("imovelCartorio").value = "";
+
+  document.getElementById("imovelCep").value = "";
+
+  document.getElementById("imovelEndereco").value = "";
+
+  document.getElementById("imovelNumero").value = "";
+
+  document.getElementById("imovelComplemento").value = "";
+
+  document.getElementById("imovelBairro").value = "";
+
+  document.getElementById("imovelCidade").value = "";
+
+  document.getElementById("imovelUf").value = "";
+
+  document.getElementById("imovelValor").value = "";
+
+  document.getElementById("imovelFonte").value = "";
+
+  document.getElementById("imovelObservacoes").value = "";
+
+}
 
 /* =========================
    INÍCIO
