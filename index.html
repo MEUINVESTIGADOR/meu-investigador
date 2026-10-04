@@ -57,6 +57,119 @@ textarea{min-height:110px;resize:vertical}
   .field.full{grid-column:auto}
   .item-head{flex-direction:column}
 }
+/* =================================================
+   PAINEL LATERAL
+================================================= */
+
+#appScreen{
+  min-height:100vh;
+}
+
+.sidebar{
+  width:245px;
+  background:#111827;
+  color:#fff;
+  padding:24px 16px;
+  position:fixed;
+  top:0;
+  left:0;
+  bottom:0;
+  z-index:50;
+}
+
+.sidebar .logo{
+  font-size:20px;
+  font-weight:800;
+  padding:8px 12px 28px;
+}
+
+.sidebar .logo span{
+  color:#7da0ff;
+}
+
+.nav a{
+  display:block;
+  color:#b9c1d1;
+  text-decoration:none;
+  padding:12px 14px;
+  border-radius:9px;
+  margin:4px 0;
+}
+
+.nav a:hover{
+  background:#202b42;
+  color:#fff;
+}
+
+.sidebar .logout{
+  position:absolute;
+  bottom:52px;
+  left:16px;
+  right:16px;
+  width:calc(100% - 32px);
+  border:0;
+  background:#202b42;
+  color:#fff;
+  padding:10px;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+.sidebar .logout:hover{
+  background:#2b3852;
+}
+
+.sidebar small{
+  position:absolute;
+  bottom:20px;
+  left:28px;
+  color:#7f8ba0;
+}
+
+#appScreen > .container{
+  margin-left:245px;
+  width:calc(100% - 245px);
+  max-width:none;
+  padding:28px 34px;
+}
+
+@media(max-width:650px){
+
+  .sidebar{
+    width:70px;
+    padding:15px 8px;
+  }
+
+  .sidebar .logo{
+    font-size:0;
+    padding:8px;
+  }
+
+  .sidebar .logo span{
+    font-size:18px;
+  }
+
+  .nav a{
+    font-size:0;
+    text-align:center;
+  }
+
+  .nav a:first-letter{
+    font-size:18px;
+  }
+
+  .sidebar small,
+  .sidebar .logout{
+    display:none;
+  }
+
+  #appScreen > .container{
+    margin-left:70px;
+    width:calc(100% - 70px);
+    padding:20px;
+  }
+
+}
 </style>
 </head>
 <body>
@@ -87,16 +200,57 @@ textarea{min-height:110px;resize:vertical}
 
 <div id="appScreen" class="hidden">
 
-<header class="topbar">
-  <div class="topbar-inner">
-    <div class="brand">🔎 Meu Investigador</div>
+<aside class="sidebar">
 
-    <div class="user-area">
-      <span id="usuarioNome"></span>
-      <button class="btn btn-secondary" onclick="logout()">Sair</button>
-    </div>
+  <div class="logo">
+    INVESTIGADOR<span>.</span>
   </div>
-</header>
+
+  <nav class="nav">
+
+    <a
+      href="#"
+      onclick="voltarInicio(); return false;"
+    >
+      🏠 &nbsp; Dashboard
+    </a>
+
+    <a
+      href="#"
+      onclick="mostrarNovaInvestigacao(); return false;"
+    >
+      ＋ &nbsp; Nova investigação
+    </a>
+
+    <a
+      href="#"
+      onclick="voltarInicio(); return false;"
+    >
+      ◷ &nbsp; Investigações
+    </a>
+
+    <a href="#">
+      ▤ &nbsp; Relatórios
+    </a>
+
+    <a href="#">
+      ⚙ &nbsp; Configurações
+    </a>
+
+  </nav>
+
+  <button
+    class="logout"
+    onclick="logout()"
+  >
+    Sair
+  </button>
+
+  <small>
+    Versão 6.0 — API + D1
+  </small>
+
+</aside>
 
 <main class="container">
 
