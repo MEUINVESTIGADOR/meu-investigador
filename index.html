@@ -33,9 +33,9 @@ body{
   color:var(--text);
 }
 
-/* =========================
+/* =================================================
    LOGIN
-========================= */
+================================================= */
 
 #loginScreen{
   min-height:100vh;
@@ -114,9 +114,10 @@ body{
   font-size:13px;
 }
 
-/* =========================
+
+/* =================================================
    APP
-========================= */
+================================================= */
 
 .app{
   display:flex;
@@ -204,6 +205,11 @@ body{
   color:var(--muted);
 }
 
+
+/* =================================================
+   BOTÕES
+================================================= */
+
 .btn{
   border:0;
   border-radius:9px;
@@ -239,9 +245,10 @@ body{
   background:#8f1d14;
 }
 
-/* =========================
+
+/* =================================================
    DASHBOARD
-========================= */
+================================================= */
 
 .stats{
   display:grid;
@@ -293,12 +300,19 @@ label{
   margin-bottom:6px;
 }
 
-input{
+input,
+select,
+textarea{
   width:100%;
   padding:11px;
   border:1px solid #d5dbe5;
   border-radius:8px;
   font-size:14px;
+  font-family:inherit;
+}
+
+textarea{
+  resize:vertical;
 }
 
 .full{
@@ -342,10 +356,8 @@ input{
 }
 
 .item span{
-  display:block;
   font-size:12px;
   color:var(--muted);
-  margin-top:4px;
 }
 
 .item-actions{
@@ -389,9 +401,10 @@ input{
   color:#b42318;
 }
 
-/* =========================
-   TELA DA INVESTIGAÇÃO
-========================= */
+
+/* =================================================
+   INVESTIGAÇÃO
+================================================= */
 
 #investigacaoScreen{
   display:none;
@@ -525,24 +538,23 @@ input{
   font-weight:700;
 }
 
-/* =========================
-   MÓDULO IMÓVEIS
-========================= */
 
-#imoveisScreen,
-#imovelDetalhesScreen{
+/* =================================================
+   IMÓVEIS
+================================================= */
+
+#imoveisScreen{
   display:none;
   width:100%;
   box-sizing:border-box;
 }
 
-#imoveisScreen .investigacao-header,
-#imovelDetalhesScreen .investigacao-header{
+#imoveisScreen .investigacao-header{
   width:100%;
   margin-bottom:24px;
 }
 
-.imoveis-card{
+#imoveisScreen .imoveis-card{
   width:100%;
   box-sizing:border-box;
 }
@@ -580,7 +592,7 @@ input{
   resize:vertical;
 }
 
-.btn-primary{
+#imoveisScreen .btn-primary{
   border:0;
   border-radius:9px;
   padding:11px 16px;
@@ -590,51 +602,63 @@ input{
   cursor:pointer;
 }
 
-.btn-primary:hover{
+#imoveisScreen .btn-primary:hover{
   background:var(--primary2);
 }
 
-/* =========================
-   DETALHES DO IMÓVEL
-========================= */
 
-.detalhes-imovel-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:20px;
+/* =================================================
+   DETALHES DO IMÓVEL
+================================================= */
+
+#imovelDetalhesScreen{
+  display:none;
+  width:100%;
+  box-sizing:border-box;
 }
 
-.detalhes-imovel-box{
+#imovelDetalhesScreen .imoveis-card{
+  width:100%;
+  box-sizing:border-box;
+  margin-bottom:20px;
+}
+
+#imovelDetalhesScreen .detalhes-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+}
+
+#imovelDetalhesScreen .detalhes-box{
   border:1px solid var(--line);
   border-radius:10px;
   padding:14px;
 }
 
-.detalhes-imovel-box.full{
+#imovelDetalhesScreen .detalhes-box.full{
   grid-column:1/-1;
 }
 
-.detalhes-imovel-label{
+#imovelDetalhesScreen .detalhes-label{
   font-size:12px;
   color:var(--muted);
-  margin-bottom:6px;
+  margin-bottom:5px;
 }
 
-.detalhes-imovel-value{
+#imovelDetalhesScreen .detalhes-value{
   font-size:15px;
   font-weight:700;
   word-break:break-word;
 }
 
-.observacoes-box{
-  white-space:pre-wrap;
-  line-height:1.6;
-  font-weight:400;
+#editarImovelForm{
+  margin-bottom:20px;
 }
 
-/* =========================
+
+/* =================================================
    RESPONSIVO
-========================= */
+================================================= */
 
 @media(max-width:900px){
 
@@ -650,14 +674,6 @@ input{
     grid-template-columns:1fr;
   }
 
-  .detalhes-imovel-grid{
-    grid-template-columns:1fr;
-  }
-
-  .detalhes-imovel-box.full{
-    grid-column:auto;
-  }
-
 }
 
 @media(max-width:700px){
@@ -667,6 +683,14 @@ input{
   }
 
   #imoveisScreen .form-group-full{
+    grid-column:auto;
+  }
+
+  #imovelDetalhesScreen .detalhes-grid{
+    grid-template-columns:1fr;
+  }
+
+  #imovelDetalhesScreen .detalhes-box.full{
     grid-column:auto;
   }
 
@@ -738,51 +762,53 @@ input{
 
 </head>
 
+
 <body>
 
 
-<!-- =========================
+<!-- =================================================
      LOGIN
-========================= -->
+================================================= -->
 
-<div id="loginScreen">
+<section id="loginScreen">
 
   <div class="login-card">
 
     <div class="login-logo">
-      INVESTIGADOR<span>.</span>
+      Meu <span>Investigador</span>
     </div>
 
     <div class="login-subtitle">
-      Acesse sua área de investigações
+      Inteligência e investigação patrimonial
     </div>
 
     <form onsubmit="entrar(event)">
 
-      <label>E-mail</label>
+      <label for="loginEmail">
+        E-mail
+      </label>
 
       <input
         id="loginEmail"
         type="email"
-        placeholder="seu@email.com"
         autocomplete="email"
         required
       >
 
-      <label>Senha</label>
+      <label for="loginSenha">
+        Senha
+      </label>
 
       <input
         id="loginSenha"
         type="password"
-        placeholder="Sua senha"
         autocomplete="current-password"
         required
       >
 
       <button
-        class="login-button"
         type="submit"
-        id="loginButton"
+        class="login-button"
       >
         Entrar
       </button>
@@ -790,66 +816,50 @@ input{
     </form>
 
     <div
+      id="loginStatus"
       class="login-status"
-      id="loginStatus">
-    </div>
+    ></div>
 
   </div>
 
-</div>
+</section>
 
 
-<!-- =========================
-     APP
-========================= -->
+<!-- =================================================
+     APLICAÇÃO
+================================================= -->
 
 <div
-  class="app"
   id="app"
-  style="display:none"
+  class="app"
+  style="display:none;"
 >
+
+
+  <!-- =================================================
+       SIDEBAR
+  ================================================= -->
 
   <aside class="sidebar">
 
     <div class="logo">
-      INVESTIGADOR<span>.</span>
+      Meu <span>Investigador</span>
     </div>
 
     <nav class="nav">
 
       <a
-        class="active"
         href="#"
-        onclick="mostrarDashboard(); return false;"
+        onclick="mostrarDashboard();return false;"
+        class="active"
       >
-        ▣ &nbsp; Dashboard
-      </a>
-
-      <a
-        href="#nova"
-        onclick="mostrarDashboard(); setTimeout(()=>document.getElementById('nome').focus(),100);"
-      >
-        ＋ &nbsp; Nova investigação
-      </a>
-
-      <a
-        href="#recentes"
-        onclick="mostrarDashboard();"
-      >
-        ◷ &nbsp; Investigações
-      </a>
-
-      <a href="#">
-        ▤ &nbsp; Relatórios
-      </a>
-
-      <a href="#">
-        ⚙ &nbsp; Configurações
+        🏠 Dashboard
       </a>
 
     </nav>
 
     <button
+      type="button"
       class="logout"
       onclick="sair()"
     >
@@ -857,42 +867,43 @@ input{
     </button>
 
     <small>
-      Versão 6.0 — API + D1
+      Meu Investigador
     </small>
 
   </aside>
 
 
-  <section class="content">
+  <!-- =================================================
+       CONTEÚDO
+  ================================================= -->
+
+  <main class="content">
 
 
-    <!-- =========================
+    <!-- =================================================
          DASHBOARD
-    ========================= -->
+    ================================================= -->
 
-    <div id="dashboardScreen">
+    <section id="dashboardScreen">
 
       <div class="top">
 
         <div>
 
-          <h1>Dashboard</h1>
+          <h1>
+            Dashboard
+          </h1>
 
           <p>
-            Central de investigações patrimoniais
+            Gerencie suas investigações.
           </p>
 
         </div>
 
-        <button
-          class="btn"
-          onclick="document.getElementById('nome').focus()"
-        >
-          + Nova investigação
-        </button>
-
       </div>
 
+
+      <!-- ESTATÍSTICAS -->
 
       <div class="stats">
 
@@ -903,8 +914,8 @@ input{
           </div>
 
           <div
+            id="totalInvestigações"
             class="number"
-            id="total"
           >
             0
           </div>
@@ -915,12 +926,12 @@ input{
         <div class="stat">
 
           <div class="label">
-            Em andamento
+            Investigações recentes
           </div>
 
           <div
+            id="totalRecentes"
             class="number"
-            id="andamento"
           >
             0
           </div>
@@ -931,12 +942,12 @@ input{
         <div class="stat">
 
           <div class="label">
-            Fontes pesquisadas
+            Imóveis
           </div>
 
           <div
+            id="totalImoveis"
             class="number"
-            id="fontes"
           >
             0
           </div>
@@ -947,11 +958,11 @@ input{
         <div class="stat">
 
           <div class="label">
-            Relatórios
+            Status
           </div>
 
           <div class="number">
-            0
+            Ativo
           </div>
 
         </div>
@@ -959,159 +970,153 @@ input{
       </div>
 
 
+      <!-- DASHBOARD -->
+
       <div class="layout">
 
 
         <!-- NOVA INVESTIGAÇÃO -->
 
-        <div
-          class="panel"
-          id="nova"
-        >
+        <div class="panel">
 
           <h2>
-            Nova investigação
+            🔎 Nova investigação
           </h2>
 
-          <div class="formgrid">
+          <form
+            onsubmit="salvar(event)"
+          >
 
-            <div>
-
-              <label>
-                Investigado
-              </label>
-
-              <input
-                id="nome"
-                placeholder="Nome completo"
-              >
-
-            </div>
+            <div class="formgrid">
 
 
-            <div>
+              <div>
 
-              <label>
-                CPF / CNPJ
-              </label>
-
-              <input
-                id="documento"
-                placeholder="Documento"
-              >
-
-            </div>
-
-
-            <div>
-
-              <label>
-                Número do processo
-              </label>
-
-              <input
-                id="processo"
-                placeholder="0000000-00.0000.0.00.0000"
-              >
-
-            </div>
-
-
-            <div>
-
-              <label>
-                Advogado responsável
-              </label>
-
-              <input
-                id="advogado"
-                placeholder="Nome do advogado"
-              >
-
-            </div>
-
-
-            <div class="full">
-
-              <label>
-                Fontes / diligências
-              </label>
-
-              <div class="sources">
-
-                <label class="check">
-                  <input
-                    type="checkbox"
-                    value="Imóveis"
-                  >
-                  Imóveis
+                <label>
+                  Nome
                 </label>
 
-                <label class="check">
-                  <input
-                    type="checkbox"
-                    value="Empresas"
-                  >
-                  Empresas
+                <input
+                  id="nome"
+                  required
+                >
+
+              </div>
+
+
+              <div>
+
+                <label>
+                  Documento
                 </label>
 
-                <label class="check">
-                  <input
-                    type="checkbox"
-                    value="Veículos"
-                  >
-                  Veículos
+                <input
+                  id="documento"
+                >
+
+              </div>
+
+
+              <div>
+
+                <label>
+                  Processo
                 </label>
 
-                <label class="check">
-                  <input
-                    type="checkbox"
-                    value="Processos judiciais"
-                  >
-                  Processos judiciais
+                <input
+                  id="processo"
+                >
+
+              </div>
+
+
+              <div>
+
+                <label>
+                  Advogado
                 </label>
 
-                <label class="check">
-                  <input
-                    type="checkbox"
-                    value="Redes sociais / OSINT"
-                  >
-                  Redes sociais / OSINT
+                <input
+                  id="advogado"
+                >
+
+              </div>
+
+
+              <div class="full">
+
+                <label>
+                  Fontes de investigação
                 </label>
 
-                <label class="check">
-                  <input
-                    type="checkbox"
-                    value="Outras fontes"
-                  >
-                  Outras fontes
-                </label>
+                <div class="sources">
+
+                  <label class="check">
+                    <input
+                      type="checkbox"
+                      value="Google"
+                      name="fontes"
+                    >
+                    Google
+                  </label>
+
+                  <label class="check">
+                    <input
+                      type="checkbox"
+                      value="Redes sociais"
+                      name="fontes"
+                    >
+                    Redes sociais
+                  </label>
+
+                  <label class="check">
+                    <input
+                      type="checkbox"
+                      value="Cartórios"
+                      name="fontes"
+                    >
+                    Cartórios
+                  </label>
+
+                  <label class="check">
+                    <input
+                      type="checkbox"
+                      value="Tribunais"
+                      name="fontes"
+                    >
+                    Tribunais
+                  </label>
+
+                </div>
 
               </div>
 
             </div>
 
-          </div>
 
+            <div
+              style="
+                margin-top:18px;
+                display:flex;
+                gap:10px;
+              "
+            >
 
-          <button
-            class="btn"
-            onclick="salvar()"
-          >
-            Salvar investigação
-          </button>
+              <button
+                type="submit"
+                class="btn"
+              >
+                Criar investigação
+              </button>
 
-          <button
-            class="btn btn-secondary"
-            style="margin-left:6px"
-            onclick="limpar()"
-          >
-            Limpar
-          </button>
+            </div>
+
+          </form>
+
 
           <div
+            id="formStatus"
             class="status"
-            id="status"
           ></div>
 
         </div>
@@ -1119,62 +1124,61 @@ input{
 
         <!-- INVESTIGAÇÕES RECENTES -->
 
-        <div
-          class="panel"
-          id="recentes"
-        >
+        <div class="panel">
 
           <h2>
-            Investigações recentes
+            📋 Investigações recentes
           </h2>
 
           <div
+            id="listaInvestigações"
             class="recent"
-            id="lista"
-          ></div>
+          >
+
+            <div class="empty">
+              Nenhuma investigação cadastrada.
+            </div>
+
+          </div>
 
         </div>
 
       </div>
 
-    </div>
+    </section>
 
 
-    <!-- =========================
-         TELA DA INVESTIGAÇÃO
-    ========================= -->
+    <!-- =================================================
+         DETALHES DA INVESTIGAÇÃO
+    ================================================= -->
 
-    <div id="investigacaoScreen">
+    <section
+      id="investigacaoScreen"
+      style="display:none;"
+    >
 
       <div class="investigacao-header">
 
         <div>
 
-          <h1 id="investigacaoTitulo">
-            Investigação
-          </h1>
-
-          <p id="investigacaoSubtitulo">
-            Dados da investigação
-          </p>
-
-        </div>
-
-        <div class="investigacao-actions">
-
           <button
-            class="btn btn-secondary"
+            type="button"
             onclick="mostrarDashboard()"
+            class="btn-secondary"
           >
             ← Voltar
           </button>
 
-          <button
-            class="btn btn-danger"
-            id="botaoExcluirInvestigacao"
+          <h1
+            id="investigacaoTitulo"
+            style="margin-top:18px;"
           >
-            Excluir
-          </button>
+            Investigação
+          </h1>
+
+          <p id="investigacaoSubtitulo">
+            Detalhes da investigação.
+          </p>
 
         </div>
 
@@ -1183,25 +1187,27 @@ input{
 
       <div class="investigacao-grid">
 
+
         <div class="info-card">
 
           <h2>
-            Dados da investigação
+            📋 Informações da investigação
           </h2>
 
           <div class="info-grid">
 
+
             <div class="info-box">
 
               <div class="info-label">
-                Investigado
+                Nome
               </div>
 
               <div
+                id="infoNome"
                 class="info-value"
-                id="detalheNome"
               >
-                —
+                -
               </div>
 
             </div>
@@ -1210,14 +1216,14 @@ input{
             <div class="info-box">
 
               <div class="info-label">
-                CPF / CNPJ
+                Documento
               </div>
 
               <div
+                id="infoDocumento"
                 class="info-value"
-                id="detalheDocumento"
               >
-                —
+                -
               </div>
 
             </div>
@@ -1226,14 +1232,14 @@ input{
             <div class="info-box">
 
               <div class="info-label">
-                Número do processo
+                Processo
               </div>
 
               <div
+                id="infoProcesso"
                 class="info-value"
-                id="detalheProcesso"
               >
-                —
+                -
               </div>
 
             </div>
@@ -1242,47 +1248,52 @@ input{
             <div class="info-box">
 
               <div class="info-label">
-                Advogado responsável
+                Advogado
               </div>
 
               <div
+                id="infoAdvogado"
                 class="info-value"
-                id="detalheAdvogado"
               >
-                —
+                -
               </div>
 
             </div>
 
 
             <div class="info-box full">
+
+              <div class="info-label">
+                Fontes
+              </div>
+
+              <div
+                id="infoFontes"
+                class="source-list"
+              >
+                <span class="empty-source">
+                  Nenhuma fonte cadastrada.
+                </span>
+              </div>
+
+            </div>
+
+
+            <div class="info-box">
 
               <div class="info-label">
                 Data de criação
               </div>
 
               <div
+                id="infoData"
                 class="info-value"
-                id="detalheData"
               >
-                —
+                -
               </div>
 
             </div>
 
-
-            <div class="info-box full">
-
-              <div class="info-label">
-                Fontes / diligências selecionadas
-              </div>
-
-              <div
-                class="source-list"
-                id="detalheFontes"
-              ></div>
-
-            </div>
 
           </div>
 
@@ -1292,10 +1303,11 @@ input{
         <div class="info-card">
 
           <h2>
-            Módulos da investigação
+            🧭 Módulos
           </h2>
 
           <div class="future-list">
+
 
             <div
               class="future-item"
@@ -1307,7 +1319,7 @@ input{
               </strong>
 
               <span>
-                Levantamento patrimonial imobiliário
+                Pesquisa e análise de imóveis.
               </span>
 
             </div>
@@ -1320,7 +1332,7 @@ input{
               </strong>
 
               <span>
-                Pesquisa de veículos vinculados
+                Módulo disponível em breve.
               </span>
 
             </div>
@@ -1329,11 +1341,11 @@ input{
             <div class="future-item">
 
               <strong>
-                🏢 Empresas
+                💰 Patrimônio
               </strong>
 
               <span>
-                Participações e vínculos empresariais
+                Módulo disponível em breve.
               </span>
 
             </div>
@@ -1342,74 +1354,35 @@ input{
             <div class="future-item">
 
               <strong>
-                ⚖️ Processos judiciais
+                🌐 OSINT
               </strong>
 
               <span>
-                Levantamento de processos
+                Módulo disponível em breve.
               </span>
 
             </div>
 
 
-            <div class="future-item">
-
-              <strong>
-                🔎 OSINT
-              </strong>
-
-              <span>
-                Inteligência e fontes abertas
-              </span>
-
-            </div>
-
-
-            <div class="future-item">
-
-              <strong>
-                📎 Documentos
-              </strong>
-
-              <span>
-                Documentos e evidências
-              </span>
-
-            </div>
-
-
-            <div class="future-item">
-
-              <strong>
-                📝 Anotações
-              </strong>
-
-              <span>
-                Observações da investigação
-              </span>
-
-            </div>
-
-          </div>
-
-          <div class="badge">
-            Estrutura preparada para as próximas etapas
           </div>
 
         </div>
 
+
       </div>
 
-    </div>
+    </section>
 
 
-    <!-- =========================
-         TELA DO MÓDULO IMÓVEIS
-    ========================= -->
+    <!-- =================================================
+         IMÓVEIS
+    ================================================= -->
 
     <section
       id="imoveisScreen"
+      style="display:none;"
     >
+
 
       <div class="investigacao-header">
 
@@ -1423,12 +1396,14 @@ input{
             ← Voltar para investigação
           </button>
 
-          <h1>
+          <h1
+            style="margin-top:18px;"
+          >
             🏠 Imóveis
           </h1>
 
           <p>
-            Levantamento patrimonial imobiliário
+            Cadastre imóveis encontrados durante a investigação.
           </p>
 
         </div>
@@ -1436,15 +1411,13 @@ input{
       </div>
 
 
+      <!-- FORMULÁRIO -->
+
       <div class="info-card imoveis-card">
 
         <h2>
-          🏠 Cadastro do imóvel
+          ➕ Cadastrar imóvel
         </h2>
-
-        <p>
-          Cadastre os dados do imóvel encontrado durante a investigação.
-        </p>
 
 
         <div class="form-grid">
@@ -1452,55 +1425,26 @@ input{
 
           <div class="form-group">
 
-            <label for="imovelTipo">
-              Tipo do imóvel
+            <label>
+              Tipo de imóvel
             </label>
 
-            <select id="imovelTipo">
-
-              <option value="">
-                Selecione
-              </option>
-
-              <option value="Casa">
-                Casa
-              </option>
-
-              <option value="Apartamento">
-                Apartamento
-              </option>
-
-              <option value="Terreno">
-                Terreno
-              </option>
-
-              <option value="Sala comercial">
-                Sala comercial
-              </option>
-
-              <option value="Galpão">
-                Galpão
-              </option>
-
-              <option value="Outro">
-                Outro
-              </option>
-
-            </select>
+            <input
+              id="imovelTipo"
+              placeholder="Casa, apartamento, terreno..."
+            >
 
           </div>
 
 
           <div class="form-group">
 
-            <label for="imovelMatricula">
+            <label>
               Matrícula
             </label>
 
             <input
-              type="text"
               id="imovelMatricula"
-              placeholder="Ex.: 12345"
             >
 
           </div>
@@ -1508,14 +1452,12 @@ input{
 
           <div class="form-group">
 
-            <label for="imovelCartorio">
+            <label>
               Cartório
             </label>
 
             <input
-              type="text"
               id="imovelCartorio"
-              placeholder="Ex.: 14º Cartório de Registro de Imóveis"
             >
 
           </div>
@@ -1523,29 +1465,25 @@ input{
 
           <div class="form-group">
 
-            <label for="imovelCep">
+            <label>
               CEP
             </label>
 
             <input
-              type="text"
               id="imovelCep"
-              placeholder="00000-000"
             >
 
           </div>
 
 
-          <div class="form-group form-group-full">
+          <div class="form-group">
 
-            <label for="imovelEndereco">
+            <label>
               Endereço
             </label>
 
             <input
-              type="text"
               id="imovelEndereco"
-              placeholder="Rua, avenida, estrada..."
             >
 
           </div>
@@ -1553,14 +1491,12 @@ input{
 
           <div class="form-group">
 
-            <label for="imovelNumero">
+            <label>
               Número
             </label>
 
             <input
-              type="text"
               id="imovelNumero"
-              placeholder="Número"
             >
 
           </div>
@@ -1568,14 +1504,12 @@ input{
 
           <div class="form-group">
 
-            <label for="imovelComplemento">
+            <label>
               Complemento
             </label>
 
             <input
-              type="text"
               id="imovelComplemento"
-              placeholder="Apartamento, bloco, sala..."
             >
 
           </div>
@@ -1583,14 +1517,12 @@ input{
 
           <div class="form-group">
 
-            <label for="imovelBairro">
+            <label>
               Bairro
             </label>
 
             <input
-              type="text"
               id="imovelBairro"
-              placeholder="Bairro"
             >
 
           </div>
@@ -1598,14 +1530,12 @@ input{
 
           <div class="form-group">
 
-            <label for="imovelCidade">
+            <label>
               Cidade
             </label>
 
             <input
-              type="text"
               id="imovelCidade"
-              placeholder="Cidade"
             >
 
           </div>
@@ -1613,57 +1543,25 @@ input{
 
           <div class="form-group">
 
-            <label for="imovelUf">
+            <label>
               UF
             </label>
 
-            <select id="imovelUf">
-
-              <option value="">
-                Selecione
-              </option>
-
-              <option>AC</option>
-              <option>AL</option>
-              <option>AP</option>
-              <option>AM</option>
-              <option>BA</option>
-              <option>CE</option>
-              <option>DF</option>
-              <option>ES</option>
-              <option>GO</option>
-              <option>MA</option>
-              <option>MT</option>
-              <option>MS</option>
-              <option>MG</option>
-              <option>PA</option>
-              <option>PB</option>
-              <option>PR</option>
-              <option>PE</option>
-              <option>PI</option>
-              <option>RJ</option>
-              <option>RN</option>
-              <option>RS</option>
-              <option>RO</option>
-              <option>RR</option>
-              <option>SC</option>
-              <option>SP</option>
-              <option>SE</option>
-              <option>TO</option>
-
-            </select>
+            <input
+              id="imovelUf"
+              maxlength="2"
+            >
 
           </div>
 
 
           <div class="form-group">
 
-            <label for="imovelValor">
-              Valor aproximado
+            <label>
+              Valor
             </label>
 
             <input
-              type="text"
               id="imovelValor"
               placeholder="R$ 0,00"
             >
@@ -1671,16 +1569,15 @@ input{
           </div>
 
 
-          <div class="form-group form-group-full">
+          <div class="form-group">
 
-            <label for="imovelFonte">
-              Fonte da informação
+            <label>
+              Fonte
             </label>
 
             <input
-              type="text"
               id="imovelFonte"
-              placeholder="Ex.: matrícula, processo, consulta pública..."
+              placeholder="Ex.: matrícula, prefeitura, cartório..."
             >
 
           </div>
@@ -1688,22 +1585,29 @@ input{
 
           <div class="form-group form-group-full">
 
-            <label for="imovelObservacoes">
+            <label>
               Observações
             </label>
 
             <textarea
               id="imovelObservacoes"
               rows="5"
-              placeholder="Informações adicionais sobre o imóvel..."
             ></textarea>
 
           </div>
 
+
         </div>
 
 
-        <div style="margin-top:24px;">
+        <div
+          style="
+            display:flex;
+            gap:10px;
+            margin-top:20px;
+            flex-wrap:wrap;
+          "
+        >
 
           <button
             type="button"
@@ -1713,10 +1617,26 @@ input{
             💾 Salvar imóvel
           </button>
 
+          <button
+            type="button"
+            class="btn-secondary"
+            onclick="limparFormularioImovel()"
+          >
+            Limpar
+          </button>
+
         </div>
+
+
+        <div
+          id="imovelStatus"
+          class="status"
+        ></div>
 
       </div>
 
+
+      <!-- LISTA DE IMÓVEIS -->
 
       <div style="margin-top:32px;">
 
@@ -1737,16 +1657,19 @@ input{
 
       </div>
 
+
     </section>
 
 
-    <!-- =========================
-         TELA DE DETALHES DO IMÓVEL
-    ========================= -->
+    <!-- =================================================
+         DETALHES DO IMÓVEL
+    ================================================= -->
 
     <section
       id="imovelDetalhesScreen"
+      style="display:none;"
     >
+
 
       <div class="investigacao-header">
 
@@ -1760,7 +1683,9 @@ input{
             ← Voltar para imóveis
           </button>
 
-          <h1>
+          <h1
+            style="margin-top:18px;"
+          >
             🏠 Detalhes do imóvel
           </h1>
 
@@ -1773,6 +1698,254 @@ input{
       </div>
 
 
+      <!-- AÇÕES -->
+
+      <div
+        class="investigacao-actions"
+        style="margin-bottom:20px;"
+      >
+
+        <button
+          type="button"
+          class="btn"
+          onclick="editarImovelAtual()"
+        >
+          ✏️ Editar imóvel
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-danger"
+          onclick="excluirImovelAtual()"
+        >
+          🗑️ Excluir imóvel
+        </button>
+
+      </div>
+
+
+      <!-- FORMULÁRIO DE EDIÇÃO -->
+
+      <div
+        id="editarImovelForm"
+        class="info-card imoveis-card"
+        style="display:none;"
+      >
+
+        <h2>
+          ✏️ Editar imóvel
+        </h2>
+
+
+        <div class="form-grid">
+
+
+          <div class="form-group">
+
+            <label>
+              Tipo de imóvel
+            </label>
+
+            <input
+              id="editImovelTipo"
+            >
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label>
+              Matrícula
+            </label>
+
+            <input
+              id="editImovelMatricula"
+            >
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label>
+              Cartório
+            </label>
+
+            <input
+              id="editImovelCartorio"
+            >
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label>
+              CEP
+            </label>
+
+            <input
+              id="editImovelCep"
+            >
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label>
+              Endereço
+            </label>
+
+            <input
+              id="editImovelEndereco"
+            >
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label>
+              Número
+            </label>
+
+            <input
+              id="editImovelNumero"
+            >
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label>
+              Complemento
+            </label>
+
+            <input
+              id="editImovelComplemento"
+            >
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label>
+              Bairro
+            </label>
+
+            <input
+              id="editImovelBairro"
+            >
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label>
+              Cidade
+            </label>
+
+            <input
+              id="editImovelCidade"
+            >
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label>
+              UF
+            </label>
+
+            <input
+              id="editImovelUf"
+              maxlength="2"
+            >
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label>
+              Valor
+            </label>
+
+            <input
+              id="editImovelValor"
+            >
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label>
+              Fonte
+            </label>
+
+            <input
+              id="editImovelFonte"
+            >
+
+          </div>
+
+
+          <div class="form-group form-group-full">
+
+            <label>
+              Observações
+            </label>
+
+            <textarea
+              id="editImovelObservacoes"
+              rows="5"
+            ></textarea>
+
+          </div>
+
+
+        </div>
+
+
+        <div
+          style="
+            display:flex;
+            gap:10px;
+            margin-top:20px;
+            flex-wrap:wrap;
+          "
+        >
+
+          <button
+            type="button"
+            class="btn"
+            onclick="salvarEdicaoImovel()"
+          >
+            💾 Salvar alterações
+          </button>
+
+          <button
+            type="button"
+            class="btn-secondary"
+            onclick="cancelarEdicaoImovel()"
+          >
+            ↩️ Cancelar
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <!-- IDENTIFICAÇÃO -->
+
       <div class="info-card imoveis-card">
 
         <h2>
@@ -1780,12 +1953,16 @@ input{
         </h2>
 
         <div
-          class="detalhes-imovel-grid"
           id="detalhesImovelIdentificacao"
-        ></div>
+          class="detalhes-grid"
+        >
+          Carregando...
+        </div>
 
       </div>
 
+
+      <!-- LOCALIZAÇÃO -->
 
       <div class="info-card imoveis-card">
 
@@ -1794,12 +1971,16 @@ input{
         </h2>
 
         <div
-          class="detalhes-imovel-grid"
           id="detalhesImovelLocalizacao"
-        ></div>
+          class="detalhes-grid"
+        >
+          Carregando...
+        </div>
 
       </div>
 
+
+      <!-- PATRIMONIAL -->
 
       <div class="info-card imoveis-card">
 
@@ -1808,12 +1989,16 @@ input{
         </h2>
 
         <div
-          class="detalhes-imovel-grid"
           id="detalhesImovelPatrimonial"
-        ></div>
+          class="detalhes-grid"
+        >
+          Carregando...
+        </div>
 
       </div>
 
+
+      <!-- OBSERVAÇÕES -->
 
       <div class="info-card imoveis-card">
 
@@ -1822,65 +2007,68 @@ input{
         </h2>
 
         <div
-          class="detalhes-imovel-box observacoes-box"
           id="detalhesImovelObservacoes"
-        ></div>
+          class="detalhes-value"
+        >
+          Carregando...
+        </div>
 
       </div>
 
+
     </section>
 
-  </section>
+
+  </main>
 
 </div>
 
 
 <script>
 
-/* =========================
+/* =================================================
    API
-========================= */
+================================================= */
 
 const API =
   "https://api.meuinvestigador.com.br";
 
 
+/* =================================================
+   VARIÁVEIS
+================================================= */
+
 let investigacoes = [];
 
 let investigacaoAtual = null;
 
+let imovelAtual = null;
 
-/* =========================
+
+/* =================================================
    LOGIN
-========================= */
+================================================= */
 
 async function entrar(event){
 
   event.preventDefault();
 
   const email =
-    document
-      .getElementById("loginEmail")
-      .value
-      .trim();
+    document.getElementById(
+      "loginEmail"
+    ).value.trim();
 
   const senha =
-    document
-      .getElementById("loginSenha")
-      .value;
-
-  const botao =
-    document
-      .getElementById("loginButton");
+    document.getElementById(
+      "loginSenha"
+    ).value;
 
   const status =
-    document
-      .getElementById("loginStatus");
+    document.getElementById(
+      "loginStatus"
+    );
 
-  botao.disabled = true;
-  botao.textContent = "Entrando...";
   status.style.display = "none";
-
 
   try{
 
@@ -1889,13 +2077,11 @@ async function entrar(event){
         API + "/login",
         {
           method:"POST",
-
-          headers:{
-            "Content-Type":"application/json"
-          },
-
           credentials:"include",
-
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
           body:JSON.stringify({
             email,
             senha
@@ -1910,124 +2096,47 @@ async function entrar(event){
 
     if(!resposta.ok){
 
-      throw new Error(
+      status.textContent =
         resultado.erro ||
-        "E-mail ou senha inválidos."
-      );
+        "Não foi possível entrar.";
 
-    }
-
-
-    document
-      .getElementById("loginScreen")
-      .style.display = "none";
-
-
-    document
-      .getElementById("app")
-      .style.display = "flex";
-
-
-    await carregar();
-
-
-  }catch(erro){
-
-    console.error(erro);
-
-    status.textContent =
-      erro.message ||
-      "Não foi possível entrar.";
-
-    status.style.display = "block";
-
-
-  }finally{
-
-    botao.disabled = false;
-    botao.textContent = "Entrar";
-
-  }
-
-}
-
-
-/* =========================
-   VERIFICAR SESSÃO
-========================= */
-
-async function verificarSessao(){
-
-  try{
-
-    const resposta =
-      await fetch(
-        API + "/investigacoes",
-        {
-          method:"GET",
-          credentials:"include"
-        }
-      );
-
-
-    if(resposta.ok){
-
-      investigacoes =
-        await resposta.json();
-
-
-      document
-        .getElementById("loginScreen")
-        .style.display = "none";
-
-
-      document
-        .getElementById("app")
-        .style.display = "flex";
-
-
-      render();
+      status.style.display =
+        "block";
 
       return;
 
     }
 
 
-    mostrarLogin();
+    document.getElementById(
+      "loginScreen"
+    ).style.display = "none";
 
+    document.getElementById(
+      "app"
+    ).style.display = "flex";
+
+
+    await carregar();
 
   }catch(erro){
 
     console.error(erro);
 
-    mostrarLogin();
+    status.textContent =
+      "Erro de comunicação com o servidor.";
+
+    status.style.display =
+      "block";
 
   }
 
 }
 
 
-/* =========================
-   MOSTRAR LOGIN
-========================= */
-
-function mostrarLogin(){
-
-  document
-    .getElementById("loginScreen")
-    .style.display = "flex";
-
-
-  document
-    .getElementById("app")
-    .style.display = "none";
-
-}
-
-
-/* =========================
-   SAIR
-========================= */
+/* =================================================
+   LOGOUT
+================================================= */
 
 async function sair(){
 
@@ -2047,155 +2156,132 @@ async function sair(){
 
   }
 
-
   investigacoes = [];
 
   investigacaoAtual = null;
 
+  imovelAtual = null;
 
-  document
-    .getElementById("loginEmail")
-    .value = "";
+  document.getElementById(
+    "app"
+  ).style.display = "none";
 
-
-  document
-    .getElementById("loginSenha")
-    .value = "";
-
-
-  mostrarLogin();
+  document.getElementById(
+    "loginScreen"
+  ).style.display = "flex";
 
 }
 
 
-/* =========================
-   MENSAGENS
-========================= */
+/* =================================================
+   MENSAGEM
+================================================= */
 
-function msg(texto, erro=false){
+function msg(
+  texto,
+  erro = false
+){
 
   const elemento =
-    document
-      .getElementById("status");
+    document.getElementById(
+      "formStatus"
+    );
 
-  elemento.style.display = "block";
+  elemento.textContent =
+    texto;
 
-  elemento.textContent = texto;
-
-  elemento.classList.toggle(
-    "error",
+  elemento.className =
     erro
-  );
+      ? "status error"
+      : "status";
 
-
-  setTimeout(()=>{
-
-    elemento.style.display = "none";
-
-  },3000);
+  elemento.style.display =
+    "block";
 
 }
 
 
-/* =========================
-   LIMPAR
-========================= */
+/* =================================================
+   LIMPAR MENSAGEM
+================================================= */
 
 function limpar(){
 
-  [
-    "nome",
-    "documento",
-    "processo",
-    "advogado"
-  ]
+  const elemento =
+    document.getElementById(
+      "formStatus"
+    );
 
-  .forEach(id=>{
-
-    document
-      .getElementById(id)
-      .value = "";
-
-  });
-
-
-  document
-    .querySelectorAll(".check input")
-    .forEach(x=>{
-
-      x.checked = false;
-
-    });
+  elemento.style.display =
+    "none";
 
 }
 
 
-/* =========================
+/* =================================================
    DATA
-========================= */
+================================================= */
 
 function formatarData(data){
 
-  if(!data) return "";
+  if(!data){
+    return "-";
+  }
 
-  const d =
-    new Date(data);
+  try{
 
+    return new Date(data)
+      .toLocaleString(
+        "pt-BR"
+      );
 
-  if(
-    Number.isNaN(
-      d.getTime()
-    )
-  ){
+  }catch{
 
     return data;
 
   }
 
-
-  return d.toLocaleDateString(
-    "pt-BR"
-  );
-
 }
 
 
-/* =========================
+/* =================================================
    FONTES
-========================= */
+================================================= */
 
 function fontesArray(fontes){
 
-  if(Array.isArray(fontes)){
-
-    return fontes;
-
+  if(!fontes){
+    return [];
   }
 
+  if(Array.isArray(fontes)){
+    return fontes;
+  }
 
-  if(typeof fontes === "string"){
+  try{
 
-    try{
+    const resultado =
+      JSON.parse(fontes);
 
-      return JSON.parse(fontes);
-
-    }catch(e){
-
-      return [];
-
+    if(Array.isArray(resultado)){
+      return resultado;
     }
 
+  }catch{
+
   }
 
-
-  return [];
+  return String(fontes)
+    .split(",")
+    .map(item => item.trim())
+    .filter(Boolean);
 
 }
 
 
-/* =========================
+/* =================================================
    CARREGAR INVESTIGAÇÕES
-========================= */
+================================================= */
 
 async function carregar(){
 
@@ -2205,7 +2291,6 @@ async function carregar(){
       await fetch(
         API + "/investigacoes",
         {
-          method:"GET",
           credentials:"include"
         }
       );
@@ -2213,35 +2298,54 @@ async function carregar(){
 
     if(resposta.status === 401){
 
-      mostrarLogin();
+      document.getElementById(
+        "app"
+      ).style.display = "none";
+
+      document.getElementById(
+        "loginScreen"
+      ).style.display = "flex";
 
       return;
 
     }
 
 
+    const dados =
+      await resposta.json();
+
+
     if(!resposta.ok){
 
-      throw new Error(
-        "Erro ao carregar investigações."
+      msg(
+        dados.erro ||
+        "Erro ao carregar investigações.",
+        true
       );
+
+      return;
 
     }
 
 
     investigacoes =
-      await resposta.json();
+      Array.isArray(dados)
+        ? dados
+        : (
+            Array.isArray(dados.results)
+              ? dados.results
+              : []
+          );
 
 
     render();
-
 
   }catch(erro){
 
     console.error(erro);
 
     msg(
-      "Não foi possível carregar as investigações.",
+      "Erro de comunicação com o servidor.",
       true
     );
 
@@ -2250,63 +2354,48 @@ async function carregar(){
 }
 
 
-/* =========================
+/* =================================================
    SALVAR INVESTIGAÇÃO
-========================= */
+================================================= */
 
-async function salvar(){
+async function salvar(event){
+
+  event.preventDefault();
+
+  limpar();
+
 
   const nome =
-    document
-      .getElementById("nome")
-      .value
-      .trim();
+    document.getElementById(
+      "nome"
+    ).value.trim();
 
+  const documento =
+    document.getElementById(
+      "documento"
+    ).value.trim();
 
-  if(!nome){
+  const processo =
+    document.getElementById(
+      "processo"
+    ).value.trim();
 
-    msg(
-      "Informe o nome do investigado.",
-      true
-    );
-
-    return;
-
-  }
+  const advogado =
+    document.getElementById(
+      "advogado"
+    ).value.trim();
 
 
   const fontes =
-    [
-      ...document
-        .querySelectorAll(
-          ".check input:checked"
-        )
-    ]
-    .map(x=>x.value);
-
-
-  const dados = {
-
-    nome,
-
-    documento:
-      document
-        .getElementById("documento")
-        .value,
-
-    processo:
-      document
-        .getElementById("processo")
-        .value,
-
-    advogado:
-      document
-        .getElementById("advogado")
-        .value,
-
-    fontes
-
-  };
+    Array.from(
+      document.querySelectorAll(
+        'input[name="fontes"]:checked'
+      )
+    )
+    .map(
+      checkbox =>
+        checkbox.value
+    );
 
 
   try{
@@ -2315,19 +2404,21 @@ async function salvar(){
       await fetch(
         API + "/investigacoes",
         {
-
           method:"POST",
-
+          credentials:"include",
           headers:{
             "Content-Type":
               "application/json"
           },
+          body:JSON.stringify({
 
-          credentials:"include",
+            nome,
+            documento,
+            processo,
+            advogado,
+            fontes
 
-          body:
-            JSON.stringify(dados)
-
+          })
         }
       );
 
@@ -2338,26 +2429,40 @@ async function salvar(){
 
     if(!resposta.ok){
 
-      if(resposta.status === 401){
-
-        mostrarLogin();
-
-        return;
-
-      }
-
-
-      throw new Error(
+      msg(
         resultado.erro ||
-        "Erro ao salvar investigação."
+        "Não foi possível salvar.",
+        true
       );
+
+      return;
 
     }
 
 
-    limpar();
+    document.getElementById(
+      "nome"
+    ).value = "";
 
-    await carregar();
+    document.getElementById(
+      "documento"
+    ).value = "";
+
+    document.getElementById(
+      "processo"
+    ).value = "";
+
+    document.getElementById(
+      "advogado"
+    ).value = "";
+
+
+    document.querySelectorAll(
+      'input[name="fontes"]'
+    ).forEach(
+      checkbox =>
+        checkbox.checked = false
+    );
 
 
     msg(
@@ -2365,13 +2470,14 @@ async function salvar(){
     );
 
 
+    await carregar();
+
   }catch(erro){
 
     console.error(erro);
 
     msg(
-      erro.message ||
-      "Erro ao salvar investigação.",
+      "Erro de comunicação com o servidor.",
       true
     );
 
@@ -2380,134 +2486,135 @@ async function salvar(){
 }
 
 
-/* =========================
+/* =================================================
    ABRIR INVESTIGAÇÃO
-========================= */
+================================================= */
 
 function abrir(id){
 
-  const x =
+  const investigacao =
     investigacoes.find(
       item =>
         Number(item.id) === Number(id)
     );
 
 
-  if(!x) return;
+  if(!investigacao){
+
+    alert(
+      "Investigação não encontrada."
+    );
+
+    return;
+
+  }
 
 
-  investigacaoAtual = x;
+  investigacaoAtual =
+    investigacao;
+
+  imovelAtual = null;
 
 
-  document
-    .getElementById("dashboardScreen")
-    .style.display = "none";
+  document.getElementById(
+    "dashboardScreen"
+  ).style.display = "none";
+
+  document.getElementById(
+    "imoveisScreen"
+  ).style.display = "none";
+
+  document.getElementById(
+    "imovelDetalhesScreen"
+  ).style.display = "none";
+
+  document.getElementById(
+    "investigacaoScreen"
+  ).style.display = "block";
 
 
-  document
-    .getElementById("investigacaoScreen")
-    .style.display = "block";
+  document.getElementById(
+    "investigacaoTitulo"
+  ).textContent =
+    investigacao.nome || "Investigação";
 
 
-  document
-    .getElementById("imoveisScreen")
-    .style.display = "none";
+  document.getElementById(
+    "investigacaoSubtitulo"
+  ).textContent =
+    "Detalhes da investigação.";
 
 
-  document
-    .getElementById("imovelDetalhesScreen")
-    .style.display = "none";
+  document.getElementById(
+    "infoNome"
+  ).textContent =
+    investigacao.nome || "-";
 
 
-  document
-    .getElementById("investigacaoTitulo")
-    .textContent =
-      x.nome || "Investigação";
+  document.getElementById(
+    "infoDocumento"
+  ).textContent =
+    investigacao.documento || "-";
 
 
-  document
-    .getElementById("investigacaoSubtitulo")
-    .textContent =
-      "Investigação #" +
-      x.id +
-      " · criada em " +
-      formatarData(x.data_criacao);
+  document.getElementById(
+    "infoProcesso"
+  ).textContent =
+    investigacao.processo || "-";
 
 
-  document
-    .getElementById("detalheNome")
-    .textContent =
-      x.nome || "Não informado";
+  document.getElementById(
+    "infoAdvogado"
+  ).textContent =
+    investigacao.advogado || "-";
 
 
-  document
-    .getElementById("detalheDocumento")
-    .textContent =
-      x.documento || "Não informado";
-
-
-  document
-    .getElementById("detalheProcesso")
-    .textContent =
-      x.processo || "Não informado";
-
-
-  document
-    .getElementById("detalheAdvogado")
-    .textContent =
-      x.advogado || "Não informado";
-
-
-  document
-    .getElementById("detalheData")
-    .textContent =
-      formatarData(x.data_criacao) ||
-      "Não informado";
+  document.getElementById(
+    "infoData"
+  ).textContent =
+    formatarData(
+      investigacao.data_criacao
+    );
 
 
   const fontes =
-    fontesArray(x.fontes);
+    fontesArray(
+      investigacao.fontes
+    );
 
 
-  const container =
-    document
-      .getElementById("detalheFontes");
+  const listaFontes =
+    document.getElementById(
+      "infoFontes"
+    );
 
 
   if(!fontes.length){
 
-    container.innerHTML =
-      '<div class="empty-source">' +
-      'Nenhuma fonte ou diligência selecionada.' +
-      '</div>';
+    listaFontes.innerHTML =
+      `
+        <span class="empty-source">
+          Nenhuma fonte cadastrada.
+        </span>
+      `;
 
   }else{
 
-    container.innerHTML =
+    listaFontes.innerHTML =
       fontes
         .map(
           fonte =>
-            '<span class="source-tag">' +
-            esc(fonte) +
-            '</span>'
+            `
+              <span class="source-tag">
+                ${esc(fonte)}
+              </span>
+            `
         )
         .join("");
 
   }
 
 
-  document
-    .getElementById(
-      "botaoExcluirInvestigacao"
-    )
-    .onclick =
-      function(){
-
-        excluir(x.id);
-
-      };
-
-
   window.scrollTo({
     top:0,
     behavior:"smooth"
@@ -2516,37 +2623,39 @@ function abrir(id){
 }
 
 
-/* =========================
-   VOLTAR AO DASHBOARD
-========================= */
+/* =================================================
+   DASHBOARD
+================================================= */
 
 function mostrarDashboard(){
 
   investigacaoAtual = null;
 
-
-  document
-    .getElementById("imoveisScreen")
-    .style.display = "none";
+  imovelAtual = null;
 
 
-  document
-    .getElementById("imovelDetalhesScreen")
-    .style.display = "none";
+  document.getElementById(
+    "dashboardScreen"
+  ).style.display = "block";
+
+  document.getElementById(
+    "investigacaoScreen"
+  ).style.display = "none";
+
+  document.getElementById(
+    "imoveisScreen"
+  ).style.display = "none";
+
+  document.getElementById(
+    "imovelDetalhesScreen"
+  ).style.display = "none";
+
+  document.getElementById(
+    "editarImovelForm"
+  ).style.display = "none";
 
 
-  document
-    .getElementById("investigacaoScreen")
-    .style.display = "none";
-
-
-  document
-    .getElementById("dashboardScreen")
-    .style.display = "block";
-
-
-  render();
-
+  carregar();
 
   window.scrollTo({
     top:0,
@@ -2556,28 +2665,21 @@ function mostrarDashboard(){
 }
 
 
-/* =========================
-   EXCLUIR
-========================= */
+/* =================================================
+   EXCLUIR INVESTIGAÇÃO
+================================================= */
 
 async function excluir(id){
 
-  const x =
-    investigacoes.find(
-      item =>
-        Number(item.id) === Number(id)
+  const confirmar =
+    confirm(
+      "Tem certeza que deseja excluir esta investigação?\n\n" +
+      "Os imóveis vinculados também serão excluídos."
     );
 
 
-  if(!x) return;
-
-
-  if(!confirm(
-    "Excluir " + x.nome + "?"
-  )){
-
+  if(!confirmar){
     return;
-
   }
 
 
@@ -2597,64 +2699,49 @@ async function excluir(id){
       await resposta.json();
 
 
-    if(resposta.status === 401){
+    if(!resposta.ok){
 
-      mostrarLogin();
+      alert(
+        resultado.erro ||
+        "Não foi possível excluir."
+      );
 
       return;
 
     }
 
 
-    if(!resposta.ok){
-
-      throw new Error(
-        resultado.erro ||
-        "Erro ao excluir investigação."
-      );
-
-    }
-
-
     investigacaoAtual = null;
+
+    imovelAtual = null;
+
+
+    document.getElementById(
+      "dashboardScreen"
+    ).style.display = "block";
+
+    document.getElementById(
+      "investigacaoScreen"
+    ).style.display = "none";
+
+    document.getElementById(
+      "imoveisScreen"
+    ).style.display = "none";
+
+    document.getElementById(
+      "imovelDetalhesScreen"
+    ).style.display = "none";
 
 
     await carregar();
-
-
-    document
-      .getElementById("investigacaoScreen")
-      .style.display = "none";
-
-
-    document
-      .getElementById("imoveisScreen")
-      .style.display = "none";
-
-
-    document
-      .getElementById("imovelDetalhesScreen")
-      .style.display = "none";
-
-
-    document
-      .getElementById("dashboardScreen")
-      .style.display = "block";
-
-
-    msg(
-      "Investigação excluída com sucesso."
-    );
 
 
   }catch(erro){
 
     console.error(erro);
 
-    msg(
-      erro.message ||
-      "Erro ao excluir investigação.",
-      true
+    alert(
+      "Erro de comunicação com o servidor."
     );
 
   }
@@ -2662,80 +2749,64 @@ async function excluir(id){
 }
 
 
-/* =========================
-   ESCAPE HTML
-========================= */
+/* =================================================
+   ESCAPAR HTML
+================================================= */
 
-function esc(s){
+function esc(valor){
 
-  return String(s || "")
-    .replace(
-      /[&<>"']/g,
+  if(valor === null ||
+     valor === undefined){
 
-      m=>({
+    return "";
 
-        "&":"&amp;",
-        "<":"&lt;",
-        ">":"&gt;",
-        '"':"&quot;",
-        "'":"&#039;"
+  }
 
-      }[m])
-
-    );
+  return String(valor)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
 
 }
 
 
-/* =========================
-   RENDER
-========================= */
+/* =================================================
+   RENDER INVESTIGAÇÕES
+================================================= */
 
 function render(){
 
-  const total =
-    investigacoes.length;
-
-
-  const fontes =
-    investigacoes.reduce(
-
-      (s,x)=>
-        s +
-        fontesArray(x.fontes).length,
-
-      0
-
+  const lista =
+    document.getElementById(
+      "listaInvestigações"
     );
 
 
-  document
-    .getElementById("total")
-    .textContent = total;
+  document.getElementById(
+    "totalInvestigações"
+  ).textContent =
+    investigacoes.length;
 
 
-  document
-    .getElementById("andamento")
-    .textContent = total;
-
-
-  document
-    .getElementById("fontes")
-    .textContent = fontes;
-
-
-  const lista =
-    document
-      .getElementById("lista");
+  document.getElementById(
+    "totalRecentes"
+  ).textContent =
+    Math.min(
+      investigacoes.length,
+      5
+    );
 
 
   if(!investigacoes.length){
 
     lista.innerHTML =
-      '<div class="empty">' +
-      'Nenhuma investigação cadastrada. ' +
-      'Comece criando uma nova.' +
-      '</div>';
+      `
+        <div class="empty">
+          Nenhuma investigação cadastrada.
+        </div>
+      `;
 
     return;
 
@@ -2744,460 +2815,97 @@ function render(){
 
   lista.innerHTML =
     investigacoes
-      .slice(0,8)
-      .map(x=>{
+      .slice(0,5)
+      .map(
+        item =>
+          `
+            <div class="item">
 
-        const processo =
-          x.processo
-            ? "Processo: " +
-              esc(x.processo)
-            : "Sem processo";
+              <strong>
+                ${esc(item.nome)}
+              </strong>
 
+              <span>
+                ${esc(item.documento || "Sem documento")}
+              </span>
 
-        return `
+              <br>
 
-          <div class="item">
+              <span>
+                ${formatarData(item.data_criacao)}
+              </span>
 
-            <strong>
-              ${esc(x.nome)}
-            </strong>
+              <div class="item-actions">
 
-            <span>
-              ${processo}
-              ·
-              ${esc(
-                formatarData(
-                  x.data_criacao
-                )
-              )}
-            </span>
+                <button
+                  type="button"
+                  class="mini"
+                  onclick="abrir(${Number(item.id)})"
+                >
+                  Abrir
+                </button>
 
-            <div class="item-actions">
+                <button
+                  type="button"
+                  class="mini del"
+                  onclick="excluir(${Number(item.id)})"
+                >
+                  Excluir
+                </button>
 
-              <button
-                class="mini"
-                onclick="abrir(${x.id})"
-              >
-                Abrir
-              </button>
-
-              <button
-                class="mini del"
-                onclick="excluir(${x.id})"
-              >
-                Excluir
-              </button>
+              </div>
 
             </div>
-
-          </div>
-
-        `;
-
-      })
+          `
+      )
       .join("");
 
 }
 
 
-/* =========================
-   MÓDULO IMÓVEIS
-========================= */
+/* =================================================
+   ABRIR MÓDULO
+================================================= */
 
 function abrirModulo(modulo){
 
-  if(modulo === "imoveis"){
-
-    if(!investigacaoAtual){
-
-      return;
-
-    }
-
-
-    document
-      .getElementById("dashboardScreen")
-      .style.display = "none";
-
-
-    document
-      .getElementById("investigacaoScreen")
-      .style.display = "none";
-
-
-    document
-      .getElementById("imovelDetalhesScreen")
-      .style.display = "none";
-
-
-    document
-      .getElementById("imoveisScreen")
-      .style.display = "block";
-
-
-    carregarImoveis();
-
-
-    window.scrollTo({
-      top:0,
-      behavior:"smooth"
-    });
-
+  if(
+    modulo !== "imoveis"
+  ){
+    return;
   }
 
-}
-
-
-/* =========================
-   VOLTAR DA TELA IMÓVEIS
-========================= */
-
-function voltarDaTelaImoveis(){
-
-  document
-    .getElementById("imoveisScreen")
-    .style.display = "none";
-
-
-  document
-    .getElementById("imovelDetalhesScreen")
-    .style.display = "none";
-
-
-  document
-    .getElementById("investigacaoScreen")
-    .style.display = "block";
-
-
-  window.scrollTo({
-    top:0,
-    behavior:"smooth"
-  });
-
-}
-
-
-/* =========================
-   ABRIR DETALHES DO IMÓVEL
-========================= */
-
-async function abrirImovel(id){
 
   if(!investigacaoAtual){
+
+    alert(
+      "Abra uma investigação primeiro."
+    );
 
     return;
 
   }
 
 
-  try{
-
-    const resposta =
-      await fetch(
-        API +
-        "/imoveis?investigacao_id=" +
-        encodeURIComponent(
-          investigacaoAtual.id
-        ),
-        {
-          method:"GET",
-          credentials:"include"
-        }
-      );
-
-
-    if(!resposta.ok){
-
-      throw new Error(
-        "Não foi possível carregar o imóvel."
-      );
-
-    }
-
-
-    const imoveis =
-      await resposta.json();
-
-
-    const imovel =
-      imoveis.find(
-        x =>
-          Number(x.id) === Number(id)
-      );
-
-
-    if(!imovel){
-
-      alert(
-        "Imóvel não encontrado."
-      );
-
-      return;
-
-    }
-
-
-    /* IDENTIFICAÇÃO */
-
-    document
-      .getElementById(
-        "detalhesImovelIdentificacao"
-      )
-      .innerHTML = `
-
-        <div class="detalhes-imovel-box">
-
-          <div class="detalhes-imovel-label">
-            Tipo do imóvel
-          </div>
-
-          <div class="detalhes-imovel-value">
-            ${esc(
-              imovel.tipo ||
-              "Não informado"
-            )}
-          </div>
-
-        </div>
-
-
-        <div class="detalhes-imovel-box">
-
-          <div class="detalhes-imovel-label">
-            Matrícula
-          </div>
-
-          <div class="detalhes-imovel-value">
-            ${esc(
-              imovel.matricula ||
-              "Não informado"
-            )}
-          </div>
-
-        </div>
-
-
-        <div class="detalhes-imovel-box full">
-
-          <div class="detalhes-imovel-label">
-            Cartório
-          </div>
-
-          <div class="detalhes-imovel-value">
-            ${esc(
-              imovel.cartorio ||
-              "Não informado"
-            )}
-          </div>
-
-        </div>
-
-      `;
-
-
-    /* LOCALIZAÇÃO */
-
-    const endereco =
-      [
-        imovel.endereco,
-        imovel.numero,
-        imovel.complemento
-      ]
-      .filter(Boolean)
-      .join(", ");
-
-
-    document
-      .getElementById(
-        "detalhesImovelLocalizacao"
-      )
-      .innerHTML = `
-
-        <div class="detalhes-imovel-box full">
-
-          <div class="detalhes-imovel-label">
-            Endereço
-          </div>
-
-          <div class="detalhes-imovel-value">
-            ${esc(
-              endereco ||
-              "Não informado"
-            )}
-          </div>
-
-        </div>
-
-
-        <div class="detalhes-imovel-box">
-
-          <div class="detalhes-imovel-label">
-            Bairro
-          </div>
-
-          <div class="detalhes-imovel-value">
-            ${esc(
-              imovel.bairro ||
-              "Não informado"
-            )}
-          </div>
-
-        </div>
-
-
-        <div class="detalhes-imovel-box">
-
-          <div class="detalhes-imovel-label">
-            Cidade
-          </div>
-
-          <div class="detalhes-imovel-value">
-            ${esc(
-              imovel.cidade ||
-              "Não informado"
-            )}
-          </div>
-
-        </div>
-
-
-        <div class="detalhes-imovel-box">
-
-          <div class="detalhes-imovel-label">
-            UF
-          </div>
-
-          <div class="detalhes-imovel-value">
-            ${esc(
-              imovel.uf ||
-              "Não informado"
-            )}
-          </div>
-
-        </div>
-
-
-        <div class="detalhes-imovel-box">
-
-          <div class="detalhes-imovel-label">
-            CEP
-          </div>
-
-          <div class="detalhes-imovel-value">
-            ${esc(
-              imovel.cep ||
-              "Não informado"
-            )}
-          </div>
-
-        </div>
-
-      `;
-
-
-    /* PATRIMONIAL */
-
-    document
-      .getElementById(
-        "detalhesImovelPatrimonial"
-      )
-      .innerHTML = `
-
-        <div class="detalhes-imovel-box">
-
-          <div class="detalhes-imovel-label">
-            Valor aproximado
-          </div>
-
-          <div class="detalhes-imovel-value">
-            ${esc(
-              imovel.valor ||
-              "Não informado"
-            )}
-          </div>
-
-        </div>
-
-
-        <div class="detalhes-imovel-box">
-
-          <div class="detalhes-imovel-label">
-            Fonte da informação
-          </div>
-
-          <div class="detalhes-imovel-value">
-            ${esc(
-              imovel.fonte ||
-              "Não informado"
-            )}
-          </div>
-
-        </div>
-
-      `;
-
-
-    /* OBSERVAÇÕES */
-
-    document
-      .getElementById(
-        "detalhesImovelObservacoes"
-      )
-      .textContent =
-        imovel.observacoes ||
-        "Nenhuma observação registrada.";
-
-
-    /* TROCAR TELA */
-
-    document
-      .getElementById("imoveisScreen")
-      .style.display = "none";
-
-
-    document
-      .getElementById("imovelDetalhesScreen")
-      .style.display = "block";
-
-
-    window.scrollTo({
-      top:0,
-      behavior:"smooth"
-    });
-
-
-  }catch(erro){
-
-    console.error(erro);
-
-    alert(
-      erro.message ||
-      "Erro ao abrir imóvel."
-    );
-
-  }
-
-}
-
-
-/* =========================
-   VOLTAR DOS DETALHES
-========================= */
-
-function voltarDosDetalhesDoImovel(){
-
-  document
-    .getElementById(
-      "imovelDetalhesScreen"
-    )
-    .style.display = "none";
-
-
-  document
-    .getElementById(
-      "imoveisScreen"
-    )
-    .style.display = "block";
+  document.getElementById(
+    "dashboardScreen"
+  ).style.display = "none";
+
+  document.getElementById(
+    "investigacaoScreen"
+  ).style.display = "none";
+
+  document.getElementById(
+    "imovelDetalhesScreen"
+  ).style.display = "none";
+
+  document.getElementById(
+    "editarImovelForm"
+  ).style.display = "none";
+
+  document.getElementById(
+    "imoveisScreen"
+  ).style.display = "block";
 
 
   carregarImoveis();
@@ -3211,9 +2919,43 @@ function voltarDosDetalhesDoImovel(){
 }
 
 
-/* =========================
+/* =================================================
+   VOLTAR DOS IMÓVEIS
+================================================= */
+
+function voltarDaTelaImoveis(){
+
+  document.getElementById(
+    "imoveisScreen"
+  ).style.display = "none";
+
+  document.getElementById(
+    "imovelDetalhesScreen"
+  ).style.display = "none";
+
+  document.getElementById(
+    "editarImovelForm"
+  ).style.display = "none";
+
+  document.getElementById(
+    "investigacaoScreen"
+  ).style.display = "block";
+
+
+  imovelAtual = null;
+
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
+
+}
+
+
+/* =================================================
    CARREGAR IMÓVEIS
-========================= */
+================================================= */
 
 async function carregarImoveis(){
 
@@ -3230,8 +2972,388 @@ async function carregarImoveis(){
     );
 
 
-  lista.innerHTML =
-    '<div class="empty">Carregando imóveis...</div>';
+  try{
+
+    const resposta =
+      await fetch(
+        API +
+        "/imoveis?investigacao_id=" +
+        encodeURIComponent(
+          investigacaoAtual.id
+        ),
+        {
+          credentials:"include"
+        }
+      );
+
+
+    if(resposta.status === 401){
+
+      await sair();
+
+      return;
+
+    }
+
+
+    const dados =
+      await resposta.json();
+
+
+    if(!resposta.ok){
+
+      lista.innerHTML =
+        `
+          <div class="empty">
+            ${esc(
+              dados.erro ||
+              "Erro ao carregar imóveis."
+            )}
+          </div>
+        `;
+
+      return;
+
+    }
+
+
+    const imoveis =
+      Array.isArray(dados)
+        ? dados
+        : (
+            Array.isArray(dados.results)
+              ? dados.results
+              : []
+          );
+
+
+    document.getElementById(
+      "totalImoveis"
+    ).textContent =
+      imoveis.length;
+
+
+    if(!imoveis.length){
+
+      lista.innerHTML =
+        `
+          <div class="empty">
+            Nenhum imóvel cadastrado.
+          </div>
+        `;
+
+      return;
+
+    }
+
+
+    lista.innerHTML =
+      imoveis
+        .map(
+          imovel =>
+            `
+              <div class="item">
+
+                <strong>
+                  ${esc(
+                    imovel.tipo ||
+                    "Imóvel"
+                  )}
+                </strong>
+
+                <span>
+                  Matrícula:
+                  ${esc(
+                    imovel.matricula ||
+                    "Não informada"
+                  )}
+                </span>
+
+                <br>
+
+                <span>
+                  ${esc(
+                    imovel.endereco ||
+                    "Endereço não informado"
+                  )}
+                  ${imovel.numero
+                    ? ", " +
+                      esc(imovel.numero)
+                    : ""}
+                </span>
+
+                <br>
+
+                <span>
+                  ${esc(
+                    imovel.cidade || ""
+                  )}
+                  ${imovel.uf
+                    ? " / " +
+                      esc(imovel.uf)
+                    : ""}
+                </span>
+
+                <div class="item-actions">
+
+                  <button
+                    type="button"
+                    class="mini"
+                    onclick="abrirImovel(${Number(imovel.id)})"
+                  >
+                    Abrir
+                  </button>
+
+                </div>
+
+              </div>
+            `
+        )
+        .join("");
+
+  }catch(erro){
+
+    console.error(erro);
+
+    lista.innerHTML =
+      `
+        <div class="empty">
+          Erro de comunicação com o servidor.
+        </div>
+      `;
+
+  }
+
+}
+
+
+/* =================================================
+   SALVAR IMÓVEL
+================================================= */
+
+async function salvarImovel(){
+
+  if(!investigacaoAtual){
+
+    alert(
+      "Nenhuma investigação selecionada."
+    );
+
+    return;
+
+  }
+
+
+  const status =
+    document.getElementById(
+      "imovelStatus"
+    );
+
+
+  status.style.display =
+    "none";
+
+
+  const dados = {
+
+    investigacao_id:
+      investigacaoAtual.id,
+
+    tipo:
+      document.getElementById(
+        "imovelTipo"
+      ).value.trim(),
+
+    matricula:
+      document.getElementById(
+        "imovelMatricula"
+      ).value.trim(),
+
+    cartorio:
+      document.getElementById(
+        "imovelCartorio"
+      ).value.trim(),
+
+    cep:
+      document.getElementById(
+        "imovelCep"
+      ).value.trim(),
+
+    endereco:
+      document.getElementById(
+        "imovelEndereco"
+      ).value.trim(),
+
+    numero:
+      document.getElementById(
+        "imovelNumero"
+      ).value.trim(),
+
+    complemento:
+      document.getElementById(
+        "imovelComplemento"
+      ).value.trim(),
+
+    bairro:
+      document.getElementById(
+        "imovelBairro"
+      ).value.trim(),
+
+    cidade:
+      document.getElementById(
+        "imovelCidade"
+      ).value.trim(),
+
+    uf:
+      document.getElementById(
+        "imovelUf"
+      ).value.trim(),
+
+    valor:
+      document.getElementById(
+        "imovelValor"
+      ).value.trim(),
+
+    fonte:
+      document.getElementById(
+        "imovelFonte"
+      ).value.trim(),
+
+    observacoes:
+      document.getElementById(
+        "imovelObservacoes"
+      ).value.trim()
+
+  };
+
+
+  try{
+
+    const resposta =
+      await fetch(
+        API + "/imoveis",
+        {
+          method:"POST",
+          credentials:"include",
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
+          body:JSON.stringify(dados)
+        }
+      );
+
+
+    const resultado =
+      await resposta.json();
+
+
+    if(!resposta.ok){
+
+      status.textContent =
+        resultado.erro ||
+        "Não foi possível salvar o imóvel.";
+
+      status.className =
+        "status error";
+
+      status.style.display =
+        "block";
+
+      return;
+
+    }
+
+
+    status.textContent =
+      "Imóvel cadastrado com sucesso.";
+
+    status.className =
+      "status";
+
+    status.style.display =
+      "block";
+
+
+    limparFormularioImovel();
+
+
+    await carregarImoveis();
+
+  }catch(erro){
+
+    console.error(erro);
+
+    status.textContent =
+      "Erro de comunicação com o servidor.";
+
+    status.className =
+      "status error";
+
+    status.style.display =
+      "block";
+
+  }
+
+}
+
+
+/* =================================================
+   LIMPAR FORMULÁRIO DO IMÓVEL
+================================================= */
+
+function limparFormularioImovel(){
+
+  const campos = [
+
+    "imovelTipo",
+    "imovelMatricula",
+    "imovelCartorio",
+    "imovelCep",
+    "imovelEndereco",
+    "imovelNumero",
+    "imovelComplemento",
+    "imovelBairro",
+    "imovelCidade",
+    "imovelUf",
+    "imovelValor",
+    "imovelFonte",
+    "imovelObservacoes"
+
+  ];
+
+
+  campos.forEach(
+    id => {
+
+      const elemento =
+        document.getElementById(id);
+
+      if(elemento){
+        elemento.value = "";
+      }
+
+    }
+  );
+
+}
+
+
+/* =================================================
+   ABRIR IMÓVEL
+================================================= */
+
+async function abrirImovel(id){
+
+  if(!investigacaoAtual){
+
+    alert(
+      "Nenhuma investigação selecionada."
+    );
+
+    return;
+
+  }
 
 
   try{
@@ -3244,215 +3366,486 @@ async function carregarImoveis(){
           investigacaoAtual.id
         ),
         {
-          method:"GET",
           credentials:"include"
         }
       );
 
 
-    const resultado =
+    const dados =
       await resposta.json();
-
-
-    if(resposta.status === 401){
-
-      mostrarLogin();
-
-      return;
-
-    }
 
 
     if(!resposta.ok){
 
-      throw new Error(
-        resultado.erro ||
-        "Erro ao carregar imóveis."
+      alert(
+        dados.erro ||
+        "Erro ao carregar imóvel."
       );
-
-    }
-
-
-    if(
-      !Array.isArray(resultado) ||
-      resultado.length === 0
-    ){
-
-      lista.innerHTML =
-        '<div class="empty">' +
-        'Nenhum imóvel cadastrado.' +
-        '</div>';
 
       return;
 
     }
 
 
-    lista.innerHTML =
-      resultado
-        .map(imovel => {
-
-          const enderecoCompleto =
-            [
-              imovel.endereco,
-              imovel.numero,
-              imovel.complemento
-            ]
-            .filter(Boolean)
-            .join(", ");
+    const imoveis =
+      Array.isArray(dados)
+        ? dados
+        : (
+            Array.isArray(dados.results)
+              ? dados.results
+              : []
+          );
 
 
-          const localidade =
-            [
-              imovel.bairro,
-              imovel.cidade,
-              imovel.uf
-            ]
-            .filter(Boolean)
-            .join(" — ");
+    const imovel =
+      imoveis.find(
+        item =>
+          Number(item.id) === Number(id)
+      );
 
 
-          return `
+    if(!imovel){
 
-            <div class="item">
+      alert(
+        "Imóvel não encontrado."
+      );
 
-              <strong>
-                🏠 ${esc(
-                  imovel.tipo ||
-                  "Imóvel"
-                )}
-              </strong>
+      return;
 
-
-              ${
-                imovel.matricula
-                  ? `
-                    <span>
-                      Matrícula:
-                      ${esc(
-                        imovel.matricula
-                      )}
-                    </span>
-                  `
-                  : ""
-              }
+    }
 
 
-              ${
-                enderecoCompleto
-                  ? `
-                    <span>
-                      ${esc(
-                        enderecoCompleto
-                      )}
-                    </span>
-                  `
-                  : ""
-              }
+    imovelAtual =
+      imovel;
 
 
-              ${
-                localidade
-                  ? `
-                    <span>
-                      ${esc(
-                        localidade
-                      )}
-                    </span>
-                  `
-                  : ""
-              }
+    document.getElementById(
+      "imoveisScreen"
+    ).style.display = "none";
+
+    document.getElementById(
+      "editarImovelForm"
+    ).style.display = "none";
+
+    document.getElementById(
+      "imovelDetalhesScreen"
+    ).style.display = "block";
 
 
-              ${
-                imovel.valor
-                  ? `
-                    <span>
-                      Valor:
-                      ${esc(
-                        imovel.valor
-                      )}
-                    </span>
-                  `
-                  : ""
-              }
+    document.getElementById(
+      "detalhesImovelIdentificacao"
+    ).innerHTML = `
+
+      <div class="detalhes-box">
+
+        <div class="detalhes-label">
+          Tipo de imóvel
+        </div>
+
+        <div class="detalhes-value">
+          ${esc(
+            imovel.tipo ||
+            "-"
+          )}
+        </div>
+
+      </div>
 
 
-              ${
-                imovel.fonte
-                  ? `
-                    <span>
-                      Fonte:
-                      ${esc(
-                        imovel.fonte
-                      )}
-                    </span>
-                  `
-                  : ""
-              }
+      <div class="detalhes-box">
+
+        <div class="detalhes-label">
+          Matrícula
+        </div>
+
+        <div class="detalhes-value">
+          ${esc(
+            imovel.matricula ||
+            "-"
+          )}
+        </div>
+
+      </div>
 
 
-              ${
-                imovel.observacoes
-                  ? `
-                    <span>
-                      Observações:
-                      ${esc(
-                        imovel.observacoes
-                      )}
-                    </span>
-                  `
-                  : ""
-              }
+      <div class="detalhes-box full">
+
+        <div class="detalhes-label">
+          Cartório
+        </div>
+
+        <div class="detalhes-value">
+          ${esc(
+            imovel.cartorio ||
+            "-"
+          )}
+        </div>
+
+      </div>
+
+    `;
 
 
-              <div class="item-actions">
+    document.getElementById(
+      "detalhesImovelLocalizacao"
+    ).innerHTML = `
 
-                <button
-                  type="button"
-                  class="mini"
-                  onclick="abrirImovel(${imovel.id})"
-                >
-                  Abrir
-                </button>
+      <div class="detalhes-box">
 
-              </div>
+        <div class="detalhes-label">
+          CEP
+        </div>
 
-            </div>
+        <div class="detalhes-value">
+          ${esc(
+            imovel.cep ||
+            "-"
+          )}
+        </div>
 
-          `;
+      </div>
 
-        })
-        .join("");
 
+      <div class="detalhes-box">
+
+        <div class="detalhes-label">
+          Endereço
+        </div>
+
+        <div class="detalhes-value">
+          ${esc(
+            imovel.endereco ||
+            "-"
+          )}
+        </div>
+
+      </div>
+
+
+      <div class="detalhes-box">
+
+        <div class="detalhes-label">
+          Número
+        </div>
+
+        <div class="detalhes-value">
+          ${esc(
+            imovel.numero ||
+            "-"
+          )}
+        </div>
+
+      </div>
+
+
+      <div class="detalhes-box">
+
+        <div class="detalhes-label">
+          Complemento
+        </div>
+
+        <div class="detalhes-value">
+          ${esc(
+            imovel.complemento ||
+            "-"
+          )}
+        </div>
+
+      </div>
+
+
+      <div class="detalhes-box">
+
+        <div class="detalhes-label">
+          Bairro
+        </div>
+
+        <div class="detalhes-value">
+          ${esc(
+            imovel.bairro ||
+            "-"
+          )}
+        </div>
+
+      </div>
+
+
+      <div class="detalhes-box">
+
+        <div class="detalhes-label">
+          Cidade
+        </div>
+
+        <div class="detalhes-value">
+          ${esc(
+            imovel.cidade ||
+            "-"
+          )}
+        </div>
+
+      </div>
+
+
+      <div class="detalhes-box">
+
+        <div class="detalhes-label">
+          UF
+        </div>
+
+        <div class="detalhes-value">
+          ${esc(
+            imovel.uf ||
+            "-"
+          )}
+        </div>
+
+      </div>
+
+    `;
+
+
+    document.getElementById(
+      "detalhesImovelPatrimonial"
+    ).innerHTML = `
+
+      <div class="detalhes-box">
+
+        <div class="detalhes-label">
+          Valor
+        </div>
+
+        <div class="detalhes-value">
+          ${esc(
+            imovel.valor ||
+            "-"
+          )}
+        </div>
+
+      </div>
+
+
+      <div class="detalhes-box">
+
+        <div class="detalhes-label">
+          Fonte
+        </div>
+
+        <div class="detalhes-value">
+          ${esc(
+            imovel.fonte ||
+            "-"
+          )}
+        </div>
+
+      </div>
+
+
+      <div class="detalhes-box full">
+
+        <div class="detalhes-label">
+          Data de cadastro
+        </div>
+
+        <div class="detalhes-value">
+          ${formatarData(
+            imovel.data_criacao
+          )}
+        </div>
+
+      </div>
+
+    `;
+
+
+    document.getElementById(
+      "detalhesImovelObservacoes"
+    ).textContent =
+      imovel.observacoes ||
+      "Nenhuma observação cadastrada.";
+
+
+    window.scrollTo({
+      top:0,
+      behavior:"smooth"
+    });
 
   }catch(erro){
 
     console.error(erro);
 
-    lista.innerHTML =
-      '<div class="empty">' +
-      esc(
-        erro.message ||
-        "Erro ao carregar imóveis."
-      ) +
-      '</div>';
+    alert(
+      "Erro de comunicação com o servidor."
+    );
 
   }
 
 }
 
 
-/* =========================
-   SALVAR IMÓVEL
-========================= */
+/* =================================================
+   VOLTAR DOS DETALHES DO IMÓVEL
+================================================= */
 
-async function salvarImovel(){
+function voltarDosDetalhesDoImovel(){
 
-  if(!investigacaoAtual){
+  document.getElementById(
+    "imovelDetalhesScreen"
+  ).style.display = "none";
+
+  document.getElementById(
+    "editarImovelForm"
+  ).style.display = "none";
+
+  document.getElementById(
+    "imoveisScreen"
+  ).style.display = "block";
+
+
+  imovelAtual = null;
+
+
+  carregarImoveis();
+
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
+
+}
+
+
+/* =================================================
+   EDITAR IMÓVEL ATUAL
+================================================= */
+
+function editarImovelAtual(){
+
+  if(!imovelAtual){
 
     alert(
-      "Nenhuma investigação está selecionada."
+      "Nenhum imóvel selecionado."
+    );
+
+    return;
+
+  }
+
+
+  document.getElementById(
+    "editImovelTipo"
+  ).value =
+    imovelAtual.tipo || "";
+
+
+  document.getElementById(
+    "editImovelMatricula"
+  ).value =
+    imovelAtual.matricula || "";
+
+
+  document.getElementById(
+    "editImovelCartorio"
+  ).value =
+    imovelAtual.cartorio || "";
+
+
+  document.getElementById(
+    "editImovelCep"
+  ).value =
+    imovelAtual.cep || "";
+
+
+  document.getElementById(
+    "editImovelEndereco"
+  ).value =
+    imovelAtual.endereco || "";
+
+
+  document.getElementById(
+    "editImovelNumero"
+  ).value =
+    imovelAtual.numero || "";
+
+
+  document.getElementById(
+    "editImovelComplemento"
+  ).value =
+    imovelAtual.complemento || "";
+
+
+  document.getElementById(
+    "editImovelBairro"
+  ).value =
+    imovelAtual.bairro || "";
+
+
+  document.getElementById(
+    "editImovelCidade"
+  ).value =
+    imovelAtual.cidade || "";
+
+
+  document.getElementById(
+    "editImovelUf"
+  ).value =
+    imovelAtual.uf || "";
+
+
+  document.getElementById(
+    "editImovelValor"
+  ).value =
+    imovelAtual.valor || "";
+
+
+  document.getElementById(
+    "editImovelFonte"
+  ).value =
+    imovelAtual.fonte || "";
+
+
+  document.getElementById(
+    "editImovelObservacoes"
+  ).value =
+    imovelAtual.observacoes || "";
+
+
+  document.getElementById(
+    "editarImovelForm"
+  ).style.display = "block";
+
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
+
+}
+
+
+/* =================================================
+   CANCELAR EDIÇÃO
+================================================= */
+
+function cancelarEdicaoImovel(){
+
+  document.getElementById(
+    "editarImovelForm"
+  ).style.display = "none";
+
+}
+
+
+/* =================================================
+   SALVAR EDIÇÃO
+================================================= */
+
+async function salvarEdicaoImovel(){
+
+  if(!imovelAtual){
+
+    alert(
+      "Nenhum imóvel selecionado."
     );
 
     return;
@@ -3462,84 +3855,70 @@ async function salvarImovel(){
 
   const dados = {
 
-    investigacao_id:
-      investigacaoAtual.id,
-
     tipo:
-      document
-        .getElementById("imovelTipo")
-        .value,
+      document.getElementById(
+        "editImovelTipo"
+      ).value.trim(),
 
     matricula:
-      document
-        .getElementById("imovelMatricula")
-        .value
-        .trim(),
+      document.getElementById(
+        "editImovelMatricula"
+      ).value.trim(),
 
     cartorio:
-      document
-        .getElementById("imovelCartorio")
-        .value
-        .trim(),
+      document.getElementById(
+        "editImovelCartorio"
+      ).value.trim(),
 
     cep:
-      document
-        .getElementById("imovelCep")
-        .value
-        .trim(),
+      document.getElementById(
+        "editImovelCep"
+      ).value.trim(),
 
     endereco:
-      document
-        .getElementById("imovelEndereco")
-        .value
-        .trim(),
+      document.getElementById(
+        "editImovelEndereco"
+      ).value.trim(),
 
     numero:
-      document
-        .getElementById("imovelNumero")
-        .value
-        .trim(),
+      document.getElementById(
+        "editImovelNumero"
+      ).value.trim(),
 
     complemento:
-      document
-        .getElementById("imovelComplemento")
-        .value
-        .trim(),
+      document.getElementById(
+        "editImovelComplemento"
+      ).value.trim(),
 
     bairro:
-      document
-        .getElementById("imovelBairro")
-        .value
-        .trim(),
+      document.getElementById(
+        "editImovelBairro"
+      ).value.trim(),
 
     cidade:
-      document
-        .getElementById("imovelCidade")
-        .value
-        .trim(),
+      document.getElementById(
+        "editImovelCidade"
+      ).value.trim(),
 
     uf:
-      document
-        .getElementById("imovelUf")
-        .value,
+      document.getElementById(
+        "editImovelUf"
+      ).value.trim(),
 
     valor:
-      document
-        .getElementById("imovelValor")
-        .value
-        .trim(),
+      document.getElementById(
+        "editImovelValor"
+      ).value.trim(),
 
     fonte:
-      document
-        .getElementById("imovelFonte")
-        .value
-        .trim(),
+      document.getElementById(
+        "editImovelFonte"
+      ).value.trim(),
 
     observacoes:
-      document
-        .getElementById("imovelObservacoes")
-        .value
-        .trim()
+      document.getElementById(
+        "editImovelObservacoes"
+      ).value.trim()
 
   };
 
@@ -3548,19 +3927,17 @@ async function salvarImovel(){
 
     const resposta =
       await fetch(
-        API + "/imoveis",
+        API +
+        "/imoveis/" +
+        imovelAtual.id,
         {
-          method:"POST",
-
+          method:"PUT",
+          credentials:"include",
           headers:{
             "Content-Type":
               "application/json"
           },
-
-          credentials:"include",
-
-          body:
-            JSON.stringify(dados)
+          body:JSON.stringify(dados)
         }
       );
 
@@ -3571,41 +3948,36 @@ async function salvarImovel(){
 
     if(!resposta.ok){
 
-      if(resposta.status === 401){
-
-        mostrarLogin();
-
-        return;
-
-      }
-
-
-      throw new Error(
+      alert(
         resultado.erro ||
-        "Erro ao salvar imóvel."
+        "Não foi possível atualizar o imóvel."
       );
+
+      return;
 
     }
 
 
     alert(
-      "Imóvel salvo com sucesso."
+      "Imóvel atualizado com sucesso."
     );
 
 
-    limparFormularioImovel();
+    document.getElementById(
+      "editarImovelForm"
+    ).style.display = "none";
 
 
-    await carregarImoveis();
-
+    await abrirImovel(
+      imovelAtual.id
+    );
 
   }catch(erro){
 
     console.error(erro);
 
     alert(
-      erro.message ||
-      "Erro ao salvar imóvel."
+      "Erro de comunicação com o servidor."
     );
 
   }
@@ -3613,44 +3985,166 @@ async function salvarImovel(){
 }
 
 
-/* =========================
-   LIMPAR FORMULÁRIO IMÓVEL
-========================= */
+/* =================================================
+   EXCLUIR IMÓVEL
+================================================= */
 
-function limparFormularioImovel(){
+async function excluirImovelAtual(){
 
-  document.getElementById("imovelTipo").value = "";
+  if(!imovelAtual){
 
-  document.getElementById("imovelMatricula").value = "";
+    alert(
+      "Nenhum imóvel selecionado."
+    );
 
-  document.getElementById("imovelCartorio").value = "";
+    return;
 
-  document.getElementById("imovelCep").value = "";
+  }
 
-  document.getElementById("imovelEndereco").value = "";
 
-  document.getElementById("imovelNumero").value = "";
+  const confirmar =
+    confirm(
+      "Tem certeza que deseja excluir este imóvel?\n\n" +
+      "Esta operação não poderá ser desfeita."
+    );
 
-  document.getElementById("imovelComplemento").value = "";
 
-  document.getElementById("imovelBairro").value = "";
+  if(!confirmar){
+    return;
+  }
 
-  document.getElementById("imovelCidade").value = "";
 
-  document.getElementById("imovelUf").value = "";
+  try{
 
-  document.getElementById("imovelValor").value = "";
+    const resposta =
+      await fetch(
+        API +
+        "/imoveis/" +
+        imovelAtual.id,
+        {
+          method:"DELETE",
+          credentials:"include"
+        }
+      );
 
-  document.getElementById("imovelFonte").value = "";
 
-  document.getElementById("imovelObservacoes").value = "";
+    const resultado =
+      await resposta.json();
+
+
+    if(!resposta.ok){
+
+      alert(
+        resultado.erro ||
+        "Não foi possível excluir o imóvel."
+      );
+
+      return;
+
+    }
+
+
+    alert(
+      "Imóvel excluído com sucesso."
+    );
+
+
+    imovelAtual = null;
+
+
+    document.getElementById(
+      "imovelDetalhesScreen"
+    ).style.display = "none";
+
+    document.getElementById(
+      "imoveisScreen"
+    ).style.display = "block";
+
+
+    await carregarImoveis();
+
+
+    window.scrollTo({
+      top:0,
+      behavior:"smooth"
+    });
+
+  }catch(erro){
+
+    console.error(erro);
+
+    alert(
+      "Erro de comunicação com o servidor."
+    );
+
+  }
 
 }
 
 
-/* =========================
-   INÍCIO
-========================= */
+/* =================================================
+   VERIFICAR SESSÃO
+================================================= */
+
+async function verificarSessao(){
+
+  try{
+
+    const resposta =
+      await fetch(
+        API + "/investigacoes",
+        {
+          credentials:"include"
+        }
+      );
+
+
+    if(resposta.ok){
+
+      document.getElementById(
+        "loginScreen"
+      ).style.display = "none";
+
+      document.getElementById(
+        "app"
+      ).style.display = "flex";
+
+
+      await carregar();
+
+      return;
+
+    }
+
+
+    document.getElementById(
+      "loginScreen"
+    ).style.display = "flex";
+
+    document.getElementById(
+      "app"
+    ).style.display = "none";
+
+  }catch(erro){
+
+    console.error(erro);
+
+    document.getElementById(
+      "loginScreen"
+    ).style.display = "flex";
+
+    document.getElementById(
+      "app"
+    ).style.display = "none";
+
+  }
+
+}
+
+
+/* =================================================
+   INICIAR
+================================================= */
 
 verificarSessao();
 
