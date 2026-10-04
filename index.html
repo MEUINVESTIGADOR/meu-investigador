@@ -3407,16 +3407,175 @@ async function excluirVeiculoAtual(){
 
 async function abrirRelatorio(){
 
-  if(!investigacaoAtual){
+  mostrarSomente("relatorioScreen");
+
+  $("relatorioConteudo").innerHTML =
+    '<div class="loading">Carregando investigações...</div>';
+
+  try{
+
+    if(!investigacoes.length){
+      await carregarInvestigacoes();
+    }
+
+
+    if(!investigacoes.length){
+
+      $("relatorioConteudo").innerHTML = `
+
+        <div class="empty">
+
+          Nenhuma investigação cadastrada.
+
+          <div
+            class="actions"
+            style="justify-content:center"
+          >
+
+            <button
+              class="btn btn-primary"
+              onclick="mostrarSomente('homeScreen'); mostrarNovaInvestigacao();"
+            >
+              ＋ Nova investigação
+            </button>
+
+          </div>
+
+        </div>
+
+      `;
+
+      return;
+    }
+
+
+    if(investigacaoAtual){
+
+      await gerarRelatorioDaInvestigacao(
+        investigacaoAtual.id
+      );
+
+      return;
+    }
+
+
+    $("relatorioConteudo").innerHTML = `
+
+      <div class="relatorio-capa">
+
+        <div class="badge">
+          RELATÓRIOS DE INVESTIGAÇÃO
+        </div>
+
+        <h1>
+          Meu Investigador
+        </h1>
+
+        <p class="muted">
+          Selecione a investigação
+          que deseja consultar.
+        </p>
+
+      </div>
+
+
+      <div class="relatorio-section">
+
+        <h2>
+          🔎 Investigações cadastradas
+        </h2>
+
+        ${
+          investigacoes.map(function(inv){
+
+            return `
+
+              <div class="item">
+
+                <div class="item-head">
+
+                  <div>
+
+                    <div class="item-title">
+                      ${escapeHtml(inv.nome)}
+                    </div>
+
+                    <div class="muted">
+                      Processo:
+                      ${escapeHtml(inv.processo || "-")}
+                    </div>
+
+                    <div class="muted">
+                      Documento:
+                      ${escapeHtml(inv.documento || "-")}
+                    </div>
+
+                  </div>
+
+
+                  <div
+                    class="actions"
+                    style="margin-top:0"
+                  >
+
+                    <button
+                      class="btn btn-primary"
+                      onclick="gerarRelatorioDaInvestigacao(${Number(inv.id)})"
+                    >
+                      📄 Gerar relatório
+                    </button>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            `;
+
+          }).join("")
+        }
+
+      </div>
+
+    `;
+
+  }catch(e){
+
+    $("relatorioConteudo").innerHTML =
+      '<div class="error">' +
+      'Erro ao carregar relatórios: ' +
+      escapeHtml(e.message) +
+      '</div>';
+
+  }
+
+}
+
+
+async function gerarRelatorioDaInvestigacao(id){
+
+  const encontrada =
+    investigacoes.find(
+      x =>
+        Number(x.id) ===
+        Number(id)
+    );
+
+
+  if(!encontrada){
 
     alert(
-      "Abra uma investigação primeiro " +
-      "para gerar o relatório."
+      "Investigação não encontrada."
     );
 
     return;
 
   }
+
+
+  investigacaoAtual =
+    encontrada;
 
 
   mostrarSomente(
@@ -3504,6 +3663,7 @@ function renderizarRelatorio(){
                   ${index + 1}
 
                   —
+
                   ${escapeHtml(
                     im.tipo ||
                     "Imóvel"
@@ -3589,12 +3749,10 @@ function renderizarRelatorio(){
                 <div class="detail">
 
                   <strong>
-
                     ${escapeHtml(
                       im.observacoes ||
                       "Nenhuma observação cadastrada."
                     )}
-
                   </strong>
 
                 </div>
@@ -3607,10 +3765,12 @@ function renderizarRelatorio(){
           .join("")
 
       : `
+
         <div class="empty">
           Nenhum imóvel cadastrado
           nesta investigação.
         </div>
+
       `;
 
 
@@ -3733,12 +3893,10 @@ function renderizarRelatorio(){
                 <div class="detail">
 
                   <strong>
-
                     ${escapeHtml(
                       v.observacoes ||
                       "Nenhuma observação cadastrada."
                     )}
-
                   </strong>
 
                 </div>
@@ -3751,18 +3909,19 @@ function renderizarRelatorio(){
           .join("")
 
       : `
+
         <div class="empty">
           Nenhum veículo cadastrado
           nesta investigação.
         </div>
+
       `;
 
 
   const agora =
-    new Date()
-      .toLocaleString(
-        "pt-BR"
-      );
+    new Date().toLocaleString(
+      "pt-BR"
+    );
 
 
   $("relatorioConteudo").innerHTML = `
@@ -3936,12 +4095,10 @@ function renderizarRelatorio(){
       <div class="detail">
 
         <strong>
-
           ${escapeHtml(
             inv.fontes ||
             "Nenhuma fonte informada."
           )}
-
         </strong>
 
       </div>
@@ -3999,7 +4156,6 @@ function voltarDaTelaRelatorio(){
   }
 
 }
-
 
 /* =========================
    HELPERS
