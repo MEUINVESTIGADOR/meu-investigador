@@ -4,62 +4,261 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Meu Investigador</title>
+
 <style>
 :root{
-  --bg:#f5f7fb;--card:#fff;--text:#172033;--muted:#697386;
-  --line:#dfe4ec;--primary:#1d4ed8;--primary2:#2563eb;
-  --danger:#b91c1c;--success:#15803d;--shadow:0 8px 24px rgba(20,30,50,.08)
+  --bg:#f5f7fb;
+  --card:#fff;
+  --text:#172033;
+  --muted:#697386;
+  --line:#dfe4ec;
+  --primary:#1d4ed8;
+  --primary2:#2563eb;
+  --danger:#b91c1c;
+  --success:#15803d;
+  --shadow:0 8px 24px rgba(20,30,50,.08);
+  --dark:#111827;
 }
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
-button,input,select,textarea{font:inherit}
-button{cursor:pointer}
-.hidden{display:none!important}
-.container{max-width:1100px;margin:0 auto;padding:24px}
-.topbar{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
-.topbar-inner{max-width:1100px;margin:auto;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px}
-.brand{font-weight:800;font-size:20px}
-.user-area{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:14px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;box-shadow:var(--shadow);margin-bottom:18px}
-h1,h2,h3{margin-top:0}
-h1{font-size:26px}.muted{color:var(--muted)}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
-.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
-.field{display:flex;flex-direction:column;gap:6px}
-.field.full{grid-column:1/-1}
-label{font-weight:700;font-size:14px}
-input,select,textarea{width:100%;padding:11px 12px;border:1px solid #cfd6e2;border-radius:9px;background:#fff;color:var(--text)}
-textarea{min-height:110px;resize:vertical}
-.btn{border:0;border-radius:9px;padding:10px 15px;font-weight:700}
-.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary2)}
-.btn-secondary{background:#eef2f7;color:var(--text)}
-.btn-danger{background:#fee2e2;color:var(--danger)}
-.btn-success{background:#dcfce7;color:var(--success)}
-.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:16px}
-.notice{padding:12px 14px;border-radius:9px;margin-bottom:15px;background:#eff6ff;color:#1e40af}
-.error{background:#fee2e2;color:#991b1b}
-.success{background:#dcfce7;color:#166534}
-.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
-.login-card{width:100%;max-width:420px}
-.item{border:1px solid var(--line);border-radius:12px;padding:16px;margin:10px 0;background:#fff}
-.item-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
-.item-title{font-weight:800;font-size:17px}
-.badge{display:inline-block;padding:4px 8px;border-radius:999px;background:#eef2ff;color:#3730a3;font-size:12px;font-weight:700}
-.detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
-.detail{border:1px solid var(--line);border-radius:10px;padding:12px}
-.detail strong{display:block;margin-top:4px;word-break:break-word}
-.section-title{font-size:16px;border-bottom:1px solid var(--line);padding-bottom:8px;margin:22px 0 14px}
-.empty{padding:25px;text-align:center;color:var(--muted);border:1px dashed #cfd6e2;border-radius:10px}
-.loading{text-align:center;color:var(--muted);padding:20px}
-@media(max-width:700px){
-  .container{padding:14px}.topbar-inner{padding:12px 14px}
-  .grid,.grid3,.detail-grid{grid-template-columns:1fr}
-  .field.full{grid-column:auto}
-  .item-head{flex-direction:column}
+
+*{
+  box-sizing:border-box;
 }
-/* =================================================
-   PAINEL LATERAL
-================================================= */
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Arial,Helvetica,sans-serif;
+}
+
+button,
+input,
+select,
+textarea{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
+.hidden{
+  display:none!important;
+}
+
+.container{
+  max-width:1100px;
+  margin:0 auto;
+  padding:24px;
+}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:20px;
+  box-shadow:var(--shadow);
+  margin-bottom:18px;
+}
+
+h1,
+h2,
+h3{
+  margin-top:0;
+}
+
+h1{
+  font-size:26px;
+}
+
+.muted{
+  color:var(--muted);
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:14px;
+}
+
+.grid3{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:14px;
+}
+
+.field{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.field.full{
+  grid-column:1/-1;
+}
+
+label{
+  font-weight:700;
+  font-size:14px;
+}
+
+input,
+select,
+textarea{
+  width:100%;
+  padding:11px 12px;
+  border:1px solid #cfd6e2;
+  border-radius:9px;
+  background:#fff;
+  color:var(--text);
+}
+
+textarea{
+  min-height:110px;
+  resize:vertical;
+}
+
+.btn{
+  border:0;
+  border-radius:9px;
+  padding:10px 15px;
+  font-weight:700;
+}
+
+.btn-primary{
+  background:var(--primary);
+  color:#fff;
+}
+
+.btn-primary:hover{
+  background:var(--primary2);
+}
+
+.btn-secondary{
+  background:#eef2f7;
+  color:var(--text);
+}
+
+.btn-danger{
+  background:#fee2e2;
+  color:var(--danger);
+}
+
+.btn-success{
+  background:#dcfce7;
+  color:var(--success);
+}
+
+.actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:9px;
+  margin-top:16px;
+}
+
+.notice{
+  padding:12px 14px;
+  border-radius:9px;
+  margin-bottom:15px;
+  background:#eff6ff;
+  color:#1e40af;
+}
+
+.error{
+  background:#fee2e2;
+  color:#991b1b;
+}
+
+.success{
+  background:#dcfce7;
+  color:#166534;
+}
+
+.login-wrap{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+
+.login-card{
+  width:100%;
+  max-width:420px;
+}
+
+.item{
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:16px;
+  margin:10px 0;
+  background:#fff;
+}
+
+.item-head{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:flex-start;
+}
+
+.item-title{
+  font-weight:800;
+  font-size:17px;
+}
+
+.badge{
+  display:inline-block;
+  padding:4px 8px;
+  border-radius:999px;
+  background:#eef2ff;
+  color:#3730a3;
+  font-size:12px;
+  font-weight:700;
+}
+
+.detail-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:14px;
+}
+
+.detail{
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:12px;
+}
+
+.detail strong{
+  display:block;
+  margin-top:4px;
+  word-break:break-word;
+}
+
+.section-title{
+  font-size:16px;
+  border-bottom:1px solid var(--line);
+  padding-bottom:8px;
+  margin:22px 0 14px;
+}
+
+.empty{
+  padding:25px;
+  text-align:center;
+  color:var(--muted);
+  border:1px dashed #cfd6e2;
+  border-radius:10px;
+}
+
+.loading{
+  text-align:center;
+  color:var(--muted);
+  padding:20px;
+}
+
+/* =========================
+   SIDEBAR
+========================= */
 
 #appScreen{
   min-height:100vh;
@@ -67,7 +266,7 @@ textarea{min-height:110px;resize:vertical}
 
 .sidebar{
   width:245px;
-  background:#111827;
+  background:var(--dark);
   color:#fff;
   padding:24px 16px;
   position:fixed;
@@ -80,11 +279,18 @@ textarea{min-height:110px;resize:vertical}
 .sidebar .logo{
   font-size:20px;
   font-weight:800;
-  padding:8px 12px 28px;
+  padding:8px 12px 24px;
 }
 
 .sidebar .logo span{
   color:#7da0ff;
+}
+
+.sidebar .usuario{
+  padding:0 12px 20px;
+  color:#9ca3af;
+  font-size:13px;
+  word-break:break-word;
 }
 
 .nav a{
@@ -96,7 +302,8 @@ textarea{min-height:110px;resize:vertical}
   margin:4px 0;
 }
 
-.nav a:hover{
+.nav a:hover,
+.nav a.active{
   background:#202b42;
   color:#fff;
 }
@@ -133,7 +340,154 @@ textarea{min-height:110px;resize:vertical}
   padding:28px 34px;
 }
 
-@media(max-width:650px){
+/* =========================
+   RELATÓRIO
+========================= */
+
+.relatorio-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:16px;
+  flex-wrap:wrap;
+}
+
+.relatorio-capa{
+  text-align:center;
+  padding:12px 0 20px;
+  border-bottom:1px solid var(--line);
+  margin-bottom:20px;
+}
+
+.relatorio-capa h1{
+  margin-bottom:8px;
+}
+
+.relatorio-meta{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+  margin-bottom:20px;
+}
+
+.relatorio-section{
+  margin-top:26px;
+}
+
+.relatorio-section h2{
+  font-size:19px;
+  border-bottom:1px solid var(--line);
+  padding-bottom:8px;
+}
+
+.relatorio-counts{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px;
+}
+
+.relatorio-count{
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:14px;
+  text-align:center;
+}
+
+.relatorio-count strong{
+  display:block;
+  font-size:24px;
+  margin-top:4px;
+}
+
+.relatorio-item{
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:15px;
+  margin:12px 0;
+}
+
+.relatorio-item h3{
+  margin-bottom:10px;
+  font-size:17px;
+}
+
+.relatorio-footer{
+  margin-top:30px;
+  padding-top:14px;
+  border-top:1px solid var(--line);
+  color:var(--muted);
+  font-size:12px;
+  text-align:center;
+}
+
+/* =========================
+   IMPRESSÃO
+========================= */
+
+@media print{
+
+  body{
+    background:#fff;
+  }
+
+  #loginScreen,
+  .sidebar,
+  #homeScreen,
+  #investigacaoScreen,
+  #imoveisScreen,
+  #imovelDetalheScreen,
+  #veiculosScreen,
+  #veiculoDetalheScreen,
+  .nao-imprimir{
+    display:none!important;
+  }
+
+  #appScreen,
+  #appScreen > .container,
+  #relatorioScreen{
+    display:block!important;
+    margin:0!important;
+    width:100%!important;
+    max-width:none!important;
+    padding:0!important;
+  }
+
+  .card{
+    border:0!important;
+    box-shadow:none!important;
+    margin:0!important;
+  }
+
+  .relatorio-item{
+    break-inside:avoid;
+  }
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:700px){
+
+  .container{
+    padding:14px;
+  }
+
+  .grid,
+  .grid3,
+  .detail-grid,
+  .relatorio-meta,
+  .relatorio-counts{
+    grid-template-columns:1fr;
+  }
+
+  .field.full{
+    grid-column:auto;
+  }
+
+  .item-head{
+    flex-direction:column;
+  }
 
   .sidebar{
     width:70px;
@@ -149,6 +503,12 @@ textarea{min-height:110px;resize:vertical}
     font-size:18px;
   }
 
+  .sidebar .usuario,
+  .sidebar small,
+  .sidebar .logout{
+    display:none;
+  }
+
   .nav a{
     font-size:0;
     text-align:center;
@@ -158,162 +518,58 @@ textarea{min-height:110px;resize:vertical}
     font-size:18px;
   }
 
-  .sidebar small,
-  .sidebar .logout{
-    display:none;
-  }
-
   #appScreen > .container{
     margin-left:70px;
     width:calc(100% - 70px);
     padding:20px;
   }
-
 }
 </style>
 </head>
+
 <body>
 
+<!-- =========================
+     LOGIN
+========================= -->
+
 <div id="loginScreen" class="login-wrap">
+
   <div class="card login-card">
+
     <h1>🔎 Meu Investigador</h1>
-    <p class="muted">Acesse sua área de investigação.</p>
+
+    <p class="muted">
+      Acesse sua área de investigação.
+    </p>
+
     <div id="loginMsg"></div>
 
     <form id="loginForm">
+
       <div class="field" style="margin-bottom:12px">
+
         <label>E-mail</label>
-        <input id="loginEmail" type="email" required autocomplete="email">
+
+        <input
+          id="loginEmail"
+          type="email"
+          required
+          autocomplete="email"
+        >
+
       </div>
 
       <div class="field">
+
         <label>Senha</label>
-        <input id="loginSenha" type="password" required autocomplete="current-password">
-      </div>
 
-      <div class="actions">
-        <button class="btn btn-primary" type="submit">Entrar</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<div id="appScreen" class="hidden">
-
-<aside class="sidebar">
-
-  <div class="logo">
-    INVESTIGADOR<span>.</span>
-  </div>
-
-  <div
-  id="usuarioNome"
-  style="padding:0 12px 20px;color:#9ca3af;font-size:13px;"
-></div>
-  <nav class="nav">
-
-    <a
-      href="#"
-      onclick="voltarInicio(); return false;"
-    >
-      🏠 &nbsp; Dashboard
-    </a>
-
-    <a
-      href="#"
-      onclick="mostrarNovaInvestigacao(); return false;"
-    >
-      ＋ &nbsp; Nova investigação
-    </a>
-
-    <a
-      href="#"
-      onclick="voltarInicio(); return false;"
-    >
-      ◷ &nbsp; Investigações
-    </a>
-
-    <a href="#">
-      ▤ &nbsp; Relatórios
-    </a>
-
-    <a href="#">
-      ⚙ &nbsp; Configurações
-    </a>
-
-  </nav>
-
-  <button
-    class="logout"
-    onclick="logout()"
-  >
-    Sair
-  </button>
-
-  <small>
-    Versão 6.0 — API + D1
-  </small>
-
-</aside>
-
-<main class="container">
-
-<section id="homeScreen">
-
-  <div class="card">
-    <h1>Investigações</h1>
-
-    <p class="muted">
-      Gerencie suas investigações e os dados patrimoniais encontrados.
-    </p>
-
-    <div id="homeMsg"></div>
-
-    <div class="actions">
-      <button
-        class="btn btn-primary"
-        onclick="mostrarNovaInvestigacao()"
-      >
-        ＋ Nova investigação
-      </button>
-    </div>
-  </div>
-
-  <div id="novaInvestigacaoCard" class="card hidden">
-
-    <h2>Nova investigação</h2>
-
-    <form id="investigacaoForm">
-
-      <div class="grid">
-
-        <div class="field">
-          <label>Nome da investigação *</label>
-          <input id="invNome" required>
-        </div>
-
-        <div class="field">
-          <label>Documento</label>
-          <input id="invDocumento">
-        </div>
-
-        <div class="field">
-          <label>Processo</label>
-          <input id="invProcesso">
-        </div>
-
-        <div class="field">
-          <label>Advogado</label>
-          <input id="invAdvogado">
-        </div>
-
-        <div class="field full">
-          <label>Fontes</label>
-          <textarea
-            id="invFontes"
-            placeholder="Fontes utilizadas na investigação"
-          ></textarea>
-        </div>
+        <input
+          id="loginSenha"
+          type="password"
+          required
+          autocomplete="current-password"
+        >
 
       </div>
 
@@ -323,15 +579,7 @@ textarea{min-height:110px;resize:vertical}
           class="btn btn-primary"
           type="submit"
         >
-          Salvar investigação
-        </button>
-
-        <button
-          class="btn btn-secondary"
-          type="button"
-          onclick="fecharNovaInvestigacao()"
-        >
-          Cancelar
+          Entrar
         </button>
 
       </div>
@@ -340,569 +588,948 @@ textarea{min-height:110px;resize:vertical}
 
   </div>
 
-  <div class="card">
-
-    <h2>Investigações cadastradas</h2>
-
-    <div
-      id="listaInvestigacoes"
-      class="loading"
-    >
-      Carregando...
-    </div>
-
-  </div>
-
-</section>
-
-
-<section id="investigacaoScreen" class="hidden">
-
-  <div class="card">
-
-    <div
-      class="actions"
-      style="margin-top:0;margin-bottom:14px"
-    >
-      <button
-        class="btn btn-secondary"
-        onclick="voltarInicio()"
-      >
-        ← Voltar
-      </button>
-    </div>
-
-    <h1 id="investigacaoTitulo">
-      Investigação
-    </h1>
-
-    <div id="investigacaoInfo"></div>
-
-    <div class="actions">
-
-      <button
-        class="btn btn-primary"
-        onclick="abrirImoveis()"
-      >
-        🏠 Imóveis
-      </button>
-
-      <button
-        class="btn btn-primary"
-        onclick="abrirVeiculos()"
-      >
-        🚗 Veículos
-      </button>
-
-    </div>
-
-  </div>
-
-</section>
+</div>
 
 
 <!-- =========================
-     IMÓVEIS
+     APLICAÇÃO
 ========================= -->
 
-<section id="imoveisScreen" class="hidden">
+<div
+  id="appScreen"
+  class="hidden"
+>
 
-  <div class="card">
+  <!-- SIDEBAR -->
 
-    <div class="actions" style="margin-top:0">
+  <aside class="sidebar">
 
-      <button
-        class="btn btn-secondary"
-        onclick="voltarDaTelaPatrimonial()"
-      >
-        ← Voltar para investigação
-      </button>
-
+    <div class="logo">
+      INVESTIGADOR<span>.</span>
     </div>
-
-    <h1>🏠 Imóveis</h1>
-
-    <p
-      id="imoveisSubtitulo"
-      class="muted"
-    ></p>
-
-    <div class="actions">
-
-      <button
-        class="btn btn-primary"
-        onclick="abrirFormImovel()"
-      >
-        ＋ Cadastrar imóvel
-      </button>
-
-    </div>
-
-  </div>
-
-
-  <div
-    id="imovelFormCard"
-    class="card hidden"
-  >
-
-    <h2 id="imovelFormTitulo">
-      Cadastrar imóvel
-    </h2>
-
-    <form id="imovelForm">
-
-      <div class="grid">
-
-        <div class="field">
-          <label>Tipo de imóvel</label>
-          <input id="imTipo">
-        </div>
-
-        <div class="field">
-          <label>Matrícula</label>
-          <input id="imMatricula">
-        </div>
-
-        <div class="field">
-          <label>Cartório</label>
-          <input id="imCartorio">
-        </div>
-
-        <div class="field">
-          <label>CEP</label>
-          <input id="imCep">
-        </div>
-
-        <div class="field">
-          <label>Endereço</label>
-          <input id="imEndereco">
-        </div>
-
-        <div class="field">
-          <label>Número</label>
-          <input id="imNumero">
-        </div>
-
-        <div class="field">
-          <label>Complemento</label>
-          <input id="imComplemento">
-        </div>
-
-        <div class="field">
-          <label>Bairro</label>
-          <input id="imBairro">
-        </div>
-
-        <div class="field">
-          <label>Cidade</label>
-          <input id="imCidade">
-        </div>
-
-        <div class="field">
-          <label>UF</label>
-          <input id="imUf" maxlength="2">
-        </div>
-
-        <div class="field">
-          <label>Valor</label>
-          <input id="imValor" placeholder="R$">
-        </div>
-
-        <div class="field">
-          <label>Fonte</label>
-          <input id="imFonte">
-        </div>
-
-        <div class="field full">
-          <label>Observações</label>
-          <textarea id="imObservacoes"></textarea>
-        </div>
-
-      </div>
-
-      <div class="actions">
-
-        <button
-          class="btn btn-primary"
-          type="submit"
-        >
-          Salvar imóvel
-        </button>
-
-        <button
-          class="btn btn-secondary"
-          type="button"
-          onclick="fecharFormImovel()"
-        >
-          Cancelar
-        </button>
-
-      </div>
-
-    </form>
-
-  </div>
-
-
-  <div class="card">
-
-    <h2>Imóveis encontrados</h2>
 
     <div
-      id="listaImoveis"
-      class="loading"
+      id="usuarioNome"
+      class="usuario"
+    ></div>
+
+    <nav class="nav">
+
+      <a
+        href="#"
+        onclick="voltarInicio(); return false;"
+      >
+        🏠 &nbsp; Dashboard
+      </a>
+
+      <a
+        href="#"
+        onclick='mostrarSomente("homeScreen"); mostrarNovaInvestigacao(); return false;'
+      >
+        ＋ &nbsp; Nova investigação
+      </a>
+
+      <a
+        href="#"
+        onclick="voltarInicio(); return false;"
+      >
+        ◷ &nbsp; Investigações
+      </a>
+
+      <a
+        href="#"
+        onclick="abrirRelatorio(); return false;"
+      >
+        ▤ &nbsp; Relatórios
+      </a>
+
+      <a
+        href="#"
+        onclick="voltarInicio(); return false;"
+      >
+        ⚙ &nbsp; Configurações
+      </a>
+
+    </nav>
+
+    <button
+      class="logout"
+      onclick="logout()"
     >
-      Carregando...
-    </div>
+      Sair
+    </button>
 
-  </div>
+    <small>
+      Versão 6.0 — API + D1
+    </small>
 
-</section>
-
-
-<section id="imovelDetalheScreen" class="hidden">
-
-  <div class="card">
-
-    <div class="actions" style="margin-top:0">
-
-      <button
-        class="btn btn-secondary"
-        onclick="abrirImoveis()"
-      >
-        ← Voltar para imóveis
-      </button>
-
-    </div>
-
-    <h1>🏠 Detalhes do imóvel</h1>
-
-    <p class="muted">
-      Informações do imóvel encontrado durante a investigação.
-    </p>
-
-    <div id="imovelDetalhe"></div>
-
-    <div class="actions">
-
-      <button
-        class="btn btn-primary"
-        onclick="editarImovelAtual()"
-      >
-        ✏️ Editar imóvel
-      </button>
-
-      <button
-        class="btn btn-danger"
-        onclick="excluirImovelAtual()"
-      >
-        🗑️ Excluir imóvel
-      </button>
-
-    </div>
-
-  </div>
-
-</section>
+  </aside>
 
 
-<!-- =========================
-     VEÍCULOS
-========================= -->
+  <!-- CONTEÚDO -->
 
-<section id="veiculosScreen" class="hidden">
+  <main class="container">
 
-  <div class="card">
+    <!-- =========================
+         HOME
+    ========================= -->
 
-    <div class="actions" style="margin-top:0">
+    <section id="homeScreen">
 
-      <button
-        class="btn btn-secondary"
-        onclick="voltarDaTelaPatrimonial()"
-      >
-        ← Voltar para investigação
-      </button>
+      <div class="card">
 
-    </div>
+        <h1>
+          Investigações
+        </h1>
 
-    <h1>🚗 Veículos</h1>
+        <p class="muted">
+          Gerencie suas investigações e os dados patrimoniais encontrados.
+        </p>
 
-    <p
-      id="veiculosSubtitulo"
-      class="muted"
-    ></p>
+        <div id="homeMsg"></div>
 
-    <div class="actions">
+        <div class="actions">
 
-      <button
-        class="btn btn-primary"
-        onclick="abrirFormVeiculo()"
-      >
-        ＋ Cadastrar veículo
-      </button>
-
-    </div>
-
-  </div>
-
-
-  <div
-    id="veiculoFormCard"
-    class="card hidden"
-  >
-
-    <h2 id="veiculoFormTitulo">
-      Cadastrar veículo
-    </h2>
-
-    <form id="veiculoForm">
-
-      <div class="grid">
-
-        <div class="field">
-
-          <label>Tipo</label>
-
-          <select id="veTipo">
-
-            <option value="">
-              Selecione
-            </option>
-
-            <option>
-              Automóvel
-            </option>
-
-            <option>
-              Motocicleta
-            </option>
-
-            <option>
-              Caminhão
-            </option>
-
-            <option>
-              Utilitário
-            </option>
-
-            <option>
-              Ônibus
-            </option>
-
-            <option>
-              Outro
-            </option>
-
-          </select>
-
-        </div>
-
-        <div class="field">
-          <label>Marca</label>
-          <input id="veMarca">
-        </div>
-
-        <div class="field">
-          <label>Modelo</label>
-          <input id="veModelo">
-        </div>
-
-        <div class="field">
-          <label>Ano</label>
-          <input
-            id="veAno"
-            inputmode="numeric"
+          <button
+            class="btn btn-primary"
+            onclick="mostrarNovaInvestigacao()"
           >
-        </div>
-
-        <div class="field">
-          <label>Placa</label>
-          <input id="vePlaca">
-        </div>
-
-        <div class="field">
-          <label>RENAVAM</label>
-          <input id="veRenavam">
-        </div>
-
-        <div class="field">
-          <label>Chassi</label>
-          <input id="veChassi">
-        </div>
-
-        <div class="field">
-          <label>Cor</label>
-          <input id="veCor">
-        </div>
-
-        <div class="field">
-          <label>Cidade</label>
-          <input id="veCidade">
-        </div>
-
-        <div class="field">
-          <label>UF</label>
-          <input
-            id="veUf"
-            maxlength="2"
-          >
-        </div>
-
-        <div class="field">
-
-          <label>
-            Valor pela Tabela FIPE
-          </label>
-
-          <input
-            id="veValor"
-            placeholder="R$ 0,00"
-          >
-
-        </div>
-
-        <div class="field">
-
-          <label>
-            Data de referência FIPE
-          </label>
-
-          <input
-            id="veDataFipe"
-            type="date"
-          >
-
-        </div>
-
-        <div class="field full">
-
-          <label>Fonte</label>
-
-          <input
-            id="veFonte"
-            placeholder="Ex.: Tabela FIPE / consulta realizada em ..."
-          >
-
-        </div>
-
-        <div class="field full">
-
-          <label>Observações</label>
-
-          <textarea
-            id="veObservacoes"
-          ></textarea>
+            ＋ Nova investigação
+          </button>
 
         </div>
 
       </div>
 
-      <div class="actions">
 
-        <button
-          class="btn btn-primary"
-          type="submit"
-        >
-          Salvar veículo
-        </button>
+      <!-- NOVA INVESTIGAÇÃO -->
 
-        <button
-          class="btn btn-secondary"
-          type="button"
-          onclick="fecharFormVeiculo()"
-        >
-          Cancelar
-        </button>
+      <div
+        id="novaInvestigacaoCard"
+        class="card hidden"
+      >
+
+        <h2>
+          Nova investigação
+        </h2>
+
+        <form id="investigacaoForm">
+
+          <div class="grid">
+
+            <div class="field">
+
+              <label>
+                Nome da investigação *
+              </label>
+
+              <input
+                id="invNome"
+                required
+              >
+
+            </div>
+
+            <div class="field">
+
+              <label>
+                Documento
+              </label>
+
+              <input
+                id="invDocumento"
+              >
+
+            </div>
+
+            <div class="field">
+
+              <label>
+                Processo
+              </label>
+
+              <input
+                id="invProcesso"
+              >
+
+            </div>
+
+            <div class="field">
+
+              <label>
+                Advogado
+              </label>
+
+              <input
+                id="invAdvogado"
+              >
+
+            </div>
+
+            <div class="field full">
+
+              <label>
+                Fontes
+              </label>
+
+              <textarea
+                id="invFontes"
+                placeholder="Fontes utilizadas na investigação"
+              ></textarea>
+
+            </div>
+
+          </div>
+
+          <div class="actions">
+
+            <button
+              class="btn btn-primary"
+              type="submit"
+            >
+              Salvar investigação
+            </button>
+
+            <button
+              class="btn btn-secondary"
+              type="button"
+              onclick="fecharNovaInvestigacao()"
+            >
+              Cancelar
+            </button>
+
+          </div>
+
+        </form>
 
       </div>
 
-    </form>
 
-  </div>
+      <!-- LISTA -->
+
+      <div class="card">
+
+        <h2>
+          Investigações cadastradas
+        </h2>
+
+        <div
+          id="listaInvestigacoes"
+          class="loading"
+        >
+          Carregando...
+        </div>
+
+      </div>
+
+    </section>
 
 
-  <div class="card">
+    <!-- =========================
+         INVESTIGAÇÃO
+    ========================= -->
 
-    <h2>Veículos encontrados</h2>
-
-    <div
-      id="listaVeiculos"
-      class="loading"
+    <section
+      id="investigacaoScreen"
+      class="hidden"
     >
-      Carregando...
-    </div>
 
-  </div>
+      <div class="card">
 
-</section>
+        <div
+          class="actions"
+          style="margin-top:0;margin-bottom:14px"
+        >
+
+          <button
+            class="btn btn-secondary"
+            onclick="voltarInicio()"
+          >
+            ← Voltar
+          </button>
+
+        </div>
+
+        <h1 id="investigacaoTitulo">
+          Investigação
+        </h1>
+
+        <div id="investigacaoInfo"></div>
+
+        <div class="actions">
+
+          <button
+            class="btn btn-primary"
+            onclick="abrirImoveis()"
+          >
+            🏠 Imóveis
+          </button>
+
+          <button
+            class="btn btn-primary"
+            onclick="abrirVeiculos()"
+          >
+            🚗 Veículos
+          </button>
+
+          <button
+            class="btn btn-success"
+            onclick="abrirRelatorio()"
+          >
+            📄 Relatório
+          </button>
+
+        </div>
+
+      </div>
+
+    </section>
 
 
-<section id="veiculoDetalheScreen" class="hidden">
+    <!-- =========================
+         IMÓVEIS
+    ========================= -->
 
-  <div class="card">
+    <section
+      id="imoveisScreen"
+      class="hidden"
+    >
 
-    <div class="actions" style="margin-top:0">
+      <div class="card">
 
-      <button
-        class="btn btn-secondary"
-        onclick="abrirVeiculos()"
+        <div
+          class="actions"
+          style="margin-top:0"
+        >
+
+          <button
+            class="btn btn-secondary"
+            onclick="voltarDaTelaPatrimonial()"
+          >
+            ← Voltar para investigação
+          </button>
+
+        </div>
+
+        <h1>
+          🏠 Imóveis
+        </h1>
+
+        <p
+          id="imoveisSubtitulo"
+          class="muted"
+        ></p>
+
+        <div class="actions">
+
+          <button
+            class="btn btn-primary"
+            onclick="abrirFormImovel()"
+          >
+            ＋ Cadastrar imóvel
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <!-- FORMULÁRIO -->
+
+      <div
+        id="imovelFormCard"
+        class="card hidden"
       >
-        ← Voltar para veículos
-      </button>
 
-    </div>
+        <h2 id="imovelFormTitulo">
+          Cadastrar imóvel
+        </h2>
 
-    <h1>🚗 Detalhes do veículo</h1>
+        <form id="imovelForm">
 
-    <p class="muted">
-      Informações do veículo encontrado durante a investigação.
-    </p>
+          <div class="grid">
 
-    <div id="veiculoDetalhe"></div>
+            <div class="field">
+              <label>Tipo de imóvel</label>
+              <input id="imTipo">
+            </div>
 
-    <div class="actions">
+            <div class="field">
+              <label>Matrícula</label>
+              <input id="imMatricula">
+            </div>
 
-      <button
-        class="btn btn-primary"
-        onclick="editarVeiculoAtual()"
+            <div class="field">
+              <label>Cartório</label>
+              <input id="imCartorio">
+            </div>
+
+            <div class="field">
+              <label>CEP</label>
+              <input id="imCep">
+            </div>
+
+            <div class="field">
+              <label>Endereço</label>
+              <input id="imEndereco">
+            </div>
+
+            <div class="field">
+              <label>Número</label>
+              <input id="imNumero">
+            </div>
+
+            <div class="field">
+              <label>Complemento</label>
+              <input id="imComplemento">
+            </div>
+
+            <div class="field">
+              <label>Bairro</label>
+              <input id="imBairro">
+            </div>
+
+            <div class="field">
+              <label>Cidade</label>
+              <input id="imCidade">
+            </div>
+
+            <div class="field">
+              <label>UF</label>
+              <input
+                id="imUf"
+                maxlength="2"
+              >
+            </div>
+
+            <div class="field">
+              <label>Valor</label>
+              <input
+                id="imValor"
+                placeholder="R$"
+              >
+            </div>
+
+            <div class="field">
+              <label>Fonte</label>
+              <input id="imFonte">
+            </div>
+
+            <div class="field full">
+              <label>Observações</label>
+              <textarea id="imObservacoes"></textarea>
+            </div>
+
+          </div>
+
+          <div class="actions">
+
+            <button
+              class="btn btn-primary"
+              type="submit"
+            >
+              Salvar imóvel
+            </button>
+
+            <button
+              class="btn btn-secondary"
+              type="button"
+              onclick="fecharFormImovel()"
+            >
+              Cancelar
+            </button>
+
+          </div>
+
+        </form>
+
+      </div>
+
+
+      <!-- LISTA -->
+
+      <div class="card">
+
+        <h2>
+          Imóveis encontrados
+        </h2>
+
+        <div
+          id="listaImoveis"
+          class="loading"
+        >
+          Carregando...
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         DETALHE IMÓVEL
+    ========================= -->
+
+    <section
+      id="imovelDetalheScreen"
+      class="hidden"
+    >
+
+      <div class="card">
+
+        <div
+          class="actions"
+          style="margin-top:0"
+        >
+
+          <button
+            class="btn btn-secondary"
+            onclick="abrirImoveis()"
+          >
+            ← Voltar para imóveis
+          </button>
+
+        </div>
+
+        <h1>
+          🏠 Detalhes do imóvel
+        </h1>
+
+        <p class="muted">
+          Informações do imóvel encontrado durante a investigação.
+        </p>
+
+        <div id="imovelDetalhe"></div>
+
+        <div class="actions">
+
+          <button
+            class="btn btn-primary"
+            onclick="editarImovelAtual()"
+          >
+            ✏️ Editar imóvel
+          </button>
+
+          <button
+            class="btn btn-danger"
+            onclick="excluirImovelAtual()"
+          >
+            🗑️ Excluir imóvel
+          </button>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         VEÍCULOS
+    ========================= -->
+
+    <section
+      id="veiculosScreen"
+      class="hidden"
+    >
+
+      <div class="card">
+
+        <div
+          class="actions"
+          style="margin-top:0"
+        >
+
+          <button
+            class="btn btn-secondary"
+            onclick="voltarDaTelaPatrimonial()"
+          >
+            ← Voltar para investigação
+          </button>
+
+        </div>
+
+        <h1>
+          🚗 Veículos
+        </h1>
+
+        <p
+          id="veiculosSubtitulo"
+          class="muted"
+        ></p>
+
+        <div class="actions">
+
+          <button
+            class="btn btn-primary"
+            onclick="abrirFormVeiculo()"
+          >
+            ＋ Cadastrar veículo
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <!-- FORMULÁRIO -->
+
+      <div
+        id="veiculoFormCard"
+        class="card hidden"
       >
-        ✏️ Editar veículo
-      </button>
 
-      <button
-        class="btn btn-danger"
-        onclick="excluirVeiculoAtual()"
-      >
-        🗑️ Excluir veículo
-      </button>
+        <h2 id="veiculoFormTitulo">
+          Cadastrar veículo
+        </h2>
 
-    </div>
+        <form id="veiculoForm">
 
-  </div>
+          <div class="grid">
 
-</section>
+            <div class="field">
 
-</main>
+              <label>
+                Tipo
+              </label>
+
+              <select id="veTipo">
+
+                <option value="">
+                  Selecione
+                </option>
+
+                <option>
+                  Automóvel
+                </option>
+
+                <option>
+                  Motocicleta
+                </option>
+
+                <option>
+                  Caminhão
+                </option>
+
+                <option>
+                  Utilitário
+                </option>
+
+                <option>
+                  Ônibus
+                </option>
+
+                <option>
+                  Outro
+                </option>
+
+              </select>
+
+            </div>
+
+            <div class="field">
+              <label>Marca</label>
+              <input id="veMarca">
+            </div>
+
+            <div class="field">
+              <label>Modelo</label>
+              <input id="veModelo">
+            </div>
+
+            <div class="field">
+              <label>Ano</label>
+              <input
+                id="veAno"
+                inputmode="numeric"
+              >
+            </div>
+
+            <div class="field">
+              <label>Placa</label>
+              <input id="vePlaca">
+            </div>
+
+            <div class="field">
+              <label>RENAVAM</label>
+              <input id="veRenavam">
+            </div>
+
+            <div class="field">
+              <label>Chassi</label>
+              <input id="veChassi">
+            </div>
+
+            <div class="field">
+              <label>Cor</label>
+              <input id="veCor">
+            </div>
+
+            <div class="field">
+              <label>Cidade</label>
+              <input id="veCidade">
+            </div>
+
+            <div class="field">
+              <label>UF</label>
+              <input
+                id="veUf"
+                maxlength="2"
+              >
+            </div>
+
+
+            <div class="field">
+
+              <label>
+                Valor pela Tabela FIPE
+              </label>
+
+              <input
+                id="veValor"
+                placeholder="R$ 0,00"
+              >
+
+            </div>
+
+
+            <div class="field">
+
+              <label>
+                Data de referência FIPE
+              </label>
+
+              <input
+                id="veDataFipe"
+                type="date"
+              >
+
+            </div>
+
+
+            <div class="field full">
+
+              <label>
+                Fonte
+              </label>
+
+              <input
+                id="veFonte"
+                placeholder="Ex.: Tabela FIPE / consulta realizada em ..."
+              >
+
+            </div>
+
+
+            <div class="field full">
+
+              <label>
+                Observações
+              </label>
+
+              <textarea
+                id="veObservacoes"
+              ></textarea>
+
+            </div>
+
+          </div>
+
+
+          <div class="actions">
+
+            <button
+              class="btn btn-primary"
+              type="submit"
+            >
+              Salvar veículo
+            </button>
+
+            <button
+              class="btn btn-secondary"
+              type="button"
+              onclick="fecharFormVeiculo()"
+            >
+              Cancelar
+            </button>
+
+          </div>
+
+        </form>
+
+      </div>
+
+
+      <!-- LISTA -->
+
+      <div class="card">
+
+        <h2>
+          Veículos encontrados
+        </h2>
+
+        <div
+          id="listaVeiculos"
+          class="loading"
+        >
+          Carregando...
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         DETALHE VEÍCULO
+    ========================= -->
+
+    <section
+      id="veiculoDetalheScreen"
+      class="hidden"
+    >
+
+      <div class="card">
+
+        <div
+          class="actions"
+          style="margin-top:0"
+        >
+
+          <button
+            class="btn btn-secondary"
+            onclick="abrirVeiculos()"
+          >
+            ← Voltar para veículos
+          </button>
+
+        </div>
+
+        <h1>
+          🚗 Detalhes do veículo
+        </h1>
+
+        <p class="muted">
+          Informações do veículo encontrado durante a investigação.
+        </p>
+
+        <div id="veiculoDetalhe"></div>
+
+        <div class="actions">
+
+          <button
+            class="btn btn-primary"
+            onclick="editarVeiculoAtual()"
+          >
+            ✏️ Editar veículo
+          </button>
+
+          <button
+            class="btn btn-danger"
+            onclick="excluirVeiculoAtual()"
+          >
+            🗑️ Excluir veículo
+          </button>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         RELATÓRIO
+    ========================= -->
+
+    <section
+      id="relatorioScreen"
+      class="hidden"
+    >
+
+      <div class="card">
+
+        <div class="relatorio-header nao-imprimir">
+
+          <div>
+
+            <button
+              class="btn btn-secondary"
+              onclick="voltarDaTelaRelatorio()"
+            >
+              ← Voltar
+            </button>
+
+          </div>
+
+          <div
+            class="actions"
+            style="margin-top:0"
+          >
+
+            <button
+              class="btn btn-primary"
+              onclick="window.print()"
+            >
+              🖨️ Imprimir / Salvar PDF
+            </button>
+
+          </div>
+
+        </div>
+
+        <div id="relatorioConteudo">
+
+          <div class="loading">
+            Preparando relatório...
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
 </div>
+
 
 <script>
 
-const API = "https://api.meuinvestigador.com.br";
+const API =
+  "https://api.meuinvestigador.com.br";
+
 
 let usuarioAtual = null;
 
 let investigacoes = [];
+
 let investigacaoAtual = null;
 
+
 let imoveis = [];
+
 let imovelAtual = null;
+
 let imovelEditandoId = null;
 
+
 let veiculos = [];
+
 let veiculoAtual = null;
+
 let veiculoEditandoId = null;
 
+
+let relatorioImoveis = [];
+
+let relatorioVeiculos = [];
+
+
+/* =========================
+   UTILITÁRIOS
+========================= */
 
 function $(id){
   return document.getElementById(id);
@@ -938,10 +1565,15 @@ function mostrarMsg(id,texto,tipo="notice"){
   if(!el) return;
 
   el.className = tipo;
+
   el.textContent = texto;
 
 }
 
+
+/* =========================
+   API
+========================= */
 
 async function api(path,options={}){
 
@@ -963,14 +1595,19 @@ async function api(path,options={}){
 
   };
 
+
   const resposta =
     await fetch(API + path,config);
+
 
   let dados = null;
 
   try{
+
     dados = await resposta.json();
+
   }catch(e){}
+
 
   if(!resposta.ok){
 
@@ -981,32 +1618,52 @@ async function api(path,options={}){
 
   }
 
+
   return dados;
 
 }
 
+
+/* =========================
+   CONTROLE DAS TELAS
+========================= */
 
 function mostrarSomente(id){
 
   const telas = [
 
     "homeScreen",
+
     "investigacaoScreen",
 
     "imoveisScreen",
+
     "imovelDetalheScreen",
 
     "veiculosScreen",
-    "veiculoDetalheScreen"
+
+    "veiculoDetalheScreen",
+
+    "relatorioScreen"
 
   ];
 
-  telas.forEach(x => esconder($(x)));
+
+  telas.forEach(function(tela){
+
+    esconder($(tela));
+
+  });
+
 
   mostrar($(id));
 
 }
 
+
+/* =========================
+   LOGIN / SESSÃO
+========================= */
 
 async function iniciar(){
 
@@ -1015,14 +1672,18 @@ async function iniciar(){
     const dados =
       await api("/usuario");
 
+
     usuarioAtual =
       dados.usuario;
+
 
     $("usuarioNome").textContent =
       usuarioAtual.nome ||
       usuarioAtual.email;
 
+
     esconder($("loginScreen"));
+
     mostrar($("appScreen"));
 
     mostrarSomente("homeScreen");
@@ -1032,6 +1693,7 @@ async function iniciar(){
   }catch(e){
 
     mostrar($("loginScreen"));
+
     esconder($("appScreen"));
 
   }
@@ -1045,6 +1707,7 @@ $("loginForm").addEventListener(
 
     e.preventDefault();
 
+
     try{
 
       mostrarMsg(
@@ -1053,34 +1716,38 @@ $("loginForm").addEventListener(
         "notice"
       );
 
+
       const dados =
-        await api("/login",{
+        await api(
+          "/login",
+          {
+            method:"POST",
 
-          method:"POST",
+            body:JSON.stringify({
 
-          body:JSON.stringify({
+              email:
+                $("loginEmail").value.trim(),
 
-            email:
-              $("loginEmail")
-                .value
-                .trim(),
+              senha:
+                $("loginSenha").value
 
-            senha:
-              $("loginSenha")
-                .value
+            })
 
-          })
+          }
+        );
 
-        });
 
       usuarioAtual =
         dados.usuario;
+
 
       $("usuarioNome").textContent =
         usuarioAtual.nome ||
         usuarioAtual.email;
 
+
       esconder($("loginScreen"));
+
       mostrar($("appScreen"));
 
       mostrarSomente("homeScreen");
@@ -1107,38 +1774,48 @@ async function logout(){
 
     await api(
       "/logout",
-      {method:"POST"}
+      {
+        method:"POST"
+      }
     );
 
   }catch(e){}
+
 
   location.reload();
 
 }
 
 
+/* =========================
+   INVESTIGAÇÕES
+========================= */
+
 async function carregarInvestigacoes(){
 
   $("listaInvestigacoes").innerHTML =
     '<div class="loading">Carregando...</div>';
+
 
   try{
 
     const dados =
       await api("/investigacoes");
 
+
     investigacoes =
       Array.isArray(dados)
         ? dados
         : (dados.results || []);
+
 
     renderizarInvestigacoes();
 
   }catch(e){
 
     $("listaInvestigacoes").innerHTML =
-      '<div class="error">Erro: '+
-      escapeHtml(e.message)+
+      '<div class="error">Erro: ' +
+      escapeHtml(e.message) +
       '</div>';
 
   }
@@ -1151,66 +1828,74 @@ function renderizarInvestigacoes(){
   const el =
     $("listaInvestigacoes");
 
+
   if(!investigacoes.length){
 
     el.innerHTML =
-      '<div class="empty">Nenhuma investigação cadastrada.</div>';
+      '<div class="empty">' +
+      'Nenhuma investigação cadastrada.' +
+      '</div>';
 
     return;
 
   }
 
+
   el.innerHTML =
-    investigacoes.map(inv => `
+    investigacoes.map(function(inv){
 
-      <div class="item">
+      return `
 
-        <div class="item-head">
+        <div class="item">
 
-          <div>
+          <div class="item-head">
 
-            <div class="item-title">
-              ${escapeHtml(inv.nome)}
+            <div>
+
+              <div class="item-title">
+                ${escapeHtml(inv.nome)}
+              </div>
+
+              <div class="muted">
+                Processo:
+                ${escapeHtml(inv.processo || "-")}
+              </div>
+
+              <div class="muted">
+                Documento:
+                ${escapeHtml(inv.documento || "-")}
+              </div>
+
             </div>
 
-            <div class="muted">
-              Processo:
-              ${escapeHtml(inv.processo || "-")}
-            </div>
-
-            <div class="muted">
-              Documento:
-              ${escapeHtml(inv.documento || "-")}
-            </div>
-
-          </div>
-
-          <div
-            class="actions"
-            style="margin-top:0"
-          >
-
-            <button
-              class="btn btn-primary"
-              onclick="abrirInvestigacao(${Number(inv.id)})"
+            <div
+              class="actions"
+              style="margin-top:0"
             >
-              Abrir
-            </button>
 
-            <button
-              class="btn btn-danger"
-              onclick="excluirInvestigacao(${Number(inv.id)})"
-            >
-              Excluir
-            </button>
+              <button
+                class="btn btn-primary"
+                onclick="abrirInvestigacao(${Number(inv.id)})"
+              >
+                Abrir
+              </button>
+
+              <button
+                class="btn btn-danger"
+                onclick="excluirInvestigacao(${Number(inv.id)})"
+              >
+                Excluir
+              </button>
+
+            </div>
 
           </div>
 
         </div>
 
-      </div>
+      `;
 
-    `).join("");
+    }).join("");
 
 }
 
@@ -1243,47 +1928,43 @@ $("investigacaoForm").addEventListener(
 
     e.preventDefault();
 
+
     try{
 
       const dados =
-        await api("/investigacoes",{
+        await api(
+          "/investigacoes",
+          {
 
-          method:"POST",
+            method:"POST",
 
-          body:JSON.stringify({
+            body:JSON.stringify({
 
-            nome:
-              $("invNome")
-                .value
-                .trim(),
+              nome:
+                $("invNome").value.trim(),
 
-            documento:
-              $("invDocumento")
-                .value
-                .trim(),
+              documento:
+                $("invDocumento").value.trim(),
 
-            processo:
-              $("invProcesso")
-                .value
-                .trim(),
+              processo:
+                $("invProcesso").value.trim(),
 
-            advogado:
-              $("invAdvogado")
-                .value
-                .trim(),
+              advogado:
+                $("invAdvogado").value.trim(),
 
-            fontes:
-              $("invFontes")
-                .value
-                .trim()
+              fontes:
+                $("invFontes").value.trim()
 
-          })
+            })
 
-        });
+          }
+        );
+
 
       fecharNovaInvestigacao();
 
       await carregarInvestigacoes();
+
 
       mostrarMsg(
         "homeMsg",
@@ -1308,19 +1989,31 @@ $("investigacaoForm").addEventListener(
 
 async function excluirInvestigacao(id){
 
-  if(!confirm(
-    "Excluir esta investigação? Os imóveis e veículos vinculados também serão excluídos."
-  )) return;
+  if(
+    !confirm(
+      "Excluir esta investigação? " +
+      "Os imóveis vinculados também serão excluídos."
+    )
+  ){
+
+    return;
+
+  }
+
 
   try{
 
     const dados =
       await api(
-        "/investigacoes/"+id,
-        {method:"DELETE"}
+        "/investigacoes/" + id,
+        {
+          method:"DELETE"
+        }
       );
 
+
     await carregarInvestigacoes();
+
 
     mostrarMsg(
       "homeMsg",
@@ -1346,59 +2039,91 @@ function abrirInvestigacao(id){
 
   investigacaoAtual =
     investigacoes.find(
-      x => Number(x.id) === Number(id)
+      x =>
+        Number(x.id) ===
+        Number(id)
     );
 
-  if(!investigacaoAtual) return;
+
+  if(!investigacaoAtual){
+    return;
+  }
+
 
   $("investigacaoTitulo").textContent =
     investigacaoAtual.nome ||
     "Investigação";
+
 
   $("investigacaoInfo").innerHTML = `
 
     <div class="detail-grid">
 
       <div class="detail">
-        <span class="muted">Documento</span>
+
+        <span class="muted">
+          Documento
+        </span>
+
         <strong>
           ${escapeHtml(
             investigacaoAtual.documento || "-"
           )}
         </strong>
+
       </div>
 
+
       <div class="detail">
-        <span class="muted">Processo</span>
+
+        <span class="muted">
+          Processo
+        </span>
+
         <strong>
           ${escapeHtml(
             investigacaoAtual.processo || "-"
           )}
         </strong>
+
       </div>
 
+
       <div class="detail">
-        <span class="muted">Advogado</span>
+
+        <span class="muted">
+          Advogado
+        </span>
+
         <strong>
           ${escapeHtml(
             investigacaoAtual.advogado || "-"
           )}
         </strong>
+
       </div>
 
+
       <div class="detail">
-        <span class="muted">Data de criação</span>
+
+        <span class="muted">
+          Data de criação
+        </span>
+
         <strong>
           ${formatarData(
             investigacaoAtual.data_criacao
           )}
         </strong>
+
       </div>
+
 
       <div
         class="detail"
         style="grid-column:1/-1"
       >
+
         <span class="muted">
           Fontes
         </span>
@@ -1408,11 +2133,13 @@ function abrirInvestigacao(id){
             investigacaoAtual.fontes || "-"
           )}
         </strong>
+
       </div>
 
     </div>
 
   `;
+
 
   mostrarSomente(
     "investigacaoScreen"
@@ -1434,7 +2161,10 @@ function voltarInicio(){
 
 function voltarDaTelaPatrimonial(){
 
-  if(!investigacaoAtual) return;
+  if(!investigacaoAtual){
+    voltarInicio();
+    return;
+  }
 
   abrirInvestigacao(
     investigacaoAtual.id
@@ -1449,17 +2179,23 @@ function voltarDaTelaPatrimonial(){
 
 async function abrirImoveis(){
 
-  if(!investigacaoAtual) return;
+  if(!investigacaoAtual){
+    return;
+  }
+
 
   $("imoveisSubtitulo").textContent =
     "Investigação: " +
     (investigacaoAtual.nome || "");
 
+
   mostrarSomente(
     "imoveisScreen"
   );
 
+
   fecharFormImovel();
+
 
   await carregarImoveis();
 
@@ -1471,28 +2207,31 @@ async function carregarImoveis(){
   $("listaImoveis").innerHTML =
     '<div class="loading">Carregando...</div>';
 
+
   try{
 
     const dados =
       await api(
-        "/imoveis?investigacao_id="+
+        "/imoveis?investigacao_id=" +
         encodeURIComponent(
           investigacaoAtual.id
         )
       );
+
 
     imoveis =
       Array.isArray(dados)
         ? dados
         : (dados.results || []);
 
+
     renderizarImoveis();
 
   }catch(e){
 
     $("listaImoveis").innerHTML =
-      '<div class="error">Erro: '+
-      escapeHtml(e.message)+
+      '<div class="error">Erro: ' +
+      escapeHtml(e.message) +
       '</div>';
 
   }
@@ -1505,71 +2244,87 @@ function renderizarImoveis(){
   const el =
     $("listaImoveis");
 
+
   if(!imoveis.length){
 
     el.innerHTML =
-      '<div class="empty">Nenhum imóvel cadastrado.</div>';
+      '<div class="empty">' +
+      'Nenhum imóvel cadastrado.' +
+      '</div>';
 
     return;
 
   }
 
+
   el.innerHTML =
-    imoveis.map(im => `
+    imoveis.map(function(im){
 
-      <div class="item">
+      return `
 
-        <div class="item-head">
+        <div class="item">
 
-          <div>
+          <div class="item-head">
 
-            <div class="item-title">
-              🏠
-              ${escapeHtml(
-                im.tipo || "Imóvel"
-              )}
+            <div>
+
+              <div class="item-title">
+
+                🏠
+                ${escapeHtml(
+                  im.tipo || "Imóvel"
+                )}
+
+              </div>
+
+              <div class="muted">
+
+                Matrícula:
+                ${escapeHtml(
+                  im.matricula || "-"
+                )}
+
+              </div>
+
+              <div class="muted">
+
+                ${escapeHtml(
+                  im.cidade || ""
+                )}
+
+                ${
+                  im.uf
+                    ? " / " +
+                      escapeHtml(im.uf)
+                    : ""
+                }
+
+              </div>
+
             </div>
 
-            <div class="muted">
-              Matrícula:
-              ${escapeHtml(
-                im.matricula || "-"
-              )}
-            </div>
 
-            <div class="muted">
-              ${escapeHtml(
-                im.cidade || ""
-              )}
-
-              ${
-                im.uf
-                  ? " / "+escapeHtml(im.uf)
-                  : ""
-              }
-            </div>
-
-          </div>
-
-          <div
-            class="actions"
-            style="margin-top:0"
-          >
-
-            <button
-              class="btn btn-primary"
-              onclick="abrirDetalheImovel(${Number(im.id)})"
+            <div
+              class="actions"
+              style="margin-top:0"
             >
-              Abrir
-            </button>
+
+              <button
+                class="btn btn-primary"
+                onclick="abrirDetalheImovel(${Number(im.id)})"
+              >
+                Abrir
+              </button>
+
+            </div>
 
           </div>
 
         </div>
 
-      </div>
+      `;
 
-    `).join("");
+    }).join("");
 
 }
 
@@ -1581,10 +2336,12 @@ function abrirFormImovel(im=null){
       ? Number(im.id)
       : null;
 
+
   $("imovelFormTitulo").textContent =
     im
       ? "Editar imóvel"
       : "Cadastrar imóvel";
+
 
   const campos = {
 
@@ -1629,14 +2386,22 @@ function abrirFormImovel(im=null){
 
   };
 
+
   Object.entries(campos)
     .forEach(
-      ([id,v]) => $(id).value = v
+      function([id,val]){
+
+        $(id).value =
+          val;
+
+      }
     );
+
 
   mostrar(
     $("imovelFormCard")
   );
+
 
   $("imTipo").focus();
 
@@ -1651,7 +2416,8 @@ function fecharFormImovel(){
 
   $("imovelForm").reset();
 
-  imovelEditandoId = null;
+  imovelEditandoId =
+    null;
 
 }
 
@@ -1661,6 +2427,7 @@ $("imovelForm").addEventListener(
   async function(e){
 
     e.preventDefault();
+
 
     const payload = {
 
@@ -1698,9 +2465,9 @@ $("imovelForm").addEventListener(
 
       uf:
         $("imUf")
-          .value
-          .trim()
-          .toUpperCase(),
+        .value
+        .trim()
+        .toUpperCase(),
 
       valor:
         $("imValor").value.trim(),
@@ -1710,10 +2477,11 @@ $("imovelForm").addEventListener(
 
       observacoes:
         $("imObservacoes")
-          .value
-          .trim()
+        .value
+        .trim()
 
     };
+
 
     try{
 
@@ -1721,7 +2489,8 @@ $("imovelForm").addEventListener(
         await api(
 
           imovelEditandoId
-            ? "/imoveis/"+imovelEditandoId
+            ? "/imoveis/" +
+              imovelEditandoId
             : "/imoveis",
 
           {
@@ -1732,15 +2501,20 @@ $("imovelForm").addEventListener(
                 : "POST",
 
             body:
-              JSON.stringify(payload)
+              JSON.stringify(
+                payload
+              )
 
           }
 
         );
 
+
       fecharFormImovel();
 
+
       await carregarImoveis();
+
 
       alert(
         dados.mensagem ||
@@ -1761,12 +2535,19 @@ function abrirDetalheImovel(id){
 
   imovelAtual =
     imoveis.find(
-      x => Number(x.id) === Number(id)
+      x =>
+        Number(x.id) ===
+        Number(id)
     );
 
-  if(!imovelAtual) return;
+
+  if(!imovelAtual){
+    return;
+  }
+
 
   renderizarDetalheImovel();
+
 
   mostrarSomente(
     "imovelDetalheScreen"
@@ -1780,6 +2561,7 @@ function renderizarDetalheImovel(){
   const im =
     imovelAtual;
 
+
   $("imovelDetalhe").innerHTML = `
 
     <h3 class="section-title">
@@ -1789,39 +2571,51 @@ function renderizarDetalheImovel(){
     <div class="detail-grid">
 
       <div class="detail">
+
         <span class="muted">
           Tipo de imóvel
         </span>
+
         <strong>
           ${escapeHtml(
             im.tipo || "-"
           )}
         </strong>
+
       </div>
 
+
       <div class="detail">
+
         <span class="muted">
           Matrícula
         </span>
+
         <strong>
           ${escapeHtml(
             im.matricula || "-"
           )}
         </strong>
+
       </div>
 
+
       <div class="detail">
+
         <span class="muted">
           Cartório
         </span>
+
         <strong>
           ${escapeHtml(
             im.cartorio || "-"
           )}
         </strong>
+
       </div>
 
     </div>
+
 
     <h3 class="section-title">
       📍 Localização
@@ -1829,21 +2623,43 @@ function renderizarDetalheImovel(){
 
     <div class="detail-grid">
 
-      ${detail("CEP",im.cep)}
+      ${detail(
+        "CEP",
+        im.cep
+      )}
 
-      ${detail("Endereço",im.endereco)}
+      ${detail(
+        "Endereço",
+        im.endereco
+      )}
 
-      ${detail("Número",im.numero)}
+      ${detail(
+        "Número",
+        im.numero
+      )}
 
-      ${detail("Complemento",im.complemento)}
+      ${detail(
+        "Complemento",
+        im.complemento
+      )}
 
-      ${detail("Bairro",im.bairro)}
+      ${detail(
+        "Bairro",
+        im.bairro
+      )}
 
-      ${detail("Cidade",im.cidade)}
+      ${detail(
+        "Cidade",
+        im.cidade
+      )}
 
-      ${detail("UF",im.uf)}
+      ${detail(
+        "UF",
+        im.uf
+      )}
 
     </div>
+
 
     <h3 class="section-title">
       💰 Informações patrimoniais
@@ -1851,16 +2667,25 @@ function renderizarDetalheImovel(){
 
     <div class="detail-grid">
 
-      ${detail("Valor",im.valor)}
+      ${detail(
+        "Valor",
+        im.valor
+      )}
 
-      ${detail("Fonte",im.fonte)}
+      ${detail(
+        "Fonte",
+        im.fonte
+      )}
 
       ${detail(
         "Data de cadastro",
-        formatarData(im.data_criacao)
+        formatarData(
+          im.data_criacao
+        )
       )}
 
     </div>
+
 
     <h3 class="section-title">
       📝 Observações
@@ -1897,26 +2722,46 @@ function editarImovelAtual(){
 
 async function excluirImovelAtual(){
 
-  if(!imovelAtual) return;
+  if(!imovelAtual){
+    return;
+  }
 
-  if(!confirm(
-    "Excluir este imóvel?"
-  )) return;
+
+  if(
+    !confirm(
+      "Excluir este imóvel?"
+    )
+  ){
+
+    return;
+
+  }
+
 
   try{
 
     const dados =
       await api(
-        "/imoveis/"+imovelAtual.id,
-        {method:"DELETE"}
+
+        "/imoveis/" +
+        imovelAtual.id,
+
+        {
+          method:"DELETE"
+        }
+
       );
+
 
     alert(
       dados.mensagem ||
       "Imóvel excluído com sucesso."
     );
 
-    imovelAtual = null;
+
+    imovelAtual =
+      null;
+
 
     await abrirImoveis();
 
@@ -1935,17 +2780,23 @@ async function excluirImovelAtual(){
 
 async function abrirVeiculos(){
 
-  if(!investigacaoAtual) return;
+  if(!investigacaoAtual){
+    return;
+  }
+
 
   $("veiculosSubtitulo").textContent =
     "Investigação: " +
     (investigacaoAtual.nome || "");
 
+
   mostrarSomente(
     "veiculosScreen"
   );
 
+
   fecharFormVeiculo();
+
 
   await carregarVeiculos();
 
@@ -1957,28 +2808,31 @@ async function carregarVeiculos(){
   $("listaVeiculos").innerHTML =
     '<div class="loading">Carregando...</div>';
 
+
   try{
 
     const dados =
       await api(
-        "/veiculos?investigacao_id="+
+        "/veiculos?investigacao_id=" +
         encodeURIComponent(
           investigacaoAtual.id
         )
       );
+
 
     veiculos =
       Array.isArray(dados)
         ? dados
         : (dados.results || []);
 
+
     renderizarVeiculos();
 
   }catch(e){
 
     $("listaVeiculos").innerHTML =
-      '<div class="error">Erro: '+
-      escapeHtml(e.message)+
+      '<div class="error">Erro: ' +
+      escapeHtml(e.message) +
       '</div>';
 
   }
@@ -1991,73 +2845,95 @@ function renderizarVeiculos(){
   const el =
     $("listaVeiculos");
 
+
   if(!veiculos.length){
 
     el.innerHTML =
-      '<div class="empty">Nenhum veículo cadastrado.</div>';
+      '<div class="empty">' +
+      'Nenhum veículo cadastrado.' +
+      '</div>';
 
     return;
 
   }
 
+
   el.innerHTML =
-    veiculos.map(v => `
+    veiculos.map(function(v){
 
-      <div class="item">
+      return `
 
-        <div class="item-head">
+        <div class="item">
 
-          <div>
+          <div class="item-head">
 
-            <div class="item-title">
-              🚗
-              ${escapeHtml(v.marca || "")}
-              ${escapeHtml(v.modelo || "")}
+            <div>
+
+              <div class="item-title">
+
+                🚗
+                ${escapeHtml(v.marca || "")}
+                ${escapeHtml(v.modelo || "")}
+
+              </div>
+
+              <div class="muted">
+
+                ${escapeHtml(
+                  v.tipo ||
+                  "Veículo"
+                )}
+
+                ·
+
+                ${escapeHtml(
+                  v.ano ||
+                  "-"
+                )}
+
+              </div>
+
+              <div class="muted">
+
+                Placa:
+                ${escapeHtml(
+                  v.placa ||
+                  "-"
+                )}
+
+                · FIPE:
+
+                ${escapeHtml(
+                  v.valor ||
+                  "-"
+                )}
+
+              </div>
+
             </div>
 
-            <div class="muted">
-              ${escapeHtml(
-                v.tipo || "Veículo"
-              )}
-              ·
-              ${escapeHtml(
-                v.ano || "-"
-              )}
-            </div>
 
-            <div class="muted">
-              Placa:
-              ${escapeHtml(
-                v.placa || "-"
-              )}
-              ·
-              FIPE:
-              ${escapeHtml(
-                v.valor || "-"
-              )}
-            </div>
-
-          </div>
-
-          <div
-            class="actions"
-            style="margin-top:0"
-          >
-
-            <button
-              class="btn btn-primary"
-              onclick="abrirDetalheVeiculo(${Number(v.id)})"
+            <div
+              class="actions"
+              style="margin-top:0"
             >
-              Abrir
-            </button>
+
+              <button
+                class="btn btn-primary"
+                onclick="abrirDetalheVeiculo(${Number(v.id)})"
+              >
+                Abrir
+              </button>
+
+            </div>
 
           </div>
 
         </div>
 
-      </div>
+      `;
 
-    `).join("");
+    }).join("");
 
 }
 
@@ -2069,10 +2945,12 @@ function abrirFormVeiculo(v=null){
       ? Number(v.id)
       : null;
 
+
   $("veiculoFormTitulo").textContent =
     v
       ? "Editar veículo"
       : "Cadastrar veículo";
+
 
   const campos = {
 
@@ -2120,15 +2998,22 @@ function abrirFormVeiculo(v=null){
 
   };
 
+
   Object.entries(campos)
     .forEach(
-      ([id,val]) =>
-        $(id).value = val
+      function([id,val]){
+
+        $(id).value =
+          val;
+
+      }
     );
+
 
   mostrar(
     $("veiculoFormCard")
   );
+
 
   $("veTipo").focus();
 
@@ -2143,7 +3028,8 @@ function fecharFormVeiculo(){
 
   $("veiculoForm").reset();
 
-  veiculoEditandoId = null;
+  veiculoEditandoId =
+    null;
 
 }
 
@@ -2154,6 +3040,7 @@ $("veiculoForm").addEventListener(
 
     e.preventDefault();
 
+
     const payload = {
 
       investigacao_id:
@@ -2163,77 +3050,78 @@ $("veiculoForm").addEventListener(
 
       tipo:
         $("veTipo")
-          .value
-          .trim(),
+        .value
+        .trim(),
 
       marca:
         $("veMarca")
-          .value
-          .trim(),
+        .value
+        .trim(),
 
       modelo:
         $("veModelo")
-          .value
-          .trim(),
+        .value
+        .trim(),
 
       ano:
         $("veAno")
-          .value
-          .trim(),
+        .value
+        .trim(),
 
       placa:
         $("vePlaca")
-          .value
-          .trim()
-          .toUpperCase(),
+        .value
+        .trim()
+        .toUpperCase(),
 
       renavam:
         $("veRenavam")
-          .value
-          .trim(),
+        .value
+        .trim(),
 
       chassi:
         $("veChassi")
-          .value
-          .trim()
-          .toUpperCase(),
+        .value
+        .trim()
+        .toUpperCase(),
 
       cor:
         $("veCor")
-          .value
-          .trim(),
+        .value
+        .trim(),
 
       cidade:
         $("veCidade")
-          .value
-          .trim(),
+        .value
+        .trim(),
 
       uf:
         $("veUf")
-          .value
-          .trim()
-          .toUpperCase(),
+        .value
+        .trim()
+        .toUpperCase(),
 
       valor:
         $("veValor")
-          .value
-          .trim(),
+        .value
+        .trim(),
 
       data_fipe:
         $("veDataFipe")
-          .value,
+        .value,
 
       fonte:
         $("veFonte")
-          .value
-          .trim(),
+        .value
+        .trim(),
 
       observacoes:
         $("veObservacoes")
-          .value
-          .trim()
+        .value
+        .trim()
 
     };
+
 
     try{
 
@@ -2241,25 +3129,32 @@ $("veiculoForm").addEventListener(
         await api(
 
           veiculoEditandoId
-            ? "/veiculos/"+veiculoEditandoId
+            ? "/veiculos/" +
+              veiculoEditandoId
             : "/veiculos",
 
           {
+
             method:
               veiculoEditandoId
                 ? "PUT"
                 : "POST",
 
             body:
-              JSON.stringify(payload)
+              JSON.stringify(
+                payload
+              )
 
           }
 
         );
 
+
       fecharFormVeiculo();
 
+
       await carregarVeiculos();
+
 
       alert(
         dados.mensagem ||
@@ -2280,12 +3175,19 @@ function abrirDetalheVeiculo(id){
 
   veiculoAtual =
     veiculos.find(
-      x => Number(x.id) === Number(id)
+      x =>
+        Number(x.id) ===
+        Number(id)
     );
 
-  if(!veiculoAtual) return;
+
+  if(!veiculoAtual){
+    return;
+  }
+
 
   renderizarDetalheVeiculo();
+
 
   mostrarSomente(
     "veiculoDetalheScreen"
@@ -2299,6 +3201,7 @@ function renderizarDetalheVeiculo(){
   const v =
     veiculoAtual;
 
+
   $("veiculoDetalhe").innerHTML = `
 
     <h3 class="section-title">
@@ -2307,17 +3210,33 @@ function renderizarDetalheVeiculo(){
 
     <div class="detail-grid">
 
-      ${detail("Tipo",v.tipo)}
+      ${detail(
+        "Tipo",
+        v.tipo
+      )}
 
-      ${detail("Marca",v.marca)}
+      ${detail(
+        "Marca",
+        v.marca
+      )}
 
-      ${detail("Modelo",v.modelo)}
+      ${detail(
+        "Modelo",
+        v.modelo
+      )}
 
-      ${detail("Ano",v.ano)}
+      ${detail(
+        "Ano",
+        v.ano
+      )}
 
-      ${detail("Cor",v.cor)}
+      ${detail(
+        "Cor",
+        v.cor
+      )}
 
     </div>
+
 
     <h3 class="section-title">
       🔎 Identificadores
@@ -2325,13 +3244,23 @@ function renderizarDetalheVeiculo(){
 
     <div class="detail-grid">
 
-      ${detail("Placa",v.placa)}
+      ${detail(
+        "Placa",
+        v.placa
+      )}
 
-      ${detail("RENAVAM",v.renavam)}
+      ${detail(
+        "RENAVAM",
+        v.renavam
+      )}
 
-      ${detail("Chassi",v.chassi)}
+      ${detail(
+        "Chassi",
+        v.chassi
+      )}
 
     </div>
+
 
     <h3 class="section-title">
       📍 Localização
@@ -2339,11 +3268,18 @@ function renderizarDetalheVeiculo(){
 
     <div class="detail-grid">
 
-      ${detail("Cidade",v.cidade)}
+      ${detail(
+        "Cidade",
+        v.cidade
+      )}
 
-      ${detail("UF",v.uf)}
+      ${detail(
+        "UF",
+        v.uf
+      )}
 
     </div>
+
 
     <h3 class="section-title">
       💰 Informações patrimoniais
@@ -2358,7 +3294,9 @@ function renderizarDetalheVeiculo(){
 
       ${detail(
         "Data de referência FIPE",
-        formatarDataFipe(v.data_fipe)
+        formatarDataFipe(
+          v.data_fipe
+        )
       )}
 
       ${detail(
@@ -2368,10 +3306,13 @@ function renderizarDetalheVeiculo(){
 
       ${detail(
         "Data de cadastro",
-        formatarData(v.data_criacao)
+        formatarData(
+          v.data_criacao
+        )
       )}
 
     </div>
+
 
     <h3 class="section-title">
       📝 Observações
@@ -2408,26 +3349,46 @@ function editarVeiculoAtual(){
 
 async function excluirVeiculoAtual(){
 
-  if(!veiculoAtual) return;
+  if(!veiculoAtual){
+    return;
+  }
 
-  if(!confirm(
-    "Excluir este veículo?"
-  )) return;
+
+  if(
+    !confirm(
+      "Excluir este veículo?"
+    )
+  ){
+
+    return;
+
+  }
+
 
   try{
 
     const dados =
       await api(
-        "/veiculos/"+veiculoAtual.id,
-        {method:"DELETE"}
+
+        "/veiculos/" +
+        veiculoAtual.id,
+
+        {
+          method:"DELETE"
+        }
+
       );
+
 
     alert(
       dados.mensagem ||
       "Veículo excluído com sucesso."
     );
 
-    veiculoAtual = null;
+
+    veiculoAtual =
+      null;
+
 
     await abrirVeiculos();
 
@@ -2441,25 +3402,633 @@ async function excluirVeiculoAtual(){
 
 
 /* =========================
+   RELATÓRIOS
+========================= */
+
+async function abrirRelatorio(){
+
+  if(!investigacaoAtual){
+
+    alert(
+      "Abra uma investigação primeiro " +
+      "para gerar o relatório."
+    );
+
+    return;
+
+  }
+
+
+  mostrarSomente(
+    "relatorioScreen"
+  );
+
+
+  $("relatorioConteudo").innerHTML =
+    '<div class="loading">' +
+    'Preparando relatório...' +
+    '</div>';
+
+
+  try{
+
+    const [
+      dadosImoveis,
+      dadosVeiculos
+    ] =
+      await Promise.all([
+
+        api(
+          "/imoveis?investigacao_id=" +
+          encodeURIComponent(
+            investigacaoAtual.id
+          )
+        ),
+
+        api(
+          "/veiculos?investigacao_id=" +
+          encodeURIComponent(
+            investigacaoAtual.id
+          )
+        )
+
+      ]);
+
+
+    relatorioImoveis =
+      Array.isArray(dadosImoveis)
+        ? dadosImoveis
+        : (dadosImoveis.results || []);
+
+
+    relatorioVeiculos =
+      Array.isArray(dadosVeiculos)
+        ? dadosVeiculos
+        : (dadosVeiculos.results || []);
+
+
+    renderizarRelatorio();
+
+  }catch(e){
+
+    $("relatorioConteudo").innerHTML =
+      '<div class="error">' +
+      'Erro ao preparar relatório: ' +
+      escapeHtml(e.message) +
+      '</div>';
+
+  }
+
+}
+
+
+function renderizarRelatorio(){
+
+  const inv =
+    investigacaoAtual;
+
+
+  const imoveisHtml =
+    relatorioImoveis.length
+
+      ? relatorioImoveis
+          .map(function(im,index){
+
+            return `
+
+              <div class="relatorio-item">
+
+                <h3>
+
+                  🏠 Imóvel
+                  ${index + 1}
+
+                  —
+                  ${escapeHtml(
+                    im.tipo ||
+                    "Imóvel"
+                  )}
+
+                </h3>
+
+
+                <div class="detail-grid">
+
+                  ${detail(
+                    "Matrícula",
+                    im.matricula
+                  )}
+
+                  ${detail(
+                    "Cartório",
+                    im.cartorio
+                  )}
+
+                  ${detail(
+                    "CEP",
+                    im.cep
+                  )}
+
+                  ${detail(
+                    "Endereço",
+                    im.endereco
+                  )}
+
+                  ${detail(
+                    "Número",
+                    im.numero
+                  )}
+
+                  ${detail(
+                    "Complemento",
+                    im.complemento
+                  )}
+
+                  ${detail(
+                    "Bairro",
+                    im.bairro
+                  )}
+
+                  ${detail(
+                    "Cidade",
+                    im.cidade
+                  )}
+
+                  ${detail(
+                    "UF",
+                    im.uf
+                  )}
+
+                  ${detail(
+                    "Valor",
+                    im.valor
+                  )}
+
+                  ${detail(
+                    "Fonte",
+                    im.fonte
+                  )}
+
+                  ${detail(
+                    "Data de cadastro",
+                    formatarData(
+                      im.data_criacao
+                    )
+                  )}
+
+                </div>
+
+
+                <div
+                  class="section-title"
+                >
+                  📝 Observações
+                </div>
+
+
+                <div class="detail">
+
+                  <strong>
+
+                    ${escapeHtml(
+                      im.observacoes ||
+                      "Nenhuma observação cadastrada."
+                    )}
+
+                  </strong>
+
+                </div>
+
+              </div>
+
+            `;
+
+          })
+          .join("")
+
+      : `
+        <div class="empty">
+          Nenhum imóvel cadastrado
+          nesta investigação.
+        </div>
+      `;
+
+
+  const veiculosHtml =
+    relatorioVeiculos.length
+
+      ? relatorioVeiculos
+          .map(function(v,index){
+
+            return `
+
+              <div class="relatorio-item">
+
+                <h3>
+
+                  🚗 Veículo
+                  ${index + 1}
+
+                  —
+
+                  ${escapeHtml(
+                    (
+                      v.marca || ""
+                    ) +
+                    " " +
+                    (
+                      v.modelo || ""
+                    )
+                  )}
+
+                </h3>
+
+
+                <div class="detail-grid">
+
+                  ${detail(
+                    "Tipo",
+                    v.tipo
+                  )}
+
+                  ${detail(
+                    "Marca",
+                    v.marca
+                  )}
+
+                  ${detail(
+                    "Modelo",
+                    v.modelo
+                  )}
+
+                  ${detail(
+                    "Ano",
+                    v.ano
+                  )}
+
+                  ${detail(
+                    "Cor",
+                    v.cor
+                  )}
+
+                  ${detail(
+                    "Placa",
+                    v.placa
+                  )}
+
+                  ${detail(
+                    "RENAVAM",
+                    v.renavam
+                  )}
+
+                  ${detail(
+                    "Chassi",
+                    v.chassi
+                  )}
+
+                  ${detail(
+                    "Cidade",
+                    v.cidade
+                  )}
+
+                  ${detail(
+                    "UF",
+                    v.uf
+                  )}
+
+                  ${detail(
+                    "Valor pela Tabela FIPE",
+                    v.valor
+                  )}
+
+                  ${detail(
+                    "Data de referência FIPE",
+                    formatarDataFipe(
+                      v.data_fipe
+                    )
+                  )}
+
+                  ${detail(
+                    "Fonte",
+                    v.fonte
+                  )}
+
+                  ${detail(
+                    "Data de cadastro",
+                    formatarData(
+                      v.data_criacao
+                    )
+                  )}
+
+                </div>
+
+
+                <div
+                  class="section-title"
+                >
+                  📝 Observações
+                </div>
+
+
+                <div class="detail">
+
+                  <strong>
+
+                    ${escapeHtml(
+                      v.observacoes ||
+                      "Nenhuma observação cadastrada."
+                    )}
+
+                  </strong>
+
+                </div>
+
+              </div>
+
+            `;
+
+          })
+          .join("")
+
+      : `
+        <div class="empty">
+          Nenhum veículo cadastrado
+          nesta investigação.
+        </div>
+      `;
+
+
+  const agora =
+    new Date()
+      .toLocaleString(
+        "pt-BR"
+      );
+
+
+  $("relatorioConteudo").innerHTML = `
+
+    <div class="relatorio-capa">
+
+      <div class="badge">
+        RELATÓRIO DE INVESTIGAÇÃO PATRIMONIAL
+      </div>
+
+      <h1>
+        Meu Investigador
+      </h1>
+
+      <p class="muted">
+        Relatório consolidado da investigação
+      </p>
+
+    </div>
+
+
+    <div class="relatorio-meta">
+
+      <div class="detail">
+
+        <span class="muted">
+          Investigado
+        </span>
+
+        <strong>
+          ${escapeHtml(
+            inv.nome || "-"
+          )}
+        </strong>
+
+      </div>
+
+
+      <div class="detail">
+
+        <span class="muted">
+          Documento
+        </span>
+
+        <strong>
+          ${escapeHtml(
+            inv.documento || "-"
+          )}
+        </strong>
+
+      </div>
+
+
+      <div class="detail">
+
+        <span class="muted">
+          Processo
+        </span>
+
+        <strong>
+          ${escapeHtml(
+            inv.processo || "-"
+          )}
+        </strong>
+
+      </div>
+
+
+      <div class="detail">
+
+        <span class="muted">
+          Advogado
+        </span>
+
+        <strong>
+          ${escapeHtml(
+            inv.advogado || "-"
+          )}
+        </strong>
+
+      </div>
+
+
+      <div class="detail">
+
+        <span class="muted">
+          Data de criação
+        </span>
+
+        <strong>
+          ${formatarData(
+            inv.data_criacao
+          )}
+        </strong>
+
+      </div>
+
+
+      <div class="detail">
+
+        <span class="muted">
+          Data do relatório
+        </span>
+
+        <strong>
+          ${agora}
+        </strong>
+
+      </div>
+
+    </div>
+
+
+    <div class="relatorio-section">
+
+      <h2>
+        📊 Resumo patrimonial
+      </h2>
+
+      <div class="relatorio-counts">
+
+        <div class="relatorio-count">
+
+          <span class="muted">
+            Investigações
+          </span>
+
+          <strong>
+            1
+          </strong>
+
+        </div>
+
+
+        <div class="relatorio-count">
+
+          <span class="muted">
+            Imóveis
+          </span>
+
+          <strong>
+            ${relatorioImoveis.length}
+          </strong>
+
+        </div>
+
+
+        <div class="relatorio-count">
+
+          <span class="muted">
+            Veículos
+          </span>
+
+          <strong>
+            ${relatorioVeiculos.length}
+          </strong>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="relatorio-section">
+
+      <h2>
+        🔎 Fontes / diligências
+      </h2>
+
+      <div class="detail">
+
+        <strong>
+
+          ${escapeHtml(
+            inv.fontes ||
+            "Nenhuma fonte informada."
+          )}
+
+        </strong>
+
+      </div>
+
+    </div>
+
+
+    <div class="relatorio-section">
+
+      <h2>
+        🏠 Imóveis encontrados
+      </h2>
+
+      ${imoveisHtml}
+
+    </div>
+
+
+    <div class="relatorio-section">
+
+      <h2>
+        🚗 Veículos encontrados
+      </h2>
+
+      ${veiculosHtml}
+
+    </div>
+
+
+    <div class="relatorio-footer">
+
+      Documento gerado pelo
+      Meu Investigador em
+      ${agora}.
+
+    </div>
+
+  `;
+
+}
+
+
+function voltarDaTelaRelatorio(){
+
+  if(investigacaoAtual){
+
+    abrirInvestigacao(
+      investigacaoAtual.id
+    );
+
+  }else{
+
+    voltarInicio();
+
+  }
+
+}
+
+
+/* =========================
    HELPERS
 ========================= */
 
 function detail(titulo,valor){
 
   return `
+
     <div class="detail">
 
       <span class="muted">
-        ${escapeHtml(titulo)}
+
+        ${escapeHtml(
+          titulo
+        )}
+
       </span>
 
       <strong>
+
         ${escapeHtml(
           valor || "-"
         )}
+
       </strong>
 
     </div>
+
   `;
 
 }
@@ -2467,21 +4036,29 @@ function detail(titulo,valor){
 
 function formatarData(valor){
 
-  if(!valor) return "-";
+  if(!valor){
+    return "-";
+  }
+
 
   const d =
     new Date(
       String(valor)
-        .replace(" ","T")+"Z"
+        .replace(" ","T") +
+      "Z"
     );
+
 
   if(
     Number.isNaN(
       d.getTime()
     )
   ){
+
     return String(valor);
+
   }
+
 
   return d.toLocaleString(
     "pt-BR"
@@ -2492,23 +4069,43 @@ function formatarData(valor){
 
 function formatarDataFipe(valor){
 
-  if(!valor) return "-";
+  if(!valor){
+    return "-";
+  }
+
 
   if(
-    /^\d{4}-\d{2}-\d{2}$/.test(valor)
+    /^\d{4}-\d{2}-\d{2}$/
+      .test(valor)
   ){
 
-    const [a,m,d] =
+    const [
+      a,
+      m,
+      d
+    ] =
       valor.split("-");
 
-    return d+"/"+m+"/"+a;
+
+    return (
+      d +
+      "/" +
+      m +
+      "/" +
+      a
+    );
 
   }
+
 
   return valor;
 
 }
 
+
+/* =========================
+   INICIALIZAÇÃO
+========================= */
 
 iniciar();
 
