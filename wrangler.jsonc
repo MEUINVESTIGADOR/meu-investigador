@@ -1,0 +1,12 @@
+{
+  "name": "meu-investigador-api",
+  "main": "worker.js",
+  "compatibility_date": "2026-10-05",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "meu-investigador-db",
+      "database_id": "1742e19d-2c63-400a-8b10-a80ed3866e30"
+    }
+  ]
+}
