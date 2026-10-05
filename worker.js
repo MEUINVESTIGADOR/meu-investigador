@@ -1,0 +1,2519 @@
+const CORS_HEADERS = {
+  "Access-Control-Allow-Origin": "https://meuinvestigador.com.br",
+  "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type",
+  "Access-Control-Allow-Credentials": "true",
+  "Access-Control-Max-Age": "86400"
+};
+
+// =================================================
+// RESPOSTA JSON
+// =================================================
+
+function respostaJSON(dados, status = 200) {
+  return new Response(
+    JSON.stringify(dados),
+    {
+      status,
+      headers: {
+        ...CORS_HEADERS,
+        "Content-Type": "application/json; charset=UTF-8"
+      }
+    }
+  );
+}
+
+// =================================================
+// BASE64
+// =================================================
+
+function base64(bytes) {
+  let binary = "";
+
+  for (const byte of bytes) {
+    binary += String.fromCharCode(byte);
+  }
+
+  return btoa(binary);
+}
+
+function base64ParaBytes(base64Texto) {
+  const binary = atob(base64Texto);
+  const bytes = new Uint8Array(binary.length);
+
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+
+  return bytes;
+}
+
+// =================================================
+// HASH SHA-256
+// =================================================
+
+async function sha256(texto) {
+  const dados = new TextEncoder().encode(texto);
+
+  const hash = await crypto.subtle.digest(
+    "SHA-256",
+    dados
+  );
+
+  return base64(new Uint8Array(hash));
+}
+
+// =================================================
+// HASH DE SENHA - PBKDF2
+// =================================================
+
+async function gerarHashSenha(senha, saltBytes) {
+  const material = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(senha),
+    "PBKDF2",
+    false,
+    ["deriveBits"]
+  );
+
+  const bits = await crypto.subtle.deriveBits(
+    {
+      name: "PBKDF2",
+      salt: saltBytes,
+      iterations: 100000,
+      hash: "SHA-256"
+    },
+    material,
+    256
+  );
+
+  return base64(new Uint8Array(bits));
+}
+
+// =================================================
+// VERIFICAR SENHA
+// =================================================
+
+async function verificarSenha(senha, senhaHash) {
+  try {
+    const partes = senhaHash.split(":");
+
+    if (partes.length !== 4) {
+      return false;
+    }
+
+    const salt = base64ParaBytes(partes[2]);
+    const hashEsperado = partes[3];
+
+    const hashAtual = await gerarHashSenha(
+      senha,
+      salt
+    );
+
+    return hashAtual === hashEsperado;
+
+  } catch (erro) {
+    console.error(erro);
+    return false;
+  }
+}  
+
+// =================================================
+// CRIAR HASH DA SENHA
+// =================================================
+
+async function criarHashSenha(senha) {
+  const salt = crypto.getRandomValues(
+    new Uint8Array(16)
+  );
+
+  const hash = await gerarHashSenha(
+    senha,
+    salt
+  );
+
+  return base64(salt) + ":" + hash;
+}
+
+// =================================================
+// TOKEN DE SESSÃO
+// =================================================
+
+function gerarToken() {
+  const bytes = crypto.getRandomValues(
+    new Uint8Array(32)
+  );
+
+  return base64(bytes);
+}
+
+// =================================================
+// COOKIES
+// =================================================
+
+function obterCookie(request, nome) {
+  const cookie = request.headers.get("Cookie");
+
+  if (!cookie) {
+    return null;
+  }
+
+  const partes = cookie.split(";");
+
+  for (const parte of partes) {
+    const [chave, ...resto] =
+      parte.trim().split("=");
+
+    if (chave === nome) {
+      return resto.join("=");
+    }
+  }
+
+  return null;
+}
+
+// =================================================
+// OBTER USUÁRIO LOGADO
+// =================================================
+
+async function obterUsuario(request, env) {
+  try {
+    const token = obterCookie(
+      request,
+      "meu_investigador_sessao"
+    );
+
+    if (!token) {
+      return null;
+    }
+
+    const tokenHash = await sha256(token);
+
+    const sessao = await env.DB
+      .prepare(`
+        SELECT
+          s.id,
+          s.usuario_id,
+          s.data_expiracao,
+          u.nome,
+          u.email,
+          u.ativo
+        FROM sessoes s
+        INNER JOIN usuarios u
+          ON u.id = s.usuario_id
+        WHERE s.token_hash = ?
+          AND s.data_expiracao > datetime('now')
+          AND u.ativo = 1
+        LIMIT 1
+      `)
+      .bind(tokenHash)
+      .first();
+
+    if (!sessao) {
+      return null;
+    }
+
+    return {
+      id: sessao.usuario_id,
+      nome: sessao.nome,
+      email: sessao.email
+    };
+
+  } catch (erro) {
+    console.error(
+      "Erro ao obter usuário:",
+      erro
+    );
+
+    return null;
+  }
+}
+
+// =================================================
+// COOKIE VAZIO
+// =================================================
+
+function cookieSessaoVazia() {
+  return [
+    "meu_investigador_sessao=",
+    "HttpOnly",
+    "Secure",
+    "SameSite=None",
+    "Path=/",
+    "Max-Age=0"
+  ].join("; ");
+}
+
+// =================================================
+// COOKIE DE SESSÃO
+// =================================================
+
+function cookieSessao(token) {
+  return [
+    "meu_investigador_sessao=" + token,
+    "HttpOnly",
+    "Secure",
+    "SameSite=None",
+    "Path=/",
+    "Max-Age=604800"
+  ].join("; ");
+}
+
+// =================================================
+// RESPONSE COM COOKIE
+// =================================================
+
+function respostaComCookie(
+  dados,
+  cookie,
+  status = 200
+) {
+  return new Response(
+    JSON.stringify(dados),
+    {
+      status,
+      headers: {
+        ...CORS_HEADERS,
+        "Content-Type":
+          "application/json; charset=UTF-8",
+        "Set-Cookie": cookie
+      }
+    }
+  );
+}
+
+function cpfPessoaNormalizado(valor) {
+  if (!valor) {
+    return "";
+  }
+
+  if (!/^[0-9.\-\s]+$/.test(valor)) {
+    return null;
+  }
+
+  const cpf = valor.replace(/[.\-\s]/g, "");
+
+  if (
+    !/^\d{11}$/.test(cpf) ||
+    /^(\d)\1{10}$/.test(cpf)
+  ) {
+    return null;
+  }
+
+  let soma = 0;
+
+  for (let i = 0; i < 9; i++) {
+    soma += Number(cpf[i]) * (10 - i);
+  }
+
+  let digito = (soma * 10) % 11;
+
+  if (digito === 10) {
+    digito = 0;
+  }
+
+  if (digito !== Number(cpf[9])) {
+    return null;
+  }
+
+  soma = 0;
+
+  for (let i = 0; i < 10; i++) {
+    soma += Number(cpf[i]) * (11 - i);
+  }
+
+  digito = (soma * 10) % 11;
+
+  if (digito === 10) {
+    digito = 0;
+  }
+
+  if (digito !== Number(cpf[10])) {
+    return null;
+  }
+
+  return cpf;
+}
+
+
+function dataPessoaValida(valor) {
+  if (!valor) {
+    return true;
+  }
+
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(valor)) {
+    return false;
+  }
+
+  const data = new Date(
+    valor + "T00:00:00.000Z"
+  );
+
+  return (
+    !Number.isNaN(data.getTime()) &&
+    data.toISOString().slice(0, 10) === valor
+  );
+}
+
+
+function validarDadosPessoa(dados) {
+  if (
+    !dados ||
+    typeof dados !== "object" ||
+    Array.isArray(dados)
+  ) {
+    return {
+      erro: "Dados da pessoa inválidos."
+    };
+  }
+
+  const especificacoes = [
+    ["nome", 200, "Nome completo"],
+    ["nomeSocial", 200, "Nome social"],
+    ["papel", 100, "Papel na investigação"],
+    ["descricaoRelacao", 500, "Descrição da relação"],
+    ["observacoes", 5000, "Observações"],
+    ["fonte", 500, "Fonte da informação"],
+    ["dataNascimento", 10, "Data de nascimento"],
+    ["dataObtencao", 10, "Data de obtenção"],
+    ["referencia", 2000, "Referência da fonte"],
+    ["cpf", 14, "CPF"]
+  ];
+
+  const pessoa = {};
+
+  for (const [chave, limite, rotulo] of especificacoes) {
+    let valor = dados[chave];
+
+    if (valor === undefined || valor === null) {
+      valor = "";
+    }
+
+    if (typeof valor !== "string") {
+      return {
+        erro: "Campo " + rotulo + " inválido."
+      };
+    }
+
+    valor = valor.trim();
+
+    if (valor.length > limite) {
+      return {
+        erro: "Campo " + rotulo + " excede o tamanho permitido."
+      };
+    }
+
+    pessoa[chave] = valor;
+  }
+
+  if (!pessoa.nome) {
+    return {
+      erro: "Informe o nome completo."
+    };
+  }
+
+  const cpf = cpfPessoaNormalizado(pessoa.cpf);
+
+  if (cpf === null) {
+    return {
+      erro: "CPF inválido."
+    };
+  }
+
+  pessoa.cpf = cpf;
+
+  let status = dados.status;
+
+  if (status === undefined || status === null || status === "") {
+    status = "Não verificada";
+  }
+
+  if (
+    typeof status !== "string" ||
+    ![
+      "Não verificada",
+      "Parcialmente verificada",
+      "Verificada"
+    ].includes(status.trim())
+  ) {
+    return {
+      erro: "Status da informação inválido."
+    };
+  }
+
+  pessoa.status = status.trim();
+
+  if (
+    !dataPessoaValida(pessoa.dataNascimento) ||
+    !dataPessoaValida(pessoa.dataObtencao)
+  ) {
+    return {
+      erro: "Informe datas válidas no formato AAAA-MM-DD."
+    };
+  }
+
+  const hoje = new Date().toISOString().slice(0, 10);
+
+  if (
+    pessoa.dataNascimento &&
+    pessoa.dataNascimento > hoje
+  ) {
+    return {
+      erro: "A data de nascimento não pode ser futura."
+    };
+  }
+
+  if (
+    pessoa.dataObtencao &&
+    pessoa.dataObtencao > hoje
+  ) {
+    return {
+      erro: "A data de obtenção não pode ser futura."
+    };
+  }
+
+  return {
+    pessoa
+  };
+}
+
+// =================================================
+// WORKER
+// =================================================
+
+export default {
+
+  async fetch(request, env) {
+
+    const url = new URL(request.url);
+
+    // =================================================
+    // OPTIONS / CORS
+    // =================================================
+
+    if (request.method === "OPTIONS") {
+      return new Response(
+        null,
+        {
+          status: 204,
+          headers: CORS_HEADERS
+        }
+      );
+    }
+
+    // =================================================
+    // API STATUS
+    // =================================================
+
+    if (
+      request.method === "GET" &&
+      url.pathname === "/"
+    ) {
+      return respostaJSON({
+        ok: true,
+        sistema: "Meu Investigador API",
+        status: "online"
+      });
+    }
+
+    // =================================================
+    // LOGIN
+    // =================================================
+
+    if (
+      request.method === "POST" &&
+      url.pathname === "/login"
+    ) {
+
+      try {
+
+        const dados = await request.json();
+
+        const email = String(
+          dados.email || ""
+        )
+          .trim()
+          .toLowerCase();
+
+        const senha = String(
+          dados.senha || ""
+        );
+
+        if (!email || !senha) {
+          return respostaJSON({
+            ok: false,
+            erro: "Informe e-mail e senha."
+          }, 400);
+        }
+
+        const usuario = await env.DB
+          .prepare(`
+            SELECT
+              id,
+              nome,
+              email,
+              senha_hash,
+              ativo
+            FROM usuarios
+            WHERE email = ?
+            LIMIT 1
+          `)
+          .bind(email)
+          .first();
+
+        if (!usuario) {
+          return respostaJSON({
+            ok: false,
+            erro: "E-mail ou senha inválidos."
+          }, 401);
+        }
+
+        if (!usuario.ativo) {
+          return respostaJSON({
+            ok: false,
+            erro: "Usuário inativo."
+          }, 403);
+        }
+
+        const senhaValida =
+          await verificarSenha(
+            senha,
+            usuario.senha_hash
+          );
+
+        if (!senhaValida) {
+          return respostaJSON({
+            ok: false,
+            erro: "E-mail ou senha inválidos."
+          }, 401);
+        }
+
+        const token = gerarToken();
+        const tokenHash = await sha256(token);
+
+        await env.DB
+          .prepare(`
+            DELETE FROM sessoes
+            WHERE data_expiracao <= datetime('now')
+          `)
+          .run();
+
+        await env.DB
+          .prepare(`
+            INSERT INTO sessoes (
+              usuario_id,
+              token_hash,
+              data_criacao,
+              data_expiracao
+            )
+            VALUES (
+              ?,
+              ?,
+              datetime('now'),
+              datetime('now', '+7 days')
+            )
+          `)
+          .bind(
+            usuario.id,
+            tokenHash
+          )
+          .run();
+
+        return respostaComCookie(
+          {
+            ok: true,
+            usuario: {
+              id: usuario.id,
+              nome: usuario.nome,
+              email: usuario.email
+            }
+          },
+          cookieSessao(token)
+        );
+
+      } catch (erro) {
+
+        console.error(
+          "Erro no login:",
+          erro
+        );
+
+        return respostaJSON({
+          ok: false,
+          erro: "Erro ao realizar login."
+        }, 500);
+      }
+    }
+
+    // =================================================
+    // LOGOUT
+    // =================================================
+
+    if (
+      request.method === "POST" &&
+      url.pathname === "/logout"
+    ) {
+
+      try {
+
+        const token = obterCookie(
+          request,
+          "meu_investigador_sessao"
+        );
+
+        if (token) {
+
+          const tokenHash =
+            await sha256(token);
+
+          await env.DB
+            .prepare(`
+              DELETE FROM sessoes
+              WHERE token_hash = ?
+            `)
+            .bind(tokenHash)
+            .run();
+        }
+
+        return respostaComCookie(
+          {
+            ok: true
+          },
+          cookieSessaoVazia()
+        );
+
+      } catch (erro) {
+
+        console.error(
+          "Erro no logout:",
+          erro
+        );
+
+        return respostaComCookie(
+          {
+            ok: true
+          },
+          cookieSessaoVazia()
+        );
+      }
+    }
+
+    // =================================================
+    // USUÁRIO ATUAL
+    // =================================================
+
+    if (
+      request.method === "GET" &&
+      url.pathname === "/usuario"
+    ) {
+
+      const usuario =
+        await obterUsuario(
+          request,
+          env
+        );
+
+      if (!usuario) {
+        return respostaJSON({
+          ok: false,
+          erro: "Não autenticado."
+        }, 401);
+      }
+
+      return respostaJSON({
+        ok: true,
+        usuario
+      });
+    }
+
+    // =================================================
+    // AUTENTICAÇÃO
+    // =================================================
+
+    const usuario =
+      await obterUsuario(
+        request,
+        env
+      );
+
+    // =================================================
+    // INVESTIGAÇÕES - LISTAR
+    // =================================================
+
+    if (
+      request.method === "GET" &&
+      url.pathname === "/investigacoes"
+    ) {
+
+      if (!usuario) {
+        return respostaJSON({
+          ok: false,
+          erro: "Não autenticado."
+        }, 401);
+      }
+
+      try {
+
+        const resultado =
+          await env.DB
+            .prepare(`
+              SELECT
+                id,
+                nome,
+                documento,
+                processo,
+                advogado,
+                fontes,
+                data_criacao,
+                usuario_id
+              FROM investigacoes
+              WHERE usuario_id = ?
+              ORDER BY id DESC
+            `)
+            .bind(usuario.id)
+            .all();
+
+        return respostaJSON(
+          resultado.results || []
+        );
+
+      } catch (erro) {
+
+        console.error(erro);
+
+        return respostaJSON({
+          ok: false,
+          erro: "Erro ao carregar investigações."
+        }, 500);
+      }
+    }
+
+    // =================================================
+    // INVESTIGAÇÕES - CRIAR
+    // =================================================
+
+    if (
+      request.method === "POST" &&
+      url.pathname === "/investigacoes"
+    ) {
+
+      if (!usuario) {
+        return respostaJSON({
+          ok: false,
+          erro: "Não autenticado."
+        }, 401);
+      }
+
+      try {
+
+        const dados =
+          await request.json();
+
+        const nome =
+          String(
+            dados.nome || ""
+          ).trim();
+
+        if (!nome) {
+          return respostaJSON({
+            ok: false,
+            erro:
+              "Informe o nome da investigação."
+          }, 400);
+        }
+
+        const documento =
+          String(
+            dados.documento || ""
+          ).trim();
+
+        const processo =
+          String(
+            dados.processo || ""
+          ).trim();
+
+        const advogado =
+          String(
+            dados.advogado || ""
+          ).trim();
+
+        let fontes =
+          dados.fontes || "";
+
+        if (Array.isArray(fontes)) {
+          fontes =
+            JSON.stringify(fontes);
+        } else {
+          fontes =
+            String(fontes);
+        }
+
+        const resultado =
+          await env.DB
+            .prepare(`
+              INSERT INTO investigacoes (
+                nome,
+                documento,
+                processo,
+                advogado,
+                fontes,
+                data_criacao,
+                usuario_id
+              )
+              VALUES (
+                ?,
+                ?,
+                ?,
+                ?,
+                ?,
+                datetime('now'),
+                ?
+              )
+            `)
+            .bind(
+              nome,
+              documento,
+              processo,
+              advogado,
+              fontes,
+              usuario.id
+            )
+            .run();
+
+        return respostaJSON({
+          ok: true,
+          id: resultado.meta.last_row_id,
+          mensagem:
+            "Investigação criada com sucesso."
+        });
+
+      } catch (erro) {
+
+        console.error(erro);
+
+        return respostaJSON({
+          ok: false,
+          erro:
+            "Erro ao criar investigação."
+        }, 500);
+      }
+    }
+
+    // =================================================
+    // INVESTIGAÇÕES - EXCLUIR
+    // =================================================
+
+    if (
+      request.method === "DELETE" &&
+      url.pathname.startsWith("/investigacoes/")
+    ) {
+
+      if (!usuario) {
+        return respostaJSON({
+          ok: false,
+          erro: "Não autenticado."
+        }, 401);
+      }
+
+      try {
+
+        const id =
+          Number(
+            url.pathname.split("/").pop()
+          );
+
+        if (
+          !Number.isInteger(id) ||
+          id <= 0
+        ) {
+          return respostaJSON({
+            ok: false,
+            erro:
+              "Investigação inválida."
+          }, 400);
+        }
+
+        const investigacao =
+          await env.DB
+            .prepare(`
+              SELECT id
+              FROM investigacoes
+              WHERE id = ?
+                AND usuario_id = ?
+            `)
+            .bind(
+              id,
+              usuario.id
+            )
+            .first();
+
+        if (!investigacao) {
+          return respostaJSON({
+            ok: false,
+            erro:
+              "Investigação não encontrada."
+          }, 404);
+        }
+
+        // Exclui imóveis
+        await env.DB
+          .prepare(`
+            DELETE FROM imoveis
+            WHERE investigacao_id = ?
+              AND usuario_id = ?
+          `)
+          .bind(
+            id,
+            usuario.id
+          )
+          .run();
+
+        // Exclui veículos
+        await env.DB
+          .prepare(`
+            DELETE FROM veiculos
+            WHERE investigacao_id = ?
+              AND usuario_id = ?
+          `)
+          .bind(
+            id,
+            usuario.id
+          )
+          .run();
+
+        // Exclui investigação
+        await env.DB
+          .prepare(`
+            DELETE FROM investigacoes
+            WHERE id = ?
+              AND usuario_id = ?
+          `)
+          .bind(
+            id,
+            usuario.id
+          )
+          .run();
+
+        return respostaJSON({
+          ok: true,
+          mensagem:
+            "Investigação excluída com sucesso."
+        });
+
+      } catch (erro) {
+
+        console.error(erro);
+
+        return respostaJSON({
+          ok: false,
+          erro:
+            "Erro ao excluir investigação."
+        }, 500);
+      }
+    }
+
+    // =================================================
+    // IMÓVEIS - LISTAR
+    // =================================================
+
+    if (
+      request.method === "GET" &&
+      url.pathname === "/imoveis"
+    ) {
+
+      if (!usuario) {
+        return respostaJSON({
+          ok: false,
+          erro: "Não autenticado."
+        }, 401);
+      }
+
+      try {
+
+        const investigacaoId =
+          Number(
+            url.searchParams.get(
+              "investigacao_id"
+            )
+          );
+
+        if (
+          !Number.isInteger(
+            investigacaoId
+          ) ||
+          investigacaoId <= 0
+        ) {
+          return respostaJSON({
+            ok: false,
+            erro:
+              "Investigação inválida."
+          }, 400);
+        }
+
+        const resultado =
+          await env.DB
+            .prepare(`
+              SELECT
+                id,
+                investigacao_id,
+                usuario_id,
+                tipo,
+                matricula,
+                cartorio,
+                cep,
+                endereco,
+                numero,
+                complemento,
+                bairro,
+                cidade,
+                uf,
+                valor,
+                fonte,
+                observacoes,
+                data_criacao
+              FROM imoveis
+              WHERE investigacao_id = ?
+                AND usuario_id = ?
+              ORDER BY id DESC
+            `)
+            .bind(
+              investigacaoId,
+              usuario.id
+            )
+            .all();
+
+        return respostaJSON(
+          resultado.results || []
+        );
+
+      } catch (erro) {
+
+        console.error(erro);
+
+        return respostaJSON({
+          ok: false,
+          erro:
+            "Erro ao carregar imóveis."
+        }, 500);
+      }
+    }
+
+    // =================================================
+    // IMÓVEIS - CADASTRAR
+    // =================================================
+
+    if (
+      request.method === "POST" &&
+      url.pathname === "/imoveis"
+    ) {
+
+      if (!usuario) {
+        return respostaJSON({
+          ok: false,
+          erro: "Não autenticado."
+        }, 401);
+      }
+
+      try {
+
+        const dados =
+          await request.json();
+
+        const investigacaoId =
+          Number(
+            dados.investigacao_id
+          );
+
+        if (
+          !Number.isInteger(
+            investigacaoId
+          ) ||
+          investigacaoId <= 0
+        ) {
+          return respostaJSON({
+            ok: false,
+            erro:
+              "Investigação inválida."
+          }, 400);
+        }
+
+        const investigacao =
+          await env.DB
+            .prepare(`
+              SELECT id
+              FROM investigacoes
+              WHERE id = ?
+                AND usuario_id = ?
+            `)
+            .bind(
+              investigacaoId,
+              usuario.id
+            )
+            .first();
+
+        if (!investigacao) {
+          return respostaJSON({
+            ok: false,
+            erro:
+              "Investigação não encontrada."
+          }, 404);
+        }
+
+        const resultado =
+          await env.DB
+            .prepare(`
+              INSERT INTO imoveis (
+                investigacao_id,
+                usuario_id,
+                tipo,
+                matricula,
+                cartorio,
+                cep,
+                endereco,
+                numero,
+                complemento,
+                bairro,
+                cidade,
+                uf,
+                valor,
+                fonte,
+                observacoes
+              )
+              VALUES (
+                ?,
+                ?,
+                ?,
+                ?,
+                ?,
+                ?,
+                ?,
+                ?,
+                ?,
+                ?,
+                ?,
+                ?,
+                ?,
+                ?,
+                ?
+              )
+            `)
+            .bind(
+              investigacaoId,
+              usuario.id,
+              dados.tipo || "",
+              dados.matricula || "",
+              dados.cartorio || "",
+              dados.cep || "",
+              dados.endereco || "",
+              dados.numero || "",
+              dados.complemento || "",
+              dados.bairro || "",
+              dados.cidade || "",
+              dados.uf || "",
+              dados.valor || "",
+              dados.fonte || "",
+              dados.observacoes || ""
+            )
+            .run();
+
+        return respostaJSON({
+          ok: true,
+          id:
+            resultado.meta.last_row_id,
+          mensagem:
+            "Imóvel cadastrado com sucesso."
+        });
+
+      } catch (erro) {
+
+        console.error(erro);
+
+        return respostaJSON({
+          ok: false,
+          erro:
+            "Erro ao cadastrar imóvel."
+        }, 500);
+      }
+    }
+
+    // =================================================
+    // IMÓVEIS - DETALHES
+    // =================================================
+
+    if (
+      request.method === "GET" &&
+      /^\/imoveis\/\d+$/.test(
+        url.pathname
+      )
+    ) {
+
+      if (!usuario) {
+        return respostaJSON({
+          ok: false,
+          erro: "Não autenticado."
+        }, 401);
+      }
+
+      try {
+
+        const id =
+          Number(
+            url.pathname.split("/").pop()
+          );
+
+        const imovel =
+          await env.DB
+            .prepare(`
+              SELECT
+                id,
+                investigacao_id,
+                usuario_id,
+                tipo,
+                matricula,
+                cartorio,
+                cep,
+                endereco,
+                numero,
+                complemento,
+                bairro,
+                cidade,
+                uf,
+                valor,
+                fonte,
+                observacoes,
+                data_criacao
+              FROM imoveis
+              WHERE id = ?
+                AND usuario_id = ?
+              LIMIT 1
+            `)
+            .bind(
+              id,
+              usuario.id
+            )
+            .first();
+
+        if (!imovel) {
+          return respostaJSON({
+            ok: false,
+            erro:
+              "Imóvel não encontrado."
+          }, 404);
+        }
+
+        return respostaJSON({
+          ok: true,
+          imovel
+        });
+
+      } catch (erro) {
+
+        console.error(erro);
+
+        return respostaJSON({
+          ok: false,
+          erro:
+            "Erro ao carregar imóvel."
+        }, 500);
+      }
+    }
+
+    // =================================================
+    // IMÓVEIS - EDITAR
+    // =================================================
+
+    if (
+      request.method === "PUT" &&
+      /^\/imoveis\/\d+$/.test(
+        url.pathname
+      )
+    ) {
+
+      if (!usuario) {
+        return respostaJSON({
+          ok: false,
+          erro: "Não autenticado."
+        }, 401);
+      }
+
+      try {
+
+        const id =
+          Number(
+            url.pathname.split("/").pop()
+          );
+
+        if (
+          !Number.isInteger(id) ||
+          id <= 0
+        ) {
+          return respostaJSON({
+            ok: false,
+            erro:
+              "Imóvel inválido."
+          }, 400);
+        }
+
+        const dados =
+          await request.json();
+
+        const imovel =
+          await env.DB
+            .prepare(`
+              SELECT
+                id,
+                investigacao_id
+              FROM imoveis
+              WHERE id = ?
+                AND usuario_id = ?
+            `)
+            .bind(
+              id,
+              usuario.id
+            )
+            .first();
+
+        if (!imovel) {
+          return respostaJSON({
+            ok: false,
+            erro:
+              "Imóvel não encontrado."
+          }, 404);
+        }
+
+        await env.DB
+          .prepare(`
+            UPDATE imoveis
+            SET
+              tipo = ?,
+              matricula = ?,
+              cartorio = ?,
+              cep = ?,
+              endereco = ?,
+              numero = ?,
+              complemento = ?,
+              bairro = ?,
+              cidade = ?,
+              uf = ?,
+              valor = ?,
+              fonte = ?,
+              observacoes = ?
+            WHERE id = ?
+              AND usuario_id = ?
+          `)
+          .bind(
+            dados.tipo || "",
+            dados.matricula || "",
+            dados.cartorio || "",
+            dados.cep || "",
+            dados.endereco || "",
+            dados.numero || "",
+            dados.complemento || "",
+            dados.bairro || "",
+            dados.cidade || "",
+            dados.uf || "",
+            dados.valor || "",
+            dados.fonte || "",
+            dados.observacoes || "",
+            id,
+            usuario.id
+          )
+          .run();
+
+        return respostaJSON({
+          ok: true,
+          mensagem:
+            "Imóvel atualizado com sucesso."
+        });
+
+      } catch (erro) {
+
+        console.error(erro);
+
+        return respostaJSON({
+          ok: false,
+          erro:
+            "Erro ao atualizar imóvel."
+        }, 500);
+      }
+    }
+
+    // =================================================
+    // IMÓVEIS - EXCLUIR
+    // =================================================
+
+    if (
+      request.method === "DELETE" &&
+      /^\/imoveis\/\d+$/.test(
+        url.pathname
+      )
+    ) {
+
+      if (!usuario) {
+        return respostaJSON({
+          ok: false,
+          erro: "Não autenticado."
+        }, 401);
+      }
+
+      try {
+
+        const id =
+          Number(
+            url.pathname.split("/").pop()
+          );
+
+        if (
+          !Number.isInteger(id) ||
+          id <= 0
+        ) {
+          return respostaJSON({
+            ok: false,
+            erro:
+              "Imóvel inválido."
+          }, 400);
+        }
+
+        const resultado =
+          await env.DB
+            .prepare(`
+              DELETE FROM imoveis
+              WHERE id = ?
+                AND usuario_id = ?
+            `)
+            .bind(
+              id,
+              usuario.id
+            )
+            .run();
+
+        if (
+          !resultado.meta ||
+          !resultado.meta.changes
+        ) {
+          return respostaJSON({
+            ok: false,
+            erro:
+              "Imóvel não encontrado."
+          }, 404);
+        }
+
+        return respostaJSON({
+          ok: true,
+          mensagem:
+            "Imóvel excluído com sucesso."
+        });
+
+      } catch (erro) {
+
+        console.error(erro);
+
+        return respostaJSON({
+          ok: false,
+          erro:
+            "Erro ao excluir imóvel."
+        }, 500);
+      }
+    }
+
+    // =================================================
+    // VEÍCULOS - LISTAR
+    // =================================================
+
+    if (
+      request.method === "GET" &&
+      url.pathname === "/veiculos"
+    ) {
+
+      if (!usuario) {
+        return respostaJSON({
+          ok: false,
+          erro: "Não autenticado."
+        }, 401);
+      }
+
+      try {
+
+        const investigacaoId =
+          Number(
+            url.searchParams.get(
+              "investigacao_id"
+            )
+          );
+
+        if (
+          !Number.isInteger(
+            investigacaoId
+          ) ||
+          investigacaoId <= 0
+        ) {
+          return respostaJSON({
+            ok: false,
+            erro:
+              "Investigação inválida."
+          }, 400);
+        }
+
+        const resultado =
+          await env.DB
+            .prepare(`
+              SELECT
+                id,
+                investigacao_id,
+                usuario_id,
+                tipo,
+                marca,
+                modelo,
+                ano,
+                placa,
+                renavam,
+                chassi,
+                cor,
+                cidade,
+                uf,
+                valor,
+                fonte,
+                observacoes,
+                data_criacao,
+                data_fipe
+              FROM veiculos
+              WHERE investigacao_id = ?
+                AND usuario_id = ?
+              ORDER BY id DESC
+            `)
+            .bind(
+              investigacaoId,
+              usuario.id
+            )
+            .all();
+
+        return respostaJSON(
+          resultado.results || []
+        );
+
+      } catch (erro) {
+
+        console.error(erro);
+
+        return respostaJSON({
+          ok: false,
+          erro:
+            "Erro ao carregar veículos."
+        }, 500);
+      }
+    }
+
+    // =================================================
+    // VEÍCULOS - CADASTRAR
+    // =================================================
+
+    if (
+      request.method === "POST" &&
+      url.pathname === "/veiculos"
+    ) {
+
+      if (!usuario) {
+        return respostaJSON({
+          ok: false,
+          erro: "Não autenticado."
+        }, 401);
+      }
+
+      try {
+
+        const dados =
+          await request.json();
+
+        const investigacaoId =
+          Number(
+            dados.investigacao_id
+          );
+
+        if (
+          !Number.isInteger(
+            investigacaoId
+          ) ||
+          investigacaoId <= 0
+        ) {
+          return respostaJSON({
+            ok: false,
+            erro:
+              "Investigação inválida."
+          }, 400);
+        }
+
+        const investigacao =
+          await env.DB
+            .prepare(`
+              SELECT id
+              FROM investigacoes
+              WHERE id = ?
+                AND usuario_id = ?
+              LIMIT 1
+            `)
+            .bind(
+              investigacaoId,
+              usuario.id
+            )
+            .first();
+
+        if (!investigacao) {
+          return respostaJSON({
+            ok: false,
+            erro:
+              "Investigação não encontrada."
+          }, 404);
+        }
+
+        const resultado =
+          await env.DB
+            .prepare(`
+              INSERT INTO veiculos (
+                investigacao_id,
+                usuario_id,
+                tipo,
+                marca,
+                modelo,
+                ano,
+                placa,
+                renavam,
+                chassi,
+                cor,
+                cidade,
+                uf,
+                valor,
+                fonte,
+                observacoes,
+                data_fipe
+              )
+              VALUES (
+                ?,
+                ?,
+                ?,
+                ?,
+                ?,
+                ?,
+                ?,
+                ?,
+                ?,
+                ?,
+                ?,
+                ?,
+                ?,
+                ?,
+                ?,
+                ?
+              )
+            `)
+            .bind(
+              investigacaoId,
+              usuario.id,
+              String(dados.tipo || ""),
+              String(dados.marca || ""),
+              String(dados.modelo || ""),
+              String(dados.ano || ""),
+              String(dados.placa || ""),
+              String(dados.renavam || ""),
+              String(dados.chassi || ""),
+              String(dados.cor || ""),
+              String(dados.cidade || ""),
+              String(dados.uf || ""),
+              String(dados.valor || ""),
+              String(dados.fonte || "Tabela FIPE"),
+              String(dados.observacoes || ""),
+              String(dados.data_fipe || "")
+            )
+            .run();
+
+        return respostaJSON({
+          ok: true,
+          id:
+            resultado.meta.last_row_id,
+          mensagem:
+            "Veículo cadastrado com sucesso."
+        });
+
+      } catch (erro) {
+
+        console.error(
+          "Erro ao cadastrar veículo:",
+          erro
+        );
+
+        return respostaJSON({
+          ok: false,
+          erro:
+            "Erro ao cadastrar veículo."
+        }, 500);
+      }
+    }
+
+    // =================================================
+    // VEÍCULOS - DETALHES
+    // =================================================
+
+    if (
+      request.method === "GET" &&
+      /^\/veiculos\/\d+$/.test(
+        url.pathname
+      )
+    ) {
+
+      if (!usuario) {
+        return respostaJSON({
+          ok: false,
+          erro: "Não autenticado."
+        }, 401);
+      }
+
+      try {
+
+        const id =
+          Number(
+            url.pathname.split("/").pop()
+          );
+
+        if (
+          !Number.isInteger(id) ||
+          id <= 0
+        ) {
+          return respostaJSON({
+            ok: false,
+            erro:
+              "Veículo inválido."
+          }, 400);
+        }
+
+        const veiculo =
+          await env.DB
+            .prepare(`
+              SELECT
+                id,
+                investigacao_id,
+                usuario_id,
+                tipo,
+                marca,
+                modelo,
+                ano,
+                placa,
+                renavam,
+                chassi,
+                cor,
+                cidade,
+                uf,
+                valor,
+                fonte,
+                observacoes,
+                data_criacao,
+                data_fipe
+              FROM veiculos
+              WHERE id = ?
+                AND usuario_id = ?
+              LIMIT 1
+            `)
+            .bind(
+              id,
+              usuario.id
+            )
+            .first();
+
+        if (!veiculo) {
+          return respostaJSON({
+            ok: false,
+            erro:
+              "Veículo não encontrado."
+          }, 404);
+        }
+
+        return respostaJSON({
+          ok: true,
+          veiculo
+        });
+
+      } catch (erro) {
+
+        console.error(erro);
+
+        return respostaJSON({
+          ok: false,
+          erro:
+            "Erro ao carregar veículo."
+        }, 500);
+      }
+    }
+
+    // =================================================
+    // VEÍCULOS - EDITAR
+    // =================================================
+
+    if (
+      request.method === "PUT" &&
+      /^\/veiculos\/\d+$/.test(
+        url.pathname
+      )
+    ) {
+
+      if (!usuario) {
+        return respostaJSON({
+          ok: false,
+          erro: "Não autenticado."
+        }, 401);
+      }
+
+      try {
+
+        const id =
+          Number(
+            url.pathname.split("/").pop()
+          );
+
+        if (
+          !Number.isInteger(id) ||
+          id <= 0
+        ) {
+          return respostaJSON({
+            ok: false,
+            erro:
+              "Veículo inválido."
+          }, 400);
+        }
+
+        const dados =
+          await request.json();
+
+        const veiculo =
+          await env.DB
+            .prepare(`
+              SELECT
+                id,
+                investigacao_id
+              FROM veiculos
+              WHERE id = ?
+                AND usuario_id = ?
+              LIMIT 1
+            `)
+            .bind(
+              id,
+              usuario.id
+            )
+            .first();
+
+        if (!veiculo) {
+          return respostaJSON({
+            ok: false,
+            erro:
+              "Veículo não encontrado."
+          }, 404);
+        }
+
+        await env.DB
+          .prepare(`
+            UPDATE veiculos
+            SET
+              tipo = ?,
+              marca = ?,
+              modelo = ?,
+              ano = ?,
+              placa = ?,
+              renavam = ?,
+              chassi = ?,
+              cor = ?,
+              cidade = ?,
+              uf = ?,
+              valor = ?,
+              fonte = ?,
+              observacoes = ?,
+              data_fipe = ?
+            WHERE id = ?
+              AND usuario_id = ?
+          `)
+          .bind(
+            String(dados.tipo || ""),
+            String(dados.marca || ""),
+            String(dados.modelo || ""),
+            String(dados.ano || ""),
+            String(dados.placa || ""),
+            String(dados.renavam || ""),
+            String(dados.chassi || ""),
+            String(dados.cor || ""),
+            String(dados.cidade || ""),
+            String(dados.uf || ""),
+            String(dados.valor || ""),
+            String(dados.fonte || "Tabela FIPE"),
+            String(dados.observacoes || ""),
+            String(dados.data_fipe || ""),
+            id,
+            usuario.id
+          )
+          .run();
+
+        return respostaJSON({
+          ok: true,
+          mensagem:
+            "Veículo atualizado com sucesso."
+        });
+
+      } catch (erro) {
+
+        console.error(
+          "Erro ao atualizar veículo:",
+          erro
+        );
+
+        return respostaJSON({
+          ok: false,
+          erro:
+            "Erro ao atualizar veículo."
+        }, 500);
+      }
+    }
+
+    // =================================================
+    // VEÍCULOS - EXCLUIR
+    // =================================================
+
+    if (
+      request.method === "DELETE" &&
+      /^\/veiculos\/\d+$/.test(
+        url.pathname
+      )
+    ) {
+
+      if (!usuario) {
+        return respostaJSON({
+          ok: false,
+          erro: "Não autenticado."
+        }, 401);
+      }
+
+      try {
+
+        const id =
+          Number(
+            url.pathname.split("/").pop()
+          );
+
+        if (
+          !Number.isInteger(id) ||
+          id <= 0
+        ) {
+          return respostaJSON({
+            ok: false,
+            erro:
+              "Veículo inválido."
+          }, 400);
+        }
+
+        const resultado =
+          await env.DB
+            .prepare(`
+              DELETE FROM veiculos
+              WHERE id = ?
+                AND usuario_id = ?
+            `)
+            .bind(
+              id,
+              usuario.id
+            )
+            .run();
+
+        if (
+          !resultado.meta ||
+          !resultado.meta.changes
+        ) {
+          return respostaJSON({
+            ok: false,
+            erro:
+              "Veículo não encontrado."
+          }, 404);
+        }
+
+        return respostaJSON({
+          ok: true,
+          mensagem:
+            "Veículo excluído com sucesso."
+        });
+
+      } catch (erro) {
+
+        console.error(
+          "Erro ao excluir veículo:",
+          erro
+        );
+
+        return respostaJSON({
+          ok: false,
+          erro:
+            "Erro ao excluir veículo."
+        }, 500);
+      }
+    }
+
+    // =================================================
+    // PESSOAS - LISTAR
+    // =================================================
+
+    if (
+      request.method === "GET" &&
+      url.pathname === "/pessoas"
+    ) {
+
+      if (!usuario) {
+        return respostaJSON({
+          ok: false,
+          erro: "Não autenticado."
+        }, 401);
+      }
+
+      try {
+
+        const investigacaoId =
+          Number(
+            url.searchParams.get(
+              "investigacao_id"
+            )
+          );
+
+        if (
+          !Number.isInteger(investigacaoId) ||
+          investigacaoId <= 0
+        ) {
+          return respostaJSON({
+            ok: false,
+            erro: "Investigação inválida."
+          }, 400);
+        }
+
+        const investigacao =
+          await env.DB
+            .prepare(`
+              SELECT id
+              FROM investigacoes
+              WHERE id = ?
+                AND usuario_id = ?
+              LIMIT 1
+            `)
+            .bind(
+              investigacaoId,
+              usuario.id
+            )
+            .first();
+
+        if (!investigacao) {
+          return respostaJSON({
+            ok: false,
+            erro: "Investigação não encontrada."
+          }, 404);
+        }
+
+        const resultado =
+          await env.DB
+            .prepare(`
+              SELECT
+                id,
+                investigacao_id AS investigacaoId,
+                nome_completo AS nome,
+                nome_social AS nomeSocial,
+                cpf,
+                data_nascimento AS dataNascimento,
+                papel_investigacao AS papel,
+                descricao_relacao AS descricaoRelacao,
+                status_informacao AS status,
+                observacoes,
+                fonte_informacao AS fonte,
+                data_obtencao AS dataObtencao,
+                referencia_fonte AS referencia
+              FROM pessoas
+              WHERE investigacao_id = ?
+                AND usuario_id = ?
+              ORDER BY id DESC
+            `)
+            .bind(
+              investigacaoId,
+              usuario.id
+            )
+            .all();
+
+        return respostaJSON(
+          resultado.results || []
+        );
+
+      } catch (erro) {
+
+        console.error(erro);
+
+        return respostaJSON({
+          ok: false,
+          erro: "Erro ao carregar pessoas."
+        }, 500);
+      }
+    }
+
+    // =================================================
+    // PESSOAS - CADASTRAR
+    // =================================================
+
+    if (
+      request.method === "POST" &&
+      url.pathname === "/pessoas"
+    ) {
+
+      if (!usuario) {
+        return respostaJSON({
+          ok: false,
+          erro: "Não autenticado."
+        }, 401);
+      }
+
+      try {
+
+        let dados;
+
+        try {
+          dados = await request.json();
+        } catch (erro) {
+          return respostaJSON({
+            ok: false,
+            erro: "JSON inválido."
+          }, 400);
+        }
+
+        const validacao =
+          validarDadosPessoa(dados);
+
+        if (validacao.erro) {
+          return respostaJSON({
+            ok: false,
+            erro: validacao.erro
+          }, 400);
+        }
+
+        if (
+          typeof dados.investigacaoId !== "number" &&
+          typeof dados.investigacaoId !== "string"
+        ) {
+          return respostaJSON({
+            ok: false,
+            erro: "Investigação inválida."
+          }, 400);
+        }
+
+        const investigacaoId =
+          Number(dados.investigacaoId);
+
+        if (
+          !Number.isInteger(investigacaoId) ||
+          investigacaoId <= 0
+        ) {
+          return respostaJSON({
+            ok: false,
+            erro: "Investigação inválida."
+          }, 400);
+        }
+
+        const investigacao =
+          await env.DB
+            .prepare(`
+              SELECT id
+              FROM investigacoes
+              WHERE id = ?
+                AND usuario_id = ?
+              LIMIT 1
+            `)
+            .bind(
+              investigacaoId,
+              usuario.id
+            )
+            .first();
+
+        if (!investigacao) {
+          return respostaJSON({
+            ok: false,
+            erro: "Investigação não encontrada."
+          }, 404);
+        }
+
+        const pessoa = validacao.pessoa;
+
+        const resultado =
+          await env.DB
+            .prepare(`
+              INSERT INTO pessoas (
+                investigacao_id,
+                usuario_id,
+                nome_completo,
+                nome_social,
+                cpf,
+                data_nascimento,
+                papel_investigacao,
+                descricao_relacao,
+                status_informacao,
+                observacoes,
+                fonte_informacao,
+                data_obtencao,
+                referencia_fonte
+              )
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            `)
+            .bind(
+              investigacaoId,
+              usuario.id,
+              pessoa.nome,
+              pessoa.nomeSocial,
+              pessoa.cpf,
+              pessoa.dataNascimento,
+              pessoa.papel,
+              pessoa.descricaoRelacao,
+              pessoa.status,
+              pessoa.observacoes,
+              pessoa.fonte,
+              pessoa.dataObtencao,
+              pessoa.referencia
+            )
+            .run();
+
+        return respostaJSON({
+          ok: true,
+          id: resultado.meta.last_row_id,
+          mensagem: "Pessoa cadastrada com sucesso."
+        });
+
+      } catch (erro) {
+
+        console.error(
+          "Erro ao cadastrar pessoa:",
+          erro
+        );
+
+        return respostaJSON({
+          ok: false,
+          erro: "Erro ao cadastrar pessoa."
+        }, 500);
+      }
+    }
+
+    // =================================================
+    // PESSOAS - EDITAR
+    // =================================================
+
+    if (
+      request.method === "PUT" &&
+      /^\/pessoas\/\d+$/.test(
+        url.pathname
+      )
+    ) {
+
+      if (!usuario) {
+        return respostaJSON({
+          ok: false,
+          erro: "Não autenticado."
+        }, 401);
+      }
+
+      try {
+
+        const id =
+          Number(
+            url.pathname.split("/").pop()
+          );
+
+        if (
+          !Number.isInteger(id) ||
+          id <= 0
+        ) {
+          return respostaJSON({
+            ok: false,
+            erro: "Pessoa inválida."
+          }, 400);
+        }
+
+        let dados;
+
+        try {
+          dados = await request.json();
+        } catch (erro) {
+          return respostaJSON({
+            ok: false,
+            erro: "JSON inválido."
+          }, 400);
+        }
+
+        const validacao =
+          validarDadosPessoa(dados);
+
+        if (validacao.erro) {
+          return respostaJSON({
+            ok: false,
+            erro: validacao.erro
+          }, 400);
+        }
+
+        const pessoa = validacao.pessoa;
+
+        const resultado =
+          await env.DB
+            .prepare(`
+              UPDATE pessoas
+              SET
+                nome_completo = ?,
+                nome_social = ?,
+                cpf = ?,
+                data_nascimento = ?,
+                papel_investigacao = ?,
+                descricao_relacao = ?,
+                status_informacao = ?,
+                observacoes = ?,
+                fonte_informacao = ?,
+                data_obtencao = ?,
+                referencia_fonte = ?,
+                data_atualizacao = datetime('now')
+              WHERE id = ?
+                AND usuario_id = ?
+                AND EXISTS (
+                  SELECT 1
+                  FROM investigacoes i
+                  WHERE i.id = pessoas.investigacao_id
+                    AND i.usuario_id = ?
+                )
+            `)
+            .bind(
+              pessoa.nome,
+              pessoa.nomeSocial,
+              pessoa.cpf,
+              pessoa.dataNascimento,
+              pessoa.papel,
+              pessoa.descricaoRelacao,
+              pessoa.status,
+              pessoa.observacoes,
+              pessoa.fonte,
+              pessoa.dataObtencao,
+              pessoa.referencia,
+              id,
+              usuario.id,
+              usuario.id
+            )
+            .run();
+
+        if (
+          !resultado.meta ||
+          !resultado.meta.changes
+        ) {
+          return respostaJSON({
+            ok: false,
+            erro: "Pessoa não encontrada."
+          }, 404);
+        }
+
+        return respostaJSON({
+          ok: true,
+          mensagem: "Pessoa atualizada com sucesso."
+        });
+
+      } catch (erro) {
+
+        console.error(
+          "Erro ao atualizar pessoa:",
+          erro
+        );
+
+        return respostaJSON({
+          ok: false,
+          erro: "Erro ao atualizar pessoa."
+        }, 500);
+      }
+    }
+
+    // =================================================
+    // PESSOAS - EXCLUIR
+    // =================================================
+
+    if (
+      request.method === "DELETE" &&
+      /^\/pessoas\/\d+$/.test(
+        url.pathname
+      )
+    ) {
+
+      if (!usuario) {
+        return respostaJSON({
+          ok: false,
+          erro: "Não autenticado."
+        }, 401);
+      }
+
+      try {
+
+        const id =
+          Number(
+            url.pathname.split("/").pop()
+          );
+
+        if (
+          !Number.isInteger(id) ||
+          id <= 0
+        ) {
+          return respostaJSON({
+            ok: false,
+            erro: "Pessoa inválida."
+          }, 400);
+        }
+
+        const resultado =
+          await env.DB
+            .prepare(`
+              DELETE FROM pessoas
+              WHERE id = ?
+                AND usuario_id = ?
+                AND EXISTS (
+                  SELECT 1
+                  FROM investigacoes i
+                  WHERE i.id = pessoas.investigacao_id
+                    AND i.usuario_id = ?
+                )
+            `)
+            .bind(
+              id,
+              usuario.id,
+              usuario.id
+            )
+            .run();
+
+        if (
+          !resultado.meta ||
+          !resultado.meta.changes
+        ) {
+          return respostaJSON({
+            ok: false,
+            erro: "Pessoa não encontrada."
+          }, 404);
+        }
+
+        return respostaJSON({
+          ok: true,
+          mensagem: "Pessoa excluída com sucesso."
+        });
+
+      } catch (erro) {
+
+        console.error(
+          "Erro ao excluir pessoa:",
+          erro
+        );
+
+        return respostaJSON({
+          ok: false,
+          erro: "Erro ao excluir pessoa."
+        }, 500);
+      }
+    }
+
+    // =================================================
+    // ROTA NÃO ENCONTRADA
+    // =================================================
+
+    return respostaJSON({
+      ok: false,
+      erro: "Rota não encontrada."
+    }, 404);
+  }
+};
