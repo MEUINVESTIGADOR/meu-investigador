@@ -1,3 +1,4 @@
+// Configuração do Worker Meu Investigador
 {
   "name": "meu-investigador-api",
   "main": "worker.js",
