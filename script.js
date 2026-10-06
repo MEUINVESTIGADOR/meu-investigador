@@ -4,6 +4,11 @@ let usuarioAtual = null;
 
 let investigacoes = [];
 let investigacaoAtual = null;
+let clientes = [];
+let clienteAtual = null;
+let clienteEditandoId = null;
+let investigacaoEditandoId = null;
+let retornoProcessoClienteId = null;
 
 let imoveis = [];
 let imovelAtual = null;
@@ -13,8 +18,13 @@ let veiculos = [];
 let veiculoAtual = null;
 let veiculoEditandoId = null;
 
+let pessoas = [];
+let pessoaAtual = null;
+let pessoaEditandoId = null;
+
 let relatorioImoveis = [];
 let relatorioVeiculos = [];
+let relatorioPessoas = [];
 
 
 /* =========================
@@ -138,12 +148,16 @@ function mostrarSomente(id){
   const telas = [
 
     "dashboardScreen",
+    "clientesScreen",
+    "clienteDetalheScreen",
     "homeScreen",
     "investigacaoScreen",
     "imoveisScreen",
     "imovelDetalheScreen",
     "veiculosScreen",
     "veiculoDetalheScreen",
+    "pessoasScreen",
+    "pessoaDetalheScreen",
     "relatorioScreen"
 
   ];
@@ -326,6 +340,184 @@ async function logout(){
 
 
 /* =========================
+   CLIENTES
+========================= */
+
+async function carregarClientes(){
+  const dados = await api("/clientes");
+  clientes = Array.isArray(dados) ? dados : (dados.results || []);
+  renderizarClientes();
+  preencherSelecaoClientes();
+  return clientes;
+}
+
+function preencherSelecaoClientes(selecionadoId){
+  const select = $("invClienteId");
+  if(!select) return;
+
+  const atual = selecionadoId ?? select.value;
+  select.innerHTML = '<option value="">Selecione um cliente</option>' +
+    clientes.map(function(cliente){
+      return '<option value="' + Number(cliente.id) + '">' +
+        escapeHtml(cliente.nome) +
+        (cliente.documento ? ' — ' + escapeHtml(cliente.documento) : '') +
+        '</option>';
+    }).join("");
+  if(atual) select.value = String(atual);
+}
+
+function renderizarClientes(){
+  const lista = $("listaClientes");
+  if(!lista) return;
+
+  if(!clientes.length){
+    lista.innerHTML = '<div class="empty">Nenhum cliente cadastrado.</div>';
+    return;
+  }
+
+  lista.innerHTML = clientes.map(function(cliente){
+    return `
+      <div class="item">
+        <div class="item-head">
+          <div>
+            <div class="item-title">${escapeHtml(cliente.nome)}</div>
+            <div class="muted">Documento: ${escapeHtml(cliente.documento || "-")}</div>
+            <div class="muted">Processos: ${Number(cliente.totalProcessos) || 0}</div>
+          </div>
+          <div class="actions" style="margin-top:0">
+            <button class="btn btn-primary" onclick="abrirCliente(${Number(cliente.id)})">Abrir cliente</button>
+          </div>
+        </div>
+      </div>`;
+  }).join("");
+}
+
+async function abrirClientes(){
+  mostrarSomente("clientesScreen");
+  esconder($("clienteFormCard"));
+  try{
+    await carregarClientes();
+  }catch(e){
+    $("listaClientes").innerHTML = '<div class="error">Erro ao carregar clientes: ' +
+      escapeHtml(e.message) + '</div>';
+  }
+}
+
+function renderizarProcessosDoCliente(processos){
+  const lista = $("clienteInvestigacoes");
+  if(!lista) return;
+  if(!processos.length){
+    lista.innerHTML = '<div class="empty">Este cliente ainda não tem processos cadastrados.</div>';
+    return;
+  }
+
+  lista.innerHTML = processos.map(function(inv){
+    return `
+      <div class="item">
+        <div class="item-head">
+          <div>
+            <div class="item-title">Processo: ${escapeHtml(inv.processo || "Não informado")}</div>
+            <div class="muted">Advogado: ${escapeHtml(inv.advogado || "-")}</div>
+            <div class="muted">Criado em: ${escapeHtml(formatarData(inv.data_criacao))}</div>
+          </div>
+          <div class="actions" style="margin-top:0">
+            <button class="btn btn-primary" onclick="abrirInvestigacao(${Number(inv.id)}, ${Number(clienteAtual && clienteAtual.id)})">Abrir processo</button>
+            <button class="btn btn-secondary" onclick="editarInvestigacao(${Number(inv.id)})">Editar</button>
+            <button class="btn btn-danger" onclick="excluirInvestigacao(${Number(inv.id)})">Excluir</button>
+          </div>
+        </div>
+      </div>`;
+  }).join("");
+}
+
+async function abrirCliente(id){
+  try{
+    const dados = await api("/clientes/" + encodeURIComponent(id));
+    clienteAtual = dados.cliente;
+    const processos = Array.isArray(dados.investigacoes) ? dados.investigacoes : [];
+    $("clienteDetalheTitulo").textContent = clienteAtual.nome || "Cliente";
+    $("clienteDetalheInfo").innerHTML = `
+      <div class="detail-grid">
+        <div class="detail"><span class="muted">Cliente</span><strong>${escapeHtml(clienteAtual.nome || "-")}</strong></div>
+        <div class="detail"><span class="muted">Documento</span><strong>${escapeHtml(clienteAtual.documento || "-")}</strong></div>
+        <div class="detail"><span class="muted">Processos cadastrados</span><strong>${processos.length}</strong></div>
+      </div>`;
+    renderizarProcessosDoCliente(processos);
+    mostrarSomente("clienteDetalheScreen");
+  }catch(e){
+    alert("Não foi possível abrir o cliente: " + e.message);
+  }
+}
+
+function abrirCadastroCliente(preservarRetorno){
+  if(!preservarRetorno) retornoProcessoClienteId = null;
+  clienteEditandoId = null;
+  $("clienteForm").reset();
+  $("clienteFormTitulo").textContent = "Cadastrar cliente";
+  $("clienteNome").value = "";
+  $("clienteDocumento").value = "";
+  mostrarSomente("clientesScreen");
+  mostrar($("clienteFormCard"));
+  $("clienteNome").focus();
+}
+
+function fecharCadastroCliente(){
+  esconder($("clienteFormCard"));
+  $("clienteForm").reset();
+  clienteEditandoId = null;
+  retornoProcessoClienteId = null;
+}
+
+function editarClienteAtual(){
+  if(!clienteAtual) return;
+  clienteEditandoId = Number(clienteAtual.id);
+  $("clienteForm").reset();
+  $("clienteFormTitulo").textContent = "Editar cliente";
+  $("clienteNome").value = clienteAtual.nome || "";
+  $("clienteDocumento").value = clienteAtual.documento || "";
+  retornoProcessoClienteId = Number(clienteAtual.id);
+  mostrarSomente("clientesScreen");
+  mostrar($("clienteFormCard"));
+  $("clienteNome").focus();
+}
+
+$("clienteForm").addEventListener("submit", async function(e){
+  e.preventDefault();
+  const editando = clienteEditandoId;
+  try{
+    const dados = await api(
+      editando ? "/clientes/" + editando : "/clientes",
+      {
+        method: editando ? "PUT" : "POST",
+        body: JSON.stringify({
+          nome: $("clienteNome").value.trim(),
+          documento: $("clienteDocumento").value.trim()
+        })
+      }
+    );
+    const id = dados.id || editando || retornoProcessoClienteId;
+    clienteEditandoId = null;
+    esconder($("clienteFormCard"));
+    await carregarClientes();
+    if(editando) await carregarInvestigacoes();
+    if(retornoProcessoClienteId){
+      const clienteId = Number(retornoProcessoClienteId);
+      retornoProcessoClienteId = null;
+      if(editando){
+        await abrirCliente(clienteId);
+      }else{
+        await mostrarNovaInvestigacao(clienteId);
+      }
+      return;
+    }
+    if(id) await abrirCliente(id);
+  }catch(e){
+    mostrarMsg("clienteMsg", e.message, "error");
+  }
+});
+
+
+/* =========================
    INVESTIGAÇÕES
 ========================= */
 
@@ -418,9 +610,7 @@ function renderizarInvestigacoes(){
                 <div>
 
                   <div class="item-title">
-                    ${escapeHtml(
-                      inv.nome
-                    )}
+                    Cliente: ${escapeHtml(inv.nome || "-")}
                   </div>
 
                   <div class="muted">
@@ -454,6 +644,13 @@ function renderizarInvestigacoes(){
                     Abrir
                   </button>
 
+                  <button
+                    class="btn btn-secondary"
+                    onclick="editarInvestigacao(${Number(inv.id)})"
+                  >
+                    Editar processo
+                  </button>
+
 
                   <button
                     class="btn btn-danger"
@@ -477,27 +674,39 @@ function renderizarInvestigacoes(){
 }
 
 
-function mostrarNovaInvestigacao(){
-
-  mostrar(
-    $("novaInvestigacaoCard")
-  );
-
-
-  $("invNome").focus();
-
+async function mostrarNovaInvestigacao(clienteId){
+  investigacaoEditandoId = null;
+  if(clienteId == null) retornoProcessoClienteId = null;
+  $("investigacaoForm").reset();
+  $("investigacaoFormTitulo").textContent = "Novo processo";
+  $("investigacaoSalvar").textContent = "Salvar processo";
+  $("invClienteId").disabled = false;
+  if(clienteId != null){
+    retornoProcessoClienteId = Number(clienteId);
+  }
+  mostrarSomente("homeScreen");
+  mostrar($("novaInvestigacaoCard"));
+  try{
+    await carregarClientes();
+  }catch(e){
+    mostrarMsg("homeMsg", "Não foi possível carregar os clientes: " + e.message, "error");
+  }
+  if(clienteId != null) $("invClienteId").value = String(clienteId);
+  $("invClienteId").focus();
 }
 
+function abrirCadastroClienteParaProcesso(){
+  retornoProcessoClienteId = -1;
+  abrirCadastroCliente(true);
+}
 
 function fecharNovaInvestigacao(){
-
-  esconder(
-    $("novaInvestigacaoCard")
-  );
-
-
+  const clienteId = retornoProcessoClienteId;
+  retornoProcessoClienteId = null;
+  esconder($("novaInvestigacaoCard"));
   $("investigacaoForm").reset();
-
+  investigacaoEditandoId = null;
+  if(clienteId && clienteId > 0) abrirCliente(clienteId);
 }
 
 
@@ -510,61 +719,37 @@ $("investigacaoForm").addEventListener(
 
     try{
 
-      const dados =
-        await api(
-          "/investigacoes",
-          {
-
-            method:"POST",
-
-            body:JSON.stringify({
-
-              nome:
-                $("invNome")
-                  .value
-                  .trim(),
-
-              documento:
-                $("invDocumento")
-                  .value
-                  .trim(),
-
-              processo:
-                $("invProcesso")
-                  .value
-                  .trim(),
-
-              advogado:
-                $("invAdvogado")
-                  .value
-                  .trim(),
-
-              fontes:
-                $("invFontes")
-                  .value
-                  .trim()
-
-            })
-
-          }
-        );
-
-
-      fecharNovaInvestigacao();
-
-
-      await carregarInvestigacoes();
-
-
-      mostrarMsg(
-        "homeMsg",
-        dados.mensagem ||
-        "Investigação criada com sucesso.",
-        "success"
+      const editando = investigacaoEditandoId;
+      const clienteId = Number($("invClienteId").value);
+      if(!editando && (!Number.isInteger(clienteId) || clienteId <= 0)){
+        throw new Error("Selecione um cliente para o processo.");
+      }
+      const dados = await api(
+        editando ? "/investigacoes/" + editando : "/investigacoes",
+        {
+          method: editando ? "PUT" : "POST",
+          body: JSON.stringify({
+            ...(editando ? {} : { clienteId }),
+            processo: $("invProcesso").value.trim(),
+            advogado: $("invAdvogado").value.trim(),
+            fontes: $("invFontes").value.trim()
+          })
+        }
       );
 
-
+      const retornoCliente = retornoProcessoClienteId;
+      retornoProcessoClienteId = null;
+      esconder($("novaInvestigacaoCard"));
+      $("investigacaoForm").reset();
+      investigacaoEditandoId = null;
+      await carregarInvestigacoes();
       await carregarDashboard();
+      if(retornoCliente && retornoCliente > 0){
+        await abrirCliente(retornoCliente);
+      }else{
+        mostrarSomente("homeScreen");
+        mostrarMsg("homeMsg", dados.mensagem || "Processo salvo com sucesso.", "success");
+      }
 
     }catch(e){
 
@@ -580,12 +765,42 @@ $("investigacaoForm").addEventListener(
 );
 
 
+async function editarInvestigacao(id){
+  const inv = investigacoes.find(function(item){
+    return Number(item.id) === Number(id);
+  });
+  if(!inv) return;
+  investigacaoEditandoId = Number(inv.id);
+  retornoProcessoClienteId = Number(inv.clienteId) || null;
+  $("investigacaoForm").reset();
+  $("investigacaoFormTitulo").textContent = "Editar processo";
+  $("investigacaoSalvar").textContent = "Salvar alterações";
+  mostrarSomente("homeScreen");
+  mostrar($("novaInvestigacaoCard"));
+  try{
+    await carregarClientes();
+    $("invClienteId").value = String(inv.clienteId || "");
+  }catch(e){
+    mostrarMsg("homeMsg", "Não foi possível carregar o cliente do processo: " + e.message, "error");
+  }
+  $("invClienteId").disabled = true;
+  $("invProcesso").value = inv.processo || "";
+  $("invAdvogado").value = inv.advogado || "";
+  $("invFontes").value = inv.fontes || "";
+}
+
+
 async function excluirInvestigacao(id){
+
+  const investigacaoExcluida = investigacoes.find(function(item){
+    return Number(item.id) === Number(id);
+  });
+  const clienteId = Number(investigacaoExcluida && investigacaoExcluida.clienteId) || null;
 
   if(
     !confirm(
-      "Excluir esta investigação? " +
-      "Os imóveis vinculados também serão excluídos."
+      "Excluir este processo? Os imóveis, veículos e Pessoas vinculados serão excluídos. " +
+      "O cadastro do cliente será mantido."
     )
   ){
 
@@ -624,12 +839,13 @@ async function excluirInvestigacao(id){
     await carregarDashboard();
 
 
-    mostrarMsg(
-      "homeMsg",
-      dados.mensagem ||
-      "Investigação excluída com sucesso.",
-      "success"
-    );
+    if(clienteId && clienteAtual && Number(clienteAtual.id) === clienteId){
+      await abrirCliente(clienteId);
+      mostrarMsg("clienteDetalheMensagem", dados.mensagem || "Processo excluído. O cliente foi mantido.", "success");
+    }else{
+      mostrarSomente("homeScreen");
+      mostrarMsg("homeMsg", dados.mensagem || "Processo excluído. O cliente foi mantido.", "success");
+    }
 
   }catch(e){
 
@@ -644,7 +860,7 @@ async function excluirInvestigacao(id){
 }
 
 
-function abrirInvestigacao(id){
+function abrirInvestigacao(id, clienteContextoId){
 
   investigacaoAtual =
     investigacoes.find(
@@ -661,10 +877,13 @@ function abrirInvestigacao(id){
     return;
   }
 
+  retornoProcessoClienteId = Number(clienteContextoId) || null;
+
 
   $("investigacaoTitulo").textContent =
-    investigacaoAtual.nome ||
-    "Investigação";
+    investigacaoAtual.processo
+      ? "Processo " + investigacaoAtual.processo
+      : "Investigação";
 
 
   $("investigacaoInfo").innerHTML = `
@@ -674,7 +893,20 @@ function abrirInvestigacao(id){
       <div class="detail">
 
         <span class="muted">
-          Documento
+          Cliente
+        </span>
+
+        <strong>
+          ${escapeHtml(investigacaoAtual.nome || "-")}
+        </strong>
+
+      </div>
+
+
+      <div class="detail">
+
+        <span class="muted">
+          Documento do cliente
         </span>
 
         <strong>
@@ -771,6 +1003,7 @@ function abrirInvestigacao(id){
 async function abrirDashboard(){
 
   investigacaoAtual = null;
+  retornoProcessoClienteId = null;
   imovelAtual = null;
   veiculoAtual = null;
 
@@ -914,9 +1147,7 @@ async function carregarDashboard(){
               <div>
 
                 <div class="item-title">
-                  ${escapeHtml(
-                    inv.nome
-                  )}
+                  Cliente: ${escapeHtml(inv.nome || "-")}
                 </div>
 
                 <div class="muted">
@@ -1103,6 +1334,8 @@ async function carregarDashboard(){
 
 function voltarInicio(){
 
+  retornoProcessoClienteId = null;
+
   mostrarSomente(
     "homeScreen"
   );
@@ -1126,7 +1359,8 @@ function voltarDaTelaPatrimonial(){
 
 
   abrirInvestigacao(
-    investigacaoAtual.id
+    investigacaoAtual.id,
+    retornoProcessoClienteId
   );
 
 }
@@ -2519,6 +2753,547 @@ async function excluirVeiculoAtual(){
 
 }
 
+/* =========================
+   PESSOAS
+========================= */
+
+async function abrirPessoas(){
+
+  if(!investigacaoAtual){
+    return;
+  }
+
+  $("pessoasSubtitulo")
+    .textContent =
+    "Investigação: " +
+    (
+      investigacaoAtual.nome ||
+      ""
+    );
+
+  mostrarSomente(
+    "pessoasScreen"
+  );
+
+  fecharFormPessoa();
+
+  await carregarPessoas();
+
+}
+
+
+async function carregarPessoas(){
+
+  $("listaPessoas")
+    .innerHTML =
+    '<div class="loading">Carregando...</div>';
+
+  try{
+
+    const dados =
+      await api(
+        "/pessoas?investigacao_id=" +
+        encodeURIComponent(
+          investigacaoAtual.id
+        )
+      );
+
+    pessoas =
+      Array.isArray(dados)
+        ? dados
+        : (
+            dados?.results ||
+            []
+          );
+
+    renderizarPessoas();
+
+  }catch(e){
+
+    $("listaPessoas")
+      .innerHTML =
+      '<div class="error">Erro: ' +
+      escapeHtml(e.message) +
+      '</div>';
+
+  }
+
+}
+
+
+function renderizarPessoas(){
+
+  const el =
+    $("listaPessoas");
+
+  const busca =
+    $("buscaPessoas")
+      .value
+      .trim()
+      .toLocaleLowerCase("pt-BR");
+
+  const buscaCpf =
+    busca.replace(/\D/g, "");
+
+  const filtradas =
+    pessoas.filter(function(pessoa){
+
+      const nome =
+        String(
+          pessoa.nome || ""
+        ).toLocaleLowerCase("pt-BR");
+
+      const cpf =
+        String(pessoa.cpf || "");
+
+      const cpfDigitos =
+        cpf.replace(/\D/g, "");
+
+      const correspondeBusca =
+        !busca ||
+        nome.includes(busca) ||
+        cpf.toLocaleLowerCase("pt-BR").includes(busca) ||
+        (
+          buscaCpf &&
+          cpfDigitos.includes(buscaCpf)
+        );
+
+      return correspondeBusca;
+
+    });
+
+  if(!filtradas.length){
+
+    el.innerHTML =
+      '<div class="empty">' +
+      (
+        pessoas.length
+          ? "Nenhuma pessoa corresponde à pesquisa."
+          : "Nenhuma pessoa cadastrada nesta investigação."
+      ) +
+      '</div>';
+
+    return;
+
+  }
+
+  el.innerHTML =
+    filtradas.map(function(pessoa){
+
+      return `
+
+        <div class="item">
+
+          <div class="item-head">
+
+            <div>
+
+              <div class="item-title">
+                👤 ${escapeHtml(pessoa.nome || "Pessoa")}
+              </div>
+
+              <div class="muted">
+                CPF: ${escapeHtml(pessoa.cpf || "-")}
+              </div>
+
+            </div>
+
+            <div
+              class="actions"
+              style="margin-top:0"
+            >
+              <button
+                class="btn btn-primary"
+                onclick="abrirDetalhePessoa(${Number(pessoa.id)})"
+              >
+                Ver detalhes
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+
+      `;
+
+    }).join("");
+
+}
+
+
+$("buscaPessoas").addEventListener(
+  "input",
+  renderizarPessoas
+);
+
+const camposContatoEnderecoPessoa = {
+  telefone: "pessoaTelefone",
+  email: "pessoaEmail",
+  redeSocial: "pessoaRedeSocial",
+  endereco1Cep: "pessoaEndereco1Cep",
+  endereco1Logradouro: "pessoaEndereco1Logradouro",
+  endereco1Numero: "pessoaEndereco1Numero",
+  endereco1Complemento: "pessoaEndereco1Complemento",
+  endereco1Bairro: "pessoaEndereco1Bairro",
+  endereco1Cidade: "pessoaEndereco1Cidade",
+  endereco1Uf: "pessoaEndereco1Uf",
+  endereco2Cep: "pessoaEndereco2Cep",
+  endereco2Logradouro: "pessoaEndereco2Logradouro",
+  endereco2Numero: "pessoaEndereco2Numero",
+  endereco2Complemento: "pessoaEndereco2Complemento",
+  endereco2Bairro: "pessoaEndereco2Bairro",
+  endereco2Cidade: "pessoaEndereco2Cidade",
+  endereco2Uf: "pessoaEndereco2Uf",
+  endereco3Cep: "pessoaEndereco3Cep",
+  endereco3Logradouro: "pessoaEndereco3Logradouro",
+  endereco3Numero: "pessoaEndereco3Numero",
+  endereco3Complemento: "pessoaEndereco3Complemento",
+  endereco3Bairro: "pessoaEndereco3Bairro",
+  endereco3Cidade: "pessoaEndereco3Cidade",
+  endereco3Uf: "pessoaEndereco3Uf"
+};
+
+
+function abrirFormPessoa(
+  pessoa=null
+){
+
+  pessoaEditandoId =
+    pessoa
+      ? Number(pessoa.id)
+      : null;
+
+  $("pessoaFormTitulo")
+    .textContent =
+    pessoa
+      ? "Editar pessoa"
+      : "Nova pessoa";
+
+  const campos = {
+    pessoaNome:
+      pessoa?.nome || "",
+    pessoaCpf:
+      pessoa?.cpf || "",
+    pessoaDataNascimento:
+      pessoa?.dataNascimento || "",
+    pessoaObservacoes:
+      pessoa?.observacoes || "",
+    pessoaFonte:
+      pessoa?.fonte || "",
+    pessoaReferencia:
+      pessoa?.referencia || "",
+    ...Object.fromEntries(
+      Object.entries(camposContatoEnderecoPessoa)
+        .map(function([campo, id]){
+          return [
+            id,
+            pessoa?.[campo] ?? ""
+          ];
+        })
+    )
+  };
+
+  Object.entries(campos).forEach(
+    function([id, valor]){
+      $(id).value = valor;
+    }
+  );
+
+  mostrar(
+    $("pessoaFormCard")
+  );
+
+  $("pessoaNome").focus();
+
+}
+
+
+function fecharFormPessoa(){
+
+  esconder(
+    $("pessoaFormCard")
+  );
+
+  $("pessoaForm").reset();
+
+  pessoaEditandoId = null;
+
+}
+
+
+$("pessoaForm").addEventListener(
+  "submit",
+  async function(e){
+
+    e.preventDefault();
+
+    if(!investigacaoAtual){
+      alert("Abra uma investigação antes de cadastrar pessoas.");
+      return;
+    }
+
+    const payload = {
+      nome:
+        $("pessoaNome").value.trim(),
+      cpf:
+        $("pessoaCpf").value.trim(),
+      dataNascimento:
+        $("pessoaDataNascimento").value,
+      observacoes:
+        $("pessoaObservacoes").value.trim(),
+      fonte:
+        $("pessoaFonte").value.trim(),
+      referencia:
+        $("pessoaReferencia").value.trim(),
+      ...Object.fromEntries(
+        Object.entries(camposContatoEnderecoPessoa)
+          .map(function([campo, id]){
+            return [
+              campo,
+              $(id).value.trim()
+            ];
+          })
+      )
+    };
+
+    try{
+
+      const payloadPessoa =
+        pessoaEditandoId
+          ? payload
+          : {
+              investigacaoId:
+                Number(investigacaoAtual.id),
+              ...payload
+            };
+
+      const dados =
+        await api(
+          pessoaEditandoId
+            ? "/pessoas/" + pessoaEditandoId
+            : "/pessoas",
+          {
+            method:
+              pessoaEditandoId
+                ? "PUT"
+                : "POST",
+            body:
+              JSON.stringify(payloadPessoa)
+          }
+        );
+
+      fecharFormPessoa();
+      await carregarPessoas();
+
+      alert(
+        dados.mensagem ||
+        "Pessoa salva com sucesso."
+      );
+
+    }catch(e){
+
+      alert(e.message);
+
+    }
+
+  }
+);
+
+
+function abrirDetalhePessoa(id){
+
+  pessoaAtual =
+    pessoas.find(function(pessoa){
+      return Number(pessoa.id) ===
+        Number(id);
+    });
+
+  if(!pessoaAtual){
+    return;
+  }
+
+  renderizarDetalhePessoa();
+
+  mostrarSomente(
+    "pessoaDetalheScreen"
+  );
+
+}
+
+
+function voltarDaInvestigacao(){
+  const clienteId = retornoProcessoClienteId;
+  retornoProcessoClienteId = null;
+  if(clienteId && clienteId > 0){
+    abrirCliente(clienteId);
+  }else{
+    voltarInicio();
+  }
+}
+
+
+function renderizarDetalhePessoa(){
+
+  const pessoa =
+    pessoaAtual;
+
+  const camposEndereco = [
+    ["CEP", "Cep"],
+    ["Logradouro", "Logradouro"],
+    ["Número", "Numero"],
+    ["Complemento", "Complemento"],
+    ["Bairro", "Bairro"],
+    ["Cidade", "Cidade"],
+    ["UF", "Uf"]
+  ];
+
+  const enderecosHtml =
+    [1, 2, 3]
+      .map(function(numero){
+        const campos =
+          camposEndereco.map(
+            function([rotulo, sufixo]){
+              return [
+                rotulo,
+                pessoa[
+                  "endereco" +
+                  numero +
+                  sufixo
+                ]
+              ];
+            }
+          );
+
+        if (!campos.some(function([, valor]){
+          return String(valor ?? "").trim();
+        })) {
+          return "";
+        }
+
+        return [
+          '<h3 class="section-title">📍 Endereço ' +
+            numero +
+            "</h3>",
+          '<div class="detail-grid">',
+          campos.map(function([rotulo, valor]){
+            return detail(rotulo, valor);
+          }).join(""),
+          "</div>"
+        ].join("");
+      })
+      .join("");
+
+  const referencia =
+    String(pessoa.referencia || "").trim();
+
+  const linkReferencia =
+    /^https?:\/\//i.test(referencia)
+      ? `
+          <p>
+            <a
+              href="${escapeHtml(referencia)}"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Abrir referência da fonte
+            </a>
+          </p>
+        `
+      : "";
+
+  $("pessoaDetalhe").innerHTML = `
+
+    <h3 class="section-title">📋 Identificação</h3>
+    <div class="detail-grid">
+      ${detail("Nome completo", pessoa.nome)}
+      ${detail("CPF", pessoa.cpf)}
+      ${detail("Data de nascimento", pessoa.dataNascimento)}
+    </div>
+
+    <h3 class="section-title">☎️ Contato</h3>
+    <div class="detail-grid">
+      ${detail("Telefone", pessoa.telefone)}
+      ${detail("E-mail", pessoa.email)}
+      ${detail("Rede social", pessoa.redeSocial)}
+    </div>
+
+    ${enderecosHtml}
+
+    <h3 class="section-title">ℹ️ Informações</h3>
+    <div class="detail-grid">
+      ${detail("Fonte da informação", pessoa.fonte)}
+      ${detail("Link ou referência", pessoa.referencia)}
+    </div>
+    ${linkReferencia}
+
+    <h3 class="section-title">📝 Observações</h3>
+    <div class="detail">
+      <strong>${escapeHtml(
+        pessoa.observacoes ||
+        "Nenhuma observação cadastrada."
+      )}</strong>
+    </div>
+
+  `;
+
+}
+
+
+function editarPessoaAtual(){
+
+  if(!pessoaAtual){
+    return;
+  }
+
+  mostrarSomente(
+    "pessoasScreen"
+  );
+
+  abrirFormPessoa(
+    pessoaAtual
+  );
+
+}
+
+
+async function excluirPessoaAtual(){
+
+  if(!pessoaAtual){
+    return;
+  }
+
+  if(!confirm("Excluir esta pessoa?")){
+    return;
+  }
+
+  try{
+
+    const dados =
+      await api(
+        "/pessoas/" +
+        encodeURIComponent(pessoaAtual.id),
+        {
+          method:"DELETE"
+        }
+      );
+
+    alert(
+      dados.mensagem ||
+      "Pessoa excluída com sucesso."
+    );
+
+    pessoaAtual = null;
+
+    await abrirPessoas();
+
+  }catch(e){
+
+    alert(e.message);
+
+  }
+
+}
+
 
 /* =========================
    RELATÓRIOS
@@ -2637,9 +3412,7 @@ async function abrirRelatorio(){
                         <div>
 
                           <div class="item-title">
-                            ${escapeHtml(
-                              inv.nome
-                            )}
+                            Cliente: ${escapeHtml(inv.nome || "-")}
                           </div>
 
                           <div class="muted">
@@ -2752,7 +3525,8 @@ async function gerarRelatorioDaInvestigacao(
 
     const [
       dadosImoveis,
-      dadosVeiculos
+      dadosVeiculos,
+      dadosPessoas
     ] =
       await Promise.all([
 
@@ -2765,6 +3539,13 @@ async function gerarRelatorioDaInvestigacao(
 
         api(
           "/veiculos?investigacao_id=" +
+          encodeURIComponent(
+            investigacaoAtual.id
+          )
+        ),
+
+        api(
+          "/pessoas?investigacao_id=" +
           encodeURIComponent(
             investigacaoAtual.id
           )
@@ -2794,6 +3575,17 @@ async function gerarRelatorioDaInvestigacao(
             []
           );
 
+    relatorioPessoas =
+      Array.isArray(
+        dadosPessoas
+      )
+        ? dadosPessoas
+        : Array.isArray(
+            dadosPessoas?.results
+          )
+          ? dadosPessoas.results
+          : [];
+
 
     renderizarRelatorio();
 
@@ -2817,6 +3609,27 @@ function renderizarRelatorio(){
 
   const inv =
     investigacaoAtual;
+
+  const campoRelatorioPessoa =
+    function(rotulo, valor){
+      const texto =
+        String(valor ?? "").trim();
+
+      return texto
+        ? detail(rotulo, texto)
+        : "";
+    };
+
+  const grupoRelatorioPessoa =
+    function(titulo, campos){
+      return campos
+        ? '<div class="section-title">' +
+            escapeHtml(titulo) +
+            '</div><div class="detail-grid">' +
+            campos +
+            '</div>'
+        : "";
+    };
 
 
   const imoveisHtml =
@@ -3109,6 +3922,111 @@ function renderizarRelatorio(){
 
       `;
 
+  const pessoasHtml =
+    relatorioPessoas.length
+      ? relatorioPessoas
+          .map(function(pessoa, index){
+            const identificacao = [
+              campoRelatorioPessoa("Nome completo", pessoa.nome),
+              campoRelatorioPessoa("CPF", pessoa.cpf),
+              campoRelatorioPessoa(
+                "Data de nascimento",
+                pessoa.dataNascimento
+              )
+            ].join("");
+
+            const contato = [
+              campoRelatorioPessoa("Telefone", pessoa.telefone),
+              campoRelatorioPessoa("E-mail", pessoa.email),
+              campoRelatorioPessoa(
+                "Rede social",
+                pessoa.redeSocial
+              )
+            ].join("");
+
+            const enderecos =
+              [1, 2, 3]
+                .map(function(numero){
+                  const campos = [
+                    ["CEP", "Cep"],
+                    ["Logradouro", "Logradouro"],
+                    ["Número", "Numero"],
+                    ["Complemento", "Complemento"],
+                    ["Bairro", "Bairro"],
+                    ["Cidade", "Cidade"],
+                    ["UF", "Uf"]
+                  ]
+                    .map(function([rotulo, sufixo]){
+                      return campoRelatorioPessoa(
+                        rotulo,
+                        pessoa[
+                          "endereco" +
+                          numero +
+                          sufixo
+                        ]
+                      );
+                    })
+                    .join("");
+
+                  return grupoRelatorioPessoa(
+                    "Endereço " + numero,
+                    campos
+                  );
+                })
+                .join("");
+
+            const informacoes = [
+              campoRelatorioPessoa(
+                "Fonte da informação",
+                pessoa.fonte
+              ),
+              campoRelatorioPessoa(
+                "Link ou referência",
+                pessoa.referencia
+              )
+            ].join("");
+
+            const observacoes =
+              campoRelatorioPessoa(
+                "Observações",
+                pessoa.observacoes
+              );
+
+            return (
+              '<div class="relatorio-item">' +
+                '<h3>👤 Pessoa ' +
+                  (index + 1) +
+                  ' — ' +
+                  escapeHtml(
+                    String(pessoa.nome ?? "").trim() ||
+                    "Pessoa"
+                  ) +
+                '</h3>' +
+                grupoRelatorioPessoa(
+                  "Identificação",
+                  identificacao
+                ) +
+                grupoRelatorioPessoa(
+                  "Contato",
+                  contato
+                ) +
+                enderecos +
+                grupoRelatorioPessoa(
+                  "Informações",
+                  informacoes
+                ) +
+                grupoRelatorioPessoa(
+                  "Observações",
+                  observacoes
+                ) +
+              '</div>'
+            );
+          })
+          .join("")
+      : '<div class="empty">' +
+          'Nenhuma pessoa cadastrada nesta investigação.' +
+        '</div>';
+
 
   const agora =
     new Date()
@@ -3122,18 +4040,9 @@ function renderizarRelatorio(){
 
       <div class="relatorio-capa">
 
-        <div class="badge">
-          RELATÓRIO DE INVESTIGAÇÃO PATRIMONIAL
-        </div>
-
         <h1>
-          Meu Investigador
+          RELATÓRIO
         </h1>
-
-        <p class="muted">
-          Relatório consolidado
-          da investigação
-        </p>
 
       </div>
 
@@ -3143,7 +4052,7 @@ function renderizarRelatorio(){
         <div class="detail">
 
           <span class="muted">
-            Investigado
+            Cliente
           </span>
 
           <strong>
@@ -3280,6 +4189,18 @@ function renderizarRelatorio(){
 
           </div>
 
+          <div class="relatorio-count">
+
+            <span class="muted">
+              Pessoas
+            </span>
+
+            <strong>
+              ${relatorioPessoas.length}
+            </strong>
+
+          </div>
+
         </div>
 
       </div>
@@ -3328,6 +4249,16 @@ function renderizarRelatorio(){
 
       </div>
 
+      <div class="relatorio-section">
+
+        <h2>
+          👤 Pessoas encontradas
+        </h2>
+
+        ${pessoasHtml}
+
+      </div>
+
 
       <div class="relatorio-footer">
 
@@ -3348,8 +4279,11 @@ function voltarDaTelaRelatorio(){
     investigacaoAtual
   ){
 
+    const clienteId = retornoProcessoClienteId;
+
     abrirInvestigacao(
-      investigacaoAtual.id
+      investigacaoAtual.id,
+      clienteId
     );
 
   }else{
