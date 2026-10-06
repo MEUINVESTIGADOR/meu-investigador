@@ -597,80 +597,90 @@ function renderizarInvestigacoes(){
 
 
   el.innerHTML =
-    investigacoes
-      .map(
-        function(inv){
-
+    agruparInvestigacoesPorCliente(investigacoes)
+      .map(function(grupo){
+        const listaProcessos = grupo.processos.map(function(inv, indice){
           return `
-
-            <div class="item">
-
-              <div class="item-head">
-
-                <div>
-
-                  <div class="item-title">
-                    Cliente: ${escapeHtml(inv.nome || "-")}
-                  </div>
-
-                  <div class="muted">
-                    Processo:
-                    ${escapeHtml(
-                      inv.processo ||
-                      "-"
-                    )}
-                  </div>
-
-                  <div class="muted">
-                    Documento:
-                    ${escapeHtml(
-                      inv.documento ||
-                      "-"
-                    )}
-                  </div>
-
-                </div>
-
-
-                <div
-                  class="actions"
-                  style="margin-top:0"
-                >
-
-                  <button
-                    class="btn btn-primary"
-                    onclick="abrirInvestigacao(${Number(inv.id)})"
-                  >
-                    Abrir
-                  </button>
-
-                  <button
-                    class="btn btn-secondary"
-                    onclick="editarInvestigacao(${Number(inv.id)})"
-                  >
-                    Editar processo
-                  </button>
-
-
-                  <button
-                    class="btn btn-danger"
-                    onclick="excluirInvestigacao(${Number(inv.id)})"
-                  >
-                    Excluir
-                  </button>
-
-                </div>
-
+            <div class="item-head" style="${indice ? "border-top:1px solid var(--line);padding-top:14px;margin-top:14px" : "margin-top:14px"}">
+              <div>
+                <div class="item-title">Processo: ${escapeHtml(inv.processo || "Não informado")}</div>
+                <div class="muted">Advogado: ${escapeHtml(inv.advogado || "-")}</div>
               </div>
+              <div class="actions" style="margin-top:0">
+                <button class="btn btn-primary" onclick="abrirInvestigacao(${Number(inv.id)}, ${Number(grupo.clienteId) || "null"})">Abrir processo</button>
+                <button class="btn btn-secondary" onclick="editarInvestigacao(${Number(inv.id)})">Editar processo</button>
+                <button class="btn btn-danger" onclick="excluirInvestigacao(${Number(inv.id)})">Excluir processo</button>
+              </div>
+            </div>`;
+        }).join("");
 
+        return `
+          <div class="item">
+            <div class="item-head">
+              <div>
+                <div class="item-title">Cliente: ${escapeHtml(grupo.nome || "-")}</div>
+                <div class="muted">Documento: ${escapeHtml(grupo.documento || "-")}</div>
+                <div class="muted">Processos cadastrados: ${grupo.processos.length}</div>
+              </div>
+              ${grupo.clienteId ? `
+                <div class="actions" style="margin-top:0">
+                  <button class="btn btn-secondary" onclick="abrirCliente(${Number(grupo.clienteId)})">Abrir cadastro do cliente</button>
+                </div>` : ""}
             </div>
-
-          `;
-
-        }
-      )
+            <div style="border-top:1px solid var(--line);margin-top:14px;padding-top:2px">
+              ${listaProcessos}
+            </div>
+          </div>`;
+      })
       .join("");
 
+}
+
+
+function dataInvestigacaoOrdem(inv){
+  const data = new Date(String(inv.data_criacao || "").replace(" ", "T")).getTime();
+  return Number.isFinite(data) && data ? data : (Number(inv.id) || 0);
+}
+
+
+function agruparInvestigacoesPorCliente(registros){
+  const grupos = new Map();
+
+  (Array.isArray(registros) ? registros : []).forEach(function(inv){
+    const clienteId = Number(inv.clienteId) || null;
+    const chave = clienteId ? "cliente:" + clienteId : "processo:" + Number(inv.id);
+    let grupo = grupos.get(chave);
+
+    if(!grupo){
+      grupo = {
+        clienteId,
+        nome: inv.nome || "",
+        documento: inv.documento || "",
+        processos: [],
+        dataOrdem: 0
+      };
+      grupos.set(chave, grupo);
+    }
+
+    grupo.processos.push(inv);
+    grupo.dataOrdem = Math.max(grupo.dataOrdem, dataInvestigacaoOrdem(inv));
+    if(!grupo.nome && inv.nome) grupo.nome = inv.nome;
+    if(!grupo.documento && inv.documento) grupo.documento = inv.documento;
+  });
+
+  return Array.from(grupos.values())
+    .map(function(grupo){
+      grupo.processos.sort(function(a, b){
+        return dataInvestigacaoOrdem(b) - dataInvestigacaoOrdem(a);
+      });
+      const maisRecente = grupo.processos[0];
+      return {
+        ...grupo,
+        nome: maisRecente && maisRecente.nome || grupo.nome,
+        documento: maisRecente && maisRecente.documento || grupo.documento
+      };
+    })
+    .sort(function(a, b){ return b.dataOrdem - a.dataOrdem; });
 }
 
 
@@ -1061,46 +1071,8 @@ async function carregarDashboard(){
 
 
   const recentes =
-    [...investigacoes]
-      .sort(
-        function(a,b){
-
-          const da =
-            new Date(
-              String(
-                a.data_criacao ||
-                ""
-              ).replace(
-                " ",
-                "T"
-              )
-            ).getTime() ||
-            Number(a.id) ||
-            0;
-
-
-          const db =
-            new Date(
-              String(
-                b.data_criacao ||
-                ""
-              ).replace(
-                " ",
-                "T"
-              )
-            ).getTime() ||
-            Number(b.id) ||
-            0;
-
-
-          return db - da;
-
-        }
-      )
-      .slice(
-        0,
-        5
-      );
+    agruparInvestigacoesPorCliente(investigacoes)
+      .slice(0, 5);
 
 
   if(
@@ -1111,7 +1083,7 @@ async function carregarDashboard(){
       .innerHTML = `
 
         <div class="empty">
-          Nenhuma investigação cadastrada.
+          Nenhum cliente com processos cadastrados.
         </div>
 
       `;
@@ -1136,7 +1108,11 @@ async function carregarDashboard(){
     .innerHTML =
 
     recentes.map(
-      function(inv){
+      function(grupo){
+        const processoRecente = grupo.processos[0];
+        const acaoAbrir = grupo.clienteId
+          ? `abrirCliente(${Number(grupo.clienteId)})`
+          : `abrirInvestigacao(${Number(processoRecente && processoRecente.id)})`;
 
         return `
 
@@ -1147,23 +1123,19 @@ async function carregarDashboard(){
               <div>
 
                 <div class="item-title">
-                  Cliente: ${escapeHtml(inv.nome || "-")}
+                  Cliente: ${escapeHtml(grupo.nome || "-")}
                 </div>
 
                 <div class="muted">
-                  Processo:
-                  ${escapeHtml(
-                    inv.processo ||
-                    "-"
-                  )}
+                  Processos cadastrados: ${grupo.processos.length}
                 </div>
 
                 <div class="muted">
-                  Documento:
-                  ${escapeHtml(
-                    inv.documento ||
-                    "-"
-                  )}
+                  Processo mais recente: ${escapeHtml(processoRecente && processoRecente.processo || "Não informado")}
+                </div>
+
+                <div class="muted">
+                  Documento: ${escapeHtml(grupo.documento || "-")}
                 </div>
 
               </div>
@@ -1176,9 +1148,9 @@ async function carregarDashboard(){
 
                 <button
                   class="btn btn-primary"
-                  onclick="abrirInvestigacao(${Number(inv.id)})"
+                  onclick="${acaoAbrir}"
                 >
-                  Abrir
+                  ${grupo.clienteId ? "Abrir cliente" : "Abrir processo"}
                 </button>
 
               </div>
@@ -3395,67 +3367,35 @@ async function abrirRelatorio(){
         <div class="relatorio-section">
 
           <h2>
-            🔎 Investigações cadastradas
+            🔎 Clientes e processos
           </h2>
 
           ${
-            investigacoes
-              .map(
-                function(inv){
-
+            agruparInvestigacoesPorCliente(investigacoes)
+              .map(function(grupo){
+                const processos = grupo.processos.map(function(inv, indice){
                   return `
-
-                    <div class="item">
-
-                      <div class="item-head">
-
-                        <div>
-
-                          <div class="item-title">
-                            Cliente: ${escapeHtml(inv.nome || "-")}
-                          </div>
-
-                          <div class="muted">
-                            Processo:
-                            ${escapeHtml(
-                              inv.processo ||
-                              "-"
-                            )}
-                          </div>
-
-                          <div class="muted">
-                            Documento:
-                            ${escapeHtml(
-                              inv.documento ||
-                              "-"
-                            )}
-                          </div>
-
-                        </div>
-
-
-                        <div
-                          class="actions"
-                          style="margin-top:0"
-                        >
-
-                          <button
-                            class="btn btn-primary"
-                            onclick="gerarRelatorioDaInvestigacao(${Number(inv.id)})"
-                          >
-                            📄 Gerar relatório
-                          </button>
-
-                        </div>
-
+                    <div class="item-head" style="${indice ? "border-top:1px solid var(--line);padding-top:14px;margin-top:14px" : "margin-top:14px"}">
+                      <div>
+                        <div class="item-title">Processo: ${escapeHtml(inv.processo || "Não informado")}</div>
+                        <div class="muted">Advogado: ${escapeHtml(inv.advogado || "-")}</div>
                       </div>
+                      <div class="actions" style="margin-top:0">
+                        <button class="btn btn-primary" onclick="gerarRelatorioDaInvestigacao(${Number(inv.id)})">📄 Gerar relatório</button>
+                      </div>
+                    </div>`;
+                }).join("");
 
+                return `
+                  <div class="item">
+                    <div class="item-title">Cliente: ${escapeHtml(grupo.nome || "-")}</div>
+                    <div class="muted">Documento: ${escapeHtml(grupo.documento || "-")}</div>
+                    <div class="muted">Processos cadastrados: ${grupo.processos.length}</div>
+                    <div style="border-top:1px solid var(--line);margin-top:14px;padding-top:2px">
+                      ${processos}
                     </div>
-
-                  `;
-
-                }
-              )
+                  </div>`;
+              })
               .join("")
           }
 
