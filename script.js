@@ -19,6 +19,7 @@ let pessoaEditandoId = null;
 
 let relatorioImoveis = [];
 let relatorioVeiculos = [];
+let relatorioPessoas = [];
 
 
 /* =========================
@@ -2699,6 +2700,34 @@ $("buscaPessoas").addEventListener(
   renderizarPessoas
 );
 
+const camposContatoEnderecoPessoa = {
+  telefone: "pessoaTelefone",
+  email: "pessoaEmail",
+  redeSocial: "pessoaRedeSocial",
+  endereco1Cep: "pessoaEndereco1Cep",
+  endereco1Logradouro: "pessoaEndereco1Logradouro",
+  endereco1Numero: "pessoaEndereco1Numero",
+  endereco1Complemento: "pessoaEndereco1Complemento",
+  endereco1Bairro: "pessoaEndereco1Bairro",
+  endereco1Cidade: "pessoaEndereco1Cidade",
+  endereco1Uf: "pessoaEndereco1Uf",
+  endereco2Cep: "pessoaEndereco2Cep",
+  endereco2Logradouro: "pessoaEndereco2Logradouro",
+  endereco2Numero: "pessoaEndereco2Numero",
+  endereco2Complemento: "pessoaEndereco2Complemento",
+  endereco2Bairro: "pessoaEndereco2Bairro",
+  endereco2Cidade: "pessoaEndereco2Cidade",
+  endereco2Uf: "pessoaEndereco2Uf",
+  endereco3Cep: "pessoaEndereco3Cep",
+  endereco3Logradouro: "pessoaEndereco3Logradouro",
+  endereco3Numero: "pessoaEndereco3Numero",
+  endereco3Complemento: "pessoaEndereco3Complemento",
+  endereco3Bairro: "pessoaEndereco3Bairro",
+  endereco3Cidade: "pessoaEndereco3Cidade",
+  endereco3Uf: "pessoaEndereco3Uf"
+};
+
+
 function abrirFormPessoa(
   pessoa=null
 ){
@@ -2726,7 +2755,16 @@ function abrirFormPessoa(
     pessoaFonte:
       pessoa?.fonte || "",
     pessoaReferencia:
-      pessoa?.referencia || ""
+      pessoa?.referencia || "",
+    ...Object.fromEntries(
+      Object.entries(camposContatoEnderecoPessoa)
+        .map(function([campo, id]){
+          return [
+            id,
+            pessoa?.[campo] ?? ""
+          ];
+        })
+    )
   };
 
   Object.entries(campos).forEach(
@@ -2780,7 +2818,16 @@ $("pessoaForm").addEventListener(
       fonte:
         $("pessoaFonte").value.trim(),
       referencia:
-        $("pessoaReferencia").value.trim()
+        $("pessoaReferencia").value.trim(),
+      ...Object.fromEntries(
+        Object.entries(camposContatoEnderecoPessoa)
+          .map(function([campo, id]){
+            return [
+              campo,
+              $(id).value.trim()
+            ];
+          })
+      )
     };
 
     try{
@@ -2853,6 +2900,52 @@ function renderizarDetalhePessoa(){
   const pessoa =
     pessoaAtual;
 
+  const camposEndereco = [
+    ["CEP", "Cep"],
+    ["Logradouro", "Logradouro"],
+    ["Número", "Numero"],
+    ["Complemento", "Complemento"],
+    ["Bairro", "Bairro"],
+    ["Cidade", "Cidade"],
+    ["UF", "Uf"]
+  ];
+
+  const enderecosHtml =
+    [1, 2, 3]
+      .map(function(numero){
+        const campos =
+          camposEndereco.map(
+            function([rotulo, sufixo]){
+              return [
+                rotulo,
+                pessoa[
+                  "endereco" +
+                  numero +
+                  sufixo
+                ]
+              ];
+            }
+          );
+
+        if (!campos.some(function([, valor]){
+          return String(valor ?? "").trim();
+        })) {
+          return "";
+        }
+
+        return [
+          '<h3 class="section-title">📍 Endereço ' +
+            numero +
+            "</h3>",
+          '<div class="detail-grid">',
+          campos.map(function([rotulo, valor]){
+            return detail(rotulo, valor);
+          }).join(""),
+          "</div>"
+        ].join("");
+      })
+      .join("");
+
   const referencia =
     String(pessoa.referencia || "").trim();
 
@@ -2879,6 +2972,15 @@ function renderizarDetalhePessoa(){
       ${detail("CPF", pessoa.cpf)}
       ${detail("Data de nascimento", pessoa.dataNascimento)}
     </div>
+
+    <h3 class="section-title">☎️ Contato</h3>
+    <div class="detail-grid">
+      ${detail("Telefone", pessoa.telefone)}
+      ${detail("E-mail", pessoa.email)}
+      ${detail("Rede social", pessoa.redeSocial)}
+    </div>
+
+    ${enderecosHtml}
 
     <h3 class="section-title">ℹ️ Informações</h3>
     <div class="detail-grid">
@@ -3188,7 +3290,8 @@ async function gerarRelatorioDaInvestigacao(
 
     const [
       dadosImoveis,
-      dadosVeiculos
+      dadosVeiculos,
+      dadosPessoas
     ] =
       await Promise.all([
 
@@ -3201,6 +3304,13 @@ async function gerarRelatorioDaInvestigacao(
 
         api(
           "/veiculos?investigacao_id=" +
+          encodeURIComponent(
+            investigacaoAtual.id
+          )
+        ),
+
+        api(
+          "/pessoas?investigacao_id=" +
           encodeURIComponent(
             investigacaoAtual.id
           )
@@ -3230,6 +3340,17 @@ async function gerarRelatorioDaInvestigacao(
             []
           );
 
+    relatorioPessoas =
+      Array.isArray(
+        dadosPessoas
+      )
+        ? dadosPessoas
+        : Array.isArray(
+            dadosPessoas?.results
+          )
+          ? dadosPessoas.results
+          : [];
+
 
     renderizarRelatorio();
 
@@ -3253,6 +3374,27 @@ function renderizarRelatorio(){
 
   const inv =
     investigacaoAtual;
+
+  const campoRelatorioPessoa =
+    function(rotulo, valor){
+      const texto =
+        String(valor ?? "").trim();
+
+      return texto
+        ? detail(rotulo, texto)
+        : "";
+    };
+
+  const grupoRelatorioPessoa =
+    function(titulo, campos){
+      return campos
+        ? '<div class="section-title">' +
+            escapeHtml(titulo) +
+            '</div><div class="detail-grid">' +
+            campos +
+            '</div>'
+        : "";
+    };
 
 
   const imoveisHtml =
@@ -3545,6 +3687,111 @@ function renderizarRelatorio(){
 
       `;
 
+  const pessoasHtml =
+    relatorioPessoas.length
+      ? relatorioPessoas
+          .map(function(pessoa, index){
+            const identificacao = [
+              campoRelatorioPessoa("Nome completo", pessoa.nome),
+              campoRelatorioPessoa("CPF", pessoa.cpf),
+              campoRelatorioPessoa(
+                "Data de nascimento",
+                pessoa.dataNascimento
+              )
+            ].join("");
+
+            const contato = [
+              campoRelatorioPessoa("Telefone", pessoa.telefone),
+              campoRelatorioPessoa("E-mail", pessoa.email),
+              campoRelatorioPessoa(
+                "Rede social",
+                pessoa.redeSocial
+              )
+            ].join("");
+
+            const enderecos =
+              [1, 2, 3]
+                .map(function(numero){
+                  const campos = [
+                    ["CEP", "Cep"],
+                    ["Logradouro", "Logradouro"],
+                    ["Número", "Numero"],
+                    ["Complemento", "Complemento"],
+                    ["Bairro", "Bairro"],
+                    ["Cidade", "Cidade"],
+                    ["UF", "Uf"]
+                  ]
+                    .map(function([rotulo, sufixo]){
+                      return campoRelatorioPessoa(
+                        rotulo,
+                        pessoa[
+                          "endereco" +
+                          numero +
+                          sufixo
+                        ]
+                      );
+                    })
+                    .join("");
+
+                  return grupoRelatorioPessoa(
+                    "Endereço " + numero,
+                    campos
+                  );
+                })
+                .join("");
+
+            const informacoes = [
+              campoRelatorioPessoa(
+                "Fonte da informação",
+                pessoa.fonte
+              ),
+              campoRelatorioPessoa(
+                "Link ou referência",
+                pessoa.referencia
+              )
+            ].join("");
+
+            const observacoes =
+              campoRelatorioPessoa(
+                "Observações",
+                pessoa.observacoes
+              );
+
+            return (
+              '<div class="relatorio-item">' +
+                '<h3>👤 Pessoa ' +
+                  (index + 1) +
+                  ' — ' +
+                  escapeHtml(
+                    String(pessoa.nome ?? "").trim() ||
+                    "Pessoa"
+                  ) +
+                '</h3>' +
+                grupoRelatorioPessoa(
+                  "Identificação",
+                  identificacao
+                ) +
+                grupoRelatorioPessoa(
+                  "Contato",
+                  contato
+                ) +
+                enderecos +
+                grupoRelatorioPessoa(
+                  "Informações",
+                  informacoes
+                ) +
+                grupoRelatorioPessoa(
+                  "Observações",
+                  observacoes
+                ) +
+              '</div>'
+            );
+          })
+          .join("")
+      : '<div class="empty">' +
+          'Nenhuma pessoa cadastrada nesta investigação.' +
+        '</div>';
+
 
   const agora =
     new Date()
@@ -3707,6 +3954,18 @@ function renderizarRelatorio(){
 
           </div>
 
+          <div class="relatorio-count">
+
+            <span class="muted">
+              Pessoas
+            </span>
+
+            <strong>
+              ${relatorioPessoas.length}
+            </strong>
+
+          </div>
+
         </div>
 
       </div>
@@ -3752,6 +4011,16 @@ function renderizarRelatorio(){
         </h2>
 
         ${veiculosHtml}
+
+      </div>
+
+      <div class="relatorio-section">
+
+        <h2>
+          👤 Pessoas encontradas
+        </h2>
+
+        ${pessoasHtml}
 
       </div>
 
