@@ -766,7 +766,7 @@ textarea{
             </h1>
 
             <p class="muted">
-              Central de investigações patrimoniais.
+              Central de investigações.
             </p>
 
           </div>
@@ -1715,11 +1715,6 @@ textarea{
             </div>
 
             <div class="field">
-              <label for="pessoaNomeSocial">Nome social</label>
-              <input id="pessoaNomeSocial" maxlength="200">
-            </div>
-
-            <div class="field">
               <label for="pessoaCpf">CPF</label>
               <input id="pessoaCpf" inputmode="numeric" maxlength="14">
             </div>
@@ -1729,43 +1724,22 @@ textarea{
               <input id="pessoaDataNascimento" type="date">
             </div>
 
-            <div class="field">
-              <label for="pessoaPapel">Papel/relação com investigação</label>
-              <input id="pessoaPapel" maxlength="100">
-            </div>
-
-            <div class="field">
-              <label for="pessoaStatus">Status da informação</label>
-              <select id="pessoaStatus">
-                <option>Não verificada</option>
-                <option>Parcialmente verificada</option>
-                <option>Verificada</option>
-              </select>
-            </div>
-
-            <div class="field full">
-              <label for="pessoaDescricaoRelacao">Descrição da relação</label>
-              <textarea id="pessoaDescricaoRelacao" maxlength="500"></textarea>
-            </div>
-
             <div class="field full">
               <label for="pessoaObservacoes">Observações</label>
               <textarea id="pessoaObservacoes" maxlength="5000"></textarea>
             </div>
 
             <div class="field">
-              <label for="pessoaFonte">Fonte</label>
+              <label for="pessoaFonte">Fonte da informação</label>
               <input id="pessoaFonte" maxlength="500">
             </div>
 
-            <div class="field">
-              <label for="pessoaDataObtencao">Data de obtenção</label>
-              <input id="pessoaDataObtencao" type="date">
-            </div>
-
             <div class="field full">
-              <label for="pessoaReferencia">Referência/link da fonte</label>
+              <label for="pessoaReferencia">Link ou referência</label>
               <input id="pessoaReferencia" type="text" maxlength="2000">
+              <small class="muted">
+                Informe o link, documento, processo ou outro local onde a informação foi encontrada.
+              </small>
             </div>
 
           </div>
@@ -1797,36 +1771,19 @@ textarea{
       <div class="card">
 
         <h2>
-          Pessoas vinculadas à investigação
+          Pessoas cadastradas
         </h2>
 
         <div class="grid">
 
-          <div class="field">
+          <div class="field full">
             <label for="buscaPessoas">Buscar por nome ou CPF</label>
-            <input
-              id="buscaPessoas"
-              type="search"
-              placeholder="Digite um nome ou CPF"
-              autocomplete="off"
-            >
-          </div>
-
-          <div class="field">
-            <label for="filtroPapelPessoa">Filtrar por papel</label>
-            <select id="filtroPapelPessoa">
-              <option value="">Todos os papéis</option>
-            </select>
-          </div>
-
-          <div class="field">
-            <label for="filtroStatusPessoa">Filtrar por status</label>
-            <select id="filtroStatusPessoa">
-              <option value="">Todos os status</option>
-              <option>Não verificada</option>
-              <option>Parcialmente verificada</option>
-              <option>Verificada</option>
-            </select>
+              <input
+                id="buscaPessoas"
+                type="search"
+                placeholder="Digite um nome ou CPF"
+                autocomplete="off"
+              >
           </div>
 
         </div>
@@ -1961,7 +1918,7 @@ textarea{
 
 
 <script
-  src="./script.js?v=8.0"
+  src="./script.js?v=9.0"
   defer
 ></script>
 

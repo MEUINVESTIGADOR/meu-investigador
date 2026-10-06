@@ -2579,7 +2579,6 @@ async function carregarPessoas(){
             []
           );
 
-    atualizarFiltroPapelPessoas();
     renderizarPessoas();
 
   }catch(e){
@@ -2591,48 +2590,6 @@ async function carregarPessoas(){
       '</div>';
 
   }
-
-}
-
-
-function atualizarFiltroPapelPessoas(){
-
-  const filtro =
-    $("filtroPapelPessoa");
-
-  const selecionado =
-    filtro.value;
-
-  const papeis =
-    [...new Set(
-      pessoas
-        .map(function(pessoa){
-          return String(
-            pessoa.papel || ""
-          ).trim();
-        })
-        .filter(Boolean)
-    )].sort(function(a,b){
-      return a.localeCompare(
-        b,
-        "pt-BR"
-      );
-    });
-
-  filtro.innerHTML =
-    '<option value="">Todos os papéis</option>' +
-    papeis.map(function(papel){
-      return '<option value="' +
-        escapeHtml(papel) +
-        '">' +
-        escapeHtml(papel) +
-        '</option>';
-    }).join("");
-
-  filtro.value =
-    papeis.includes(selecionado)
-      ? selecionado
-      : "";
 
 }
 
@@ -2651,23 +2608,12 @@ function renderizarPessoas(){
   const buscaCpf =
     busca.replace(/\D/g, "");
 
-  const papelSelecionado =
-    $("filtroPapelPessoa").value;
-
-  const statusSelecionado =
-    $("filtroStatusPessoa").value;
-
   const filtradas =
     pessoas.filter(function(pessoa){
 
       const nome =
         String(
           pessoa.nome || ""
-        ).toLocaleLowerCase("pt-BR");
-
-      const nomeSocial =
-        String(
-          pessoa.nomeSocial || ""
         ).toLocaleLowerCase("pt-BR");
 
       const cpf =
@@ -2679,27 +2625,13 @@ function renderizarPessoas(){
       const correspondeBusca =
         !busca ||
         nome.includes(busca) ||
-        nomeSocial.includes(busca) ||
         cpf.toLocaleLowerCase("pt-BR").includes(busca) ||
         (
           buscaCpf &&
           cpfDigitos.includes(buscaCpf)
         );
 
-      const correspondePapel =
-        !papelSelecionado ||
-        String(pessoa.papel || "").trim() ===
-          papelSelecionado;
-
-      const correspondeStatus =
-        !statusSelecionado ||
-        pessoa.status === statusSelecionado;
-
-      return (
-        correspondeBusca &&
-        correspondePapel &&
-        correspondeStatus
-      );
+      return correspondeBusca;
 
     });
 
@@ -2709,7 +2641,7 @@ function renderizarPessoas(){
       '<div class="empty">' +
       (
         pessoas.length
-          ? "Nenhuma pessoa corresponde à busca e aos filtros."
+          ? "Nenhuma pessoa corresponde à pesquisa."
           : "Nenhuma pessoa cadastrada nesta investigação."
       ) +
       '</div>';
@@ -2734,15 +2666,7 @@ function renderizarPessoas(){
               </div>
 
               <div class="muted">
-                ${pessoa.nomeSocial
-                  ? "Nome social: " + escapeHtml(pessoa.nomeSocial) + " · "
-                  : ""}
                 CPF: ${escapeHtml(pessoa.cpf || "-")}
-              </div>
-
-              <div class="muted">
-                Papel: ${escapeHtml(pessoa.papel || "-")} ·
-                Status: ${escapeHtml(pessoa.status || "Não verificada")}
               </div>
 
             </div>
@@ -2775,17 +2699,6 @@ $("buscaPessoas").addEventListener(
   renderizarPessoas
 );
 
-$("filtroPapelPessoa").addEventListener(
-  "change",
-  renderizarPessoas
-);
-
-$("filtroStatusPessoa").addEventListener(
-  "change",
-  renderizarPessoas
-);
-
-
 function abrirFormPessoa(
   pessoa=null
 ){
@@ -2804,24 +2717,14 @@ function abrirFormPessoa(
   const campos = {
     pessoaNome:
       pessoa?.nome || "",
-    pessoaNomeSocial:
-      pessoa?.nomeSocial || "",
     pessoaCpf:
       pessoa?.cpf || "",
     pessoaDataNascimento:
       pessoa?.dataNascimento || "",
-    pessoaPapel:
-      pessoa?.papel || "",
-    pessoaDescricaoRelacao:
-      pessoa?.descricaoRelacao || "",
-    pessoaStatus:
-      pessoa?.status || "Não verificada",
     pessoaObservacoes:
       pessoa?.observacoes || "",
     pessoaFonte:
       pessoa?.fonte || "",
-    pessoaDataObtencao:
-      pessoa?.dataObtencao || "",
     pessoaReferencia:
       pessoa?.referencia || ""
   };
@@ -2866,33 +2769,30 @@ $("pessoaForm").addEventListener(
     }
 
     const payload = {
-      investigacaoId:
-        Number(investigacaoAtual.id),
       nome:
         $("pessoaNome").value.trim(),
-      nomeSocial:
-        $("pessoaNomeSocial").value.trim(),
       cpf:
         $("pessoaCpf").value.trim(),
       dataNascimento:
         $("pessoaDataNascimento").value,
-      papel:
-        $("pessoaPapel").value.trim(),
-      descricaoRelacao:
-        $("pessoaDescricaoRelacao").value.trim(),
-      status:
-        $("pessoaStatus").value,
       observacoes:
         $("pessoaObservacoes").value.trim(),
       fonte:
         $("pessoaFonte").value.trim(),
-      dataObtencao:
-        $("pessoaDataObtencao").value,
       referencia:
         $("pessoaReferencia").value.trim()
     };
 
     try{
+
+      const payloadPessoa =
+        pessoaEditandoId
+          ? payload
+          : {
+              investigacaoId:
+                Number(investigacaoAtual.id),
+              ...payload
+            };
 
       const dados =
         await api(
@@ -2905,7 +2805,7 @@ $("pessoaForm").addEventListener(
                 ? "PUT"
                 : "POST",
             body:
-              JSON.stringify(payload)
+              JSON.stringify(payloadPessoa)
           }
         );
 
@@ -2976,23 +2876,14 @@ function renderizarDetalhePessoa(){
     <h3 class="section-title">📋 Identificação</h3>
     <div class="detail-grid">
       ${detail("Nome completo", pessoa.nome)}
-      ${detail("Nome social", pessoa.nomeSocial)}
       ${detail("CPF", pessoa.cpf)}
       ${detail("Data de nascimento", pessoa.dataNascimento)}
     </div>
 
-    <h3 class="section-title">🔎 Relação com a investigação</h3>
+    <h3 class="section-title">ℹ️ Informações</h3>
     <div class="detail-grid">
-      ${detail("Papel", pessoa.papel)}
-      ${detail("Status da informação", pessoa.status)}
-      ${detail("Descrição da relação", pessoa.descricaoRelacao)}
-    </div>
-
-    <h3 class="section-title">📚 Fonte da informação</h3>
-    <div class="detail-grid">
-      ${detail("Fonte", pessoa.fonte)}
-      ${detail("Data de obtenção", pessoa.dataObtencao)}
-      ${detail("Referência", pessoa.referencia)}
+      ${detail("Fonte da informação", pessoa.fonte)}
+      ${detail("Link ou referência", pessoa.referencia)}
     </div>
     ${linkReferencia}
 
@@ -3667,18 +3558,9 @@ function renderizarRelatorio(){
 
       <div class="relatorio-capa">
 
-        <div class="badge">
-          RELATÓRIO DE INVESTIGAÇÃO PATRIMONIAL
-        </div>
-
         <h1>
-          Meu Investigador
+          RELATÓRIO
         </h1>
-
-        <p class="muted">
-          Relatório consolidado
-          da investigação
-        </p>
 
       </div>
 
