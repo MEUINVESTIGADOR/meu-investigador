@@ -13,6 +13,10 @@ let veiculos = [];
 let veiculoAtual = null;
 let veiculoEditandoId = null;
 
+let pessoas = [];
+let pessoaAtual = null;
+let pessoaEditandoId = null;
+
 let relatorioImoveis = [];
 let relatorioVeiculos = [];
 
@@ -144,6 +148,8 @@ function mostrarSomente(id){
     "imovelDetalheScreen",
     "veiculosScreen",
     "veiculoDetalheScreen",
+    "pessoasScreen",
+    "pessoaDetalheScreen",
     "relatorioScreen"
 
   ];
@@ -2514,6 +2520,545 @@ async function excluirVeiculoAtual(){
     alert(
       e.message
     );
+
+  }
+
+}
+
+
+/* =========================
+   PESSOAS
+========================= */
+
+async function abrirPessoas(){
+
+  if(!investigacaoAtual){
+    return;
+  }
+
+  $("pessoasSubtitulo")
+    .textContent =
+    "Investigação: " +
+    (
+      investigacaoAtual.nome ||
+      ""
+    );
+
+  mostrarSomente(
+    "pessoasScreen"
+  );
+
+  fecharFormPessoa();
+
+  await carregarPessoas();
+
+}
+
+
+async function carregarPessoas(){
+
+  $("listaPessoas")
+    .innerHTML =
+    '<div class="loading">Carregando...</div>';
+
+  try{
+
+    const dados =
+      await api(
+        "/pessoas?investigacao_id=" +
+        encodeURIComponent(
+          investigacaoAtual.id
+        )
+      );
+
+    pessoas =
+      Array.isArray(dados)
+        ? dados
+        : (
+            dados?.results ||
+            []
+          );
+
+    atualizarFiltroPapelPessoas();
+    renderizarPessoas();
+
+  }catch(e){
+
+    $("listaPessoas")
+      .innerHTML =
+      '<div class="error">Erro: ' +
+      escapeHtml(e.message) +
+      '</div>';
+
+  }
+
+}
+
+
+function atualizarFiltroPapelPessoas(){
+
+  const filtro =
+    $("filtroPapelPessoa");
+
+  const selecionado =
+    filtro.value;
+
+  const papeis =
+    [...new Set(
+      pessoas
+        .map(function(pessoa){
+          return String(
+            pessoa.papel || ""
+          ).trim();
+        })
+        .filter(Boolean)
+    )].sort(function(a,b){
+      return a.localeCompare(
+        b,
+        "pt-BR"
+      );
+    });
+
+  filtro.innerHTML =
+    '<option value="">Todos os papéis</option>' +
+    papeis.map(function(papel){
+      return '<option value="' +
+        escapeHtml(papel) +
+        '">' +
+        escapeHtml(papel) +
+        '</option>';
+    }).join("");
+
+  filtro.value =
+    papeis.includes(selecionado)
+      ? selecionado
+      : "";
+
+}
+
+
+function renderizarPessoas(){
+
+  const el =
+    $("listaPessoas");
+
+  const busca =
+    $("buscaPessoas")
+      .value
+      .trim()
+      .toLocaleLowerCase("pt-BR");
+
+  const buscaCpf =
+    busca.replace(/\D/g, "");
+
+  const papelSelecionado =
+    $("filtroPapelPessoa").value;
+
+  const statusSelecionado =
+    $("filtroStatusPessoa").value;
+
+  const filtradas =
+    pessoas.filter(function(pessoa){
+
+      const nome =
+        String(
+          pessoa.nome || ""
+        ).toLocaleLowerCase("pt-BR");
+
+      const nomeSocial =
+        String(
+          pessoa.nomeSocial || ""
+        ).toLocaleLowerCase("pt-BR");
+
+      const cpf =
+        String(pessoa.cpf || "");
+
+      const cpfDigitos =
+        cpf.replace(/\D/g, "");
+
+      const correspondeBusca =
+        !busca ||
+        nome.includes(busca) ||
+        nomeSocial.includes(busca) ||
+        cpf.toLocaleLowerCase("pt-BR").includes(busca) ||
+        (
+          buscaCpf &&
+          cpfDigitos.includes(buscaCpf)
+        );
+
+      const correspondePapel =
+        !papelSelecionado ||
+        String(pessoa.papel || "").trim() ===
+          papelSelecionado;
+
+      const correspondeStatus =
+        !statusSelecionado ||
+        pessoa.status === statusSelecionado;
+
+      return (
+        correspondeBusca &&
+        correspondePapel &&
+        correspondeStatus
+      );
+
+    });
+
+  if(!filtradas.length){
+
+    el.innerHTML =
+      '<div class="empty">' +
+      (
+        pessoas.length
+          ? "Nenhuma pessoa corresponde à busca e aos filtros."
+          : "Nenhuma pessoa cadastrada nesta investigação."
+      ) +
+      '</div>';
+
+    return;
+
+  }
+
+  el.innerHTML =
+    filtradas.map(function(pessoa){
+
+      return `
+
+        <div class="item">
+
+          <div class="item-head">
+
+            <div>
+
+              <div class="item-title">
+                👤 ${escapeHtml(pessoa.nome || "Pessoa")}
+              </div>
+
+              <div class="muted">
+                ${pessoa.nomeSocial
+                  ? "Nome social: " + escapeHtml(pessoa.nomeSocial) + " · "
+                  : ""}
+                CPF: ${escapeHtml(pessoa.cpf || "-")}
+              </div>
+
+              <div class="muted">
+                Papel: ${escapeHtml(pessoa.papel || "-")} ·
+                Status: ${escapeHtml(pessoa.status || "Não verificada")}
+              </div>
+
+            </div>
+
+            <div
+              class="actions"
+              style="margin-top:0"
+            >
+              <button
+                class="btn btn-primary"
+                onclick="abrirDetalhePessoa(${Number(pessoa.id)})"
+              >
+                Ver detalhes
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+
+      `;
+
+    }).join("");
+
+}
+
+
+$("buscaPessoas").addEventListener(
+  "input",
+  renderizarPessoas
+);
+
+$("filtroPapelPessoa").addEventListener(
+  "change",
+  renderizarPessoas
+);
+
+$("filtroStatusPessoa").addEventListener(
+  "change",
+  renderizarPessoas
+);
+
+
+function abrirFormPessoa(
+  pessoa=null
+){
+
+  pessoaEditandoId =
+    pessoa
+      ? Number(pessoa.id)
+      : null;
+
+  $("pessoaFormTitulo")
+    .textContent =
+    pessoa
+      ? "Editar pessoa"
+      : "Nova pessoa";
+
+  const campos = {
+    pessoaNome:
+      pessoa?.nome || "",
+    pessoaNomeSocial:
+      pessoa?.nomeSocial || "",
+    pessoaCpf:
+      pessoa?.cpf || "",
+    pessoaDataNascimento:
+      pessoa?.dataNascimento || "",
+    pessoaPapel:
+      pessoa?.papel || "",
+    pessoaDescricaoRelacao:
+      pessoa?.descricaoRelacao || "",
+    pessoaStatus:
+      pessoa?.status || "Não verificada",
+    pessoaObservacoes:
+      pessoa?.observacoes || "",
+    pessoaFonte:
+      pessoa?.fonte || "",
+    pessoaDataObtencao:
+      pessoa?.dataObtencao || "",
+    pessoaReferencia:
+      pessoa?.referencia || ""
+  };
+
+  Object.entries(campos).forEach(
+    function([id, valor]){
+      $(id).value = valor;
+    }
+  );
+
+  mostrar(
+    $("pessoaFormCard")
+  );
+
+  $("pessoaNome").focus();
+
+}
+
+
+function fecharFormPessoa(){
+
+  esconder(
+    $("pessoaFormCard")
+  );
+
+  $("pessoaForm").reset();
+
+  pessoaEditandoId = null;
+
+}
+
+
+$("pessoaForm").addEventListener(
+  "submit",
+  async function(e){
+
+    e.preventDefault();
+
+    if(!investigacaoAtual){
+      alert("Abra uma investigação antes de cadastrar pessoas.");
+      return;
+    }
+
+    const payload = {
+      investigacaoId:
+        Number(investigacaoAtual.id),
+      nome:
+        $("pessoaNome").value.trim(),
+      nomeSocial:
+        $("pessoaNomeSocial").value.trim(),
+      cpf:
+        $("pessoaCpf").value.trim(),
+      dataNascimento:
+        $("pessoaDataNascimento").value,
+      papel:
+        $("pessoaPapel").value.trim(),
+      descricaoRelacao:
+        $("pessoaDescricaoRelacao").value.trim(),
+      status:
+        $("pessoaStatus").value,
+      observacoes:
+        $("pessoaObservacoes").value.trim(),
+      fonte:
+        $("pessoaFonte").value.trim(),
+      dataObtencao:
+        $("pessoaDataObtencao").value,
+      referencia:
+        $("pessoaReferencia").value.trim()
+    };
+
+    try{
+
+      const dados =
+        await api(
+          pessoaEditandoId
+            ? "/pessoas/" + pessoaEditandoId
+            : "/pessoas",
+          {
+            method:
+              pessoaEditandoId
+                ? "PUT"
+                : "POST",
+            body:
+              JSON.stringify(payload)
+          }
+        );
+
+      fecharFormPessoa();
+      await carregarPessoas();
+
+      alert(
+        dados.mensagem ||
+        "Pessoa salva com sucesso."
+      );
+
+    }catch(e){
+
+      alert(e.message);
+
+    }
+
+  }
+);
+
+
+function abrirDetalhePessoa(id){
+
+  pessoaAtual =
+    pessoas.find(function(pessoa){
+      return Number(pessoa.id) ===
+        Number(id);
+    });
+
+  if(!pessoaAtual){
+    return;
+  }
+
+  renderizarDetalhePessoa();
+
+  mostrarSomente(
+    "pessoaDetalheScreen"
+  );
+
+}
+
+
+function renderizarDetalhePessoa(){
+
+  const pessoa =
+    pessoaAtual;
+
+  const referencia =
+    String(pessoa.referencia || "").trim();
+
+  const linkReferencia =
+    /^https?:\/\//i.test(referencia)
+      ? `
+          <p>
+            <a
+              href="${escapeHtml(referencia)}"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Abrir referência da fonte
+            </a>
+          </p>
+        `
+      : "";
+
+  $("pessoaDetalhe").innerHTML = `
+
+    <h3 class="section-title">📋 Identificação</h3>
+    <div class="detail-grid">
+      ${detail("Nome completo", pessoa.nome)}
+      ${detail("Nome social", pessoa.nomeSocial)}
+      ${detail("CPF", pessoa.cpf)}
+      ${detail("Data de nascimento", pessoa.dataNascimento)}
+    </div>
+
+    <h3 class="section-title">🔎 Relação com a investigação</h3>
+    <div class="detail-grid">
+      ${detail("Papel", pessoa.papel)}
+      ${detail("Status da informação", pessoa.status)}
+      ${detail("Descrição da relação", pessoa.descricaoRelacao)}
+    </div>
+
+    <h3 class="section-title">📚 Fonte da informação</h3>
+    <div class="detail-grid">
+      ${detail("Fonte", pessoa.fonte)}
+      ${detail("Data de obtenção", pessoa.dataObtencao)}
+      ${detail("Referência", pessoa.referencia)}
+    </div>
+    ${linkReferencia}
+
+    <h3 class="section-title">📝 Observações</h3>
+    <div class="detail">
+      <strong>${escapeHtml(
+        pessoa.observacoes ||
+        "Nenhuma observação cadastrada."
+      )}</strong>
+    </div>
+
+  `;
+
+}
+
+
+function editarPessoaAtual(){
+
+  if(!pessoaAtual){
+    return;
+  }
+
+  mostrarSomente(
+    "pessoasScreen"
+  );
+
+  abrirFormPessoa(
+    pessoaAtual
+  );
+
+}
+
+
+async function excluirPessoaAtual(){
+
+  if(!pessoaAtual){
+    return;
+  }
+
+  if(!confirm("Excluir esta pessoa?")){
+    return;
+  }
+
+  try{
+
+    const dados =
+      await api(
+        "/pessoas/" +
+        encodeURIComponent(pessoaAtual.id),
+        {
+          method:"DELETE"
+        }
+      );
+
+    alert(
+      dados.mensagem ||
+      "Pessoa excluída com sucesso."
+    );
+
+    pessoaAtual = null;
+
+    await abrirPessoas();
+
+  }catch(e){
+
+    alert(e.message);
 
   }
 

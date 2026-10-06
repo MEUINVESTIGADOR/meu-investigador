@@ -506,6 +506,8 @@ textarea{
   #imovelDetalheScreen,
   #veiculosScreen,
   #veiculoDetalheScreen,
+  #pessoasScreen,
+  #pessoaDetalheScreen,
   .nao-imprimir{
     display:none!important;
   }
@@ -1064,6 +1066,13 @@ textarea{
             onclick="abrirVeiculos()"
           >
             🚗 Veículos
+          </button>
+
+          <button
+            class="btn btn-primary"
+            onclick="abrirPessoas()"
+          >
+            👤 Pessoas
           </button>
 
           <button
@@ -1640,6 +1649,259 @@ textarea{
 
 
     <!-- =========================
+         PESSOAS
+    ========================= -->
+
+    <section
+      id="pessoasScreen"
+      class="hidden"
+    >
+
+      <div class="card">
+
+        <div
+          class="actions"
+          style="margin-top:0"
+        >
+
+          <button
+            class="btn btn-secondary"
+            onclick="voltarDaTelaPatrimonial()"
+          >
+            ← Voltar para investigação
+          </button>
+
+        </div>
+
+        <h1>
+          👤 Pessoas
+        </h1>
+
+        <p
+          id="pessoasSubtitulo"
+          class="muted"
+        ></p>
+
+        <div class="actions">
+
+          <button
+            class="btn btn-primary"
+            onclick="abrirFormPessoa()"
+          >
+            ＋ Nova pessoa
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <div
+        id="pessoaFormCard"
+        class="card hidden"
+      >
+
+        <h2 id="pessoaFormTitulo">
+          Nova pessoa
+        </h2>
+
+        <form id="pessoaForm">
+
+          <div class="grid">
+
+            <div class="field">
+              <label for="pessoaNome">Nome completo *</label>
+              <input id="pessoaNome" maxlength="200" required>
+            </div>
+
+            <div class="field">
+              <label for="pessoaNomeSocial">Nome social</label>
+              <input id="pessoaNomeSocial" maxlength="200">
+            </div>
+
+            <div class="field">
+              <label for="pessoaCpf">CPF</label>
+              <input id="pessoaCpf" inputmode="numeric" maxlength="14">
+            </div>
+
+            <div class="field">
+              <label for="pessoaDataNascimento">Data de nascimento</label>
+              <input id="pessoaDataNascimento" type="date">
+            </div>
+
+            <div class="field">
+              <label for="pessoaPapel">Papel/relação com investigação</label>
+              <input id="pessoaPapel" maxlength="100">
+            </div>
+
+            <div class="field">
+              <label for="pessoaStatus">Status da informação</label>
+              <select id="pessoaStatus">
+                <option>Não verificada</option>
+                <option>Parcialmente verificada</option>
+                <option>Verificada</option>
+              </select>
+            </div>
+
+            <div class="field full">
+              <label for="pessoaDescricaoRelacao">Descrição da relação</label>
+              <textarea id="pessoaDescricaoRelacao" maxlength="500"></textarea>
+            </div>
+
+            <div class="field full">
+              <label for="pessoaObservacoes">Observações</label>
+              <textarea id="pessoaObservacoes" maxlength="5000"></textarea>
+            </div>
+
+            <div class="field">
+              <label for="pessoaFonte">Fonte</label>
+              <input id="pessoaFonte" maxlength="500">
+            </div>
+
+            <div class="field">
+              <label for="pessoaDataObtencao">Data de obtenção</label>
+              <input id="pessoaDataObtencao" type="date">
+            </div>
+
+            <div class="field full">
+              <label for="pessoaReferencia">Referência/link da fonte</label>
+              <input id="pessoaReferencia" type="text" maxlength="2000">
+            </div>
+
+          </div>
+
+          <div class="actions">
+
+            <button
+              class="btn btn-primary"
+              type="submit"
+            >
+              Salvar pessoa
+            </button>
+
+            <button
+              class="btn btn-secondary"
+              type="button"
+              onclick="fecharFormPessoa()"
+            >
+              Cancelar
+            </button>
+
+          </div>
+
+        </form>
+
+      </div>
+
+
+      <div class="card">
+
+        <h2>
+          Pessoas vinculadas à investigação
+        </h2>
+
+        <div class="grid">
+
+          <div class="field">
+            <label for="buscaPessoas">Buscar por nome ou CPF</label>
+            <input
+              id="buscaPessoas"
+              type="search"
+              placeholder="Digite um nome ou CPF"
+              autocomplete="off"
+            >
+          </div>
+
+          <div class="field">
+            <label for="filtroPapelPessoa">Filtrar por papel</label>
+            <select id="filtroPapelPessoa">
+              <option value="">Todos os papéis</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="filtroStatusPessoa">Filtrar por status</label>
+            <select id="filtroStatusPessoa">
+              <option value="">Todos os status</option>
+              <option>Não verificada</option>
+              <option>Parcialmente verificada</option>
+              <option>Verificada</option>
+            </select>
+          </div>
+
+        </div>
+
+        <div
+          id="listaPessoas"
+          class="loading"
+        >
+          Carregando...
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         DETALHE DA PESSOA
+    ========================= -->
+
+    <section
+      id="pessoaDetalheScreen"
+      class="hidden"
+    >
+
+      <div class="card">
+
+        <div
+          class="actions"
+          style="margin-top:0"
+        >
+
+          <button
+            class="btn btn-secondary"
+            onclick="abrirPessoas()"
+          >
+            ← Voltar para Pessoas
+          </button>
+
+        </div>
+
+        <h1>
+          👤 Detalhes da pessoa
+        </h1>
+
+        <p class="muted">
+          Informações da pessoa vinculada à investigação.
+        </p>
+
+        <div id="pessoaDetalhe"></div>
+
+        <div class="actions">
+
+          <button
+            class="btn btn-primary"
+            onclick="editarPessoaAtual()"
+          >
+            ✏️ Editar pessoa
+          </button>
+
+          <button
+            class="btn btn-danger"
+            onclick="excluirPessoaAtual()"
+          >
+            🗑️ Excluir pessoa
+          </button>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================
          RELATÓRIO
     ========================= -->
 
@@ -1699,7 +1961,7 @@ textarea{
 
 
 <script
-  src="./script.js?v=7.0"
+  src="./script.js?v=8.0"
   defer
 ></script>
 
