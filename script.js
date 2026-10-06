@@ -10,6 +10,40 @@ let clienteEditandoId = null;
 let investigacaoEditandoId = null;
 let retornoProcessoClienteId = null;
 
+const CAMPOS_CONTATO_CLIENTE_UI = [
+  { campo: "celular1", id: "clienteCelular1", rotulo: "Celular 1" },
+  { campo: "celular2", id: "clienteCelular2", rotulo: "Celular 2" },
+  { campo: "email1", id: "clienteEmail1", rotulo: "E-mail 1" },
+  { campo: "email2", id: "clienteEmail2", rotulo: "E-mail 2" }
+];
+
+const ENDERECOS_CLIENTE_UI = [
+  {
+    titulo: "Endereço 1",
+    campos: [
+      { campo: "endereco1Cep", id: "clienteEndereco1Cep", rotulo: "CEP" },
+      { campo: "endereco1Logradouro", id: "clienteEndereco1Logradouro", rotulo: "Logradouro" },
+      { campo: "endereco1Numero", id: "clienteEndereco1Numero", rotulo: "Número" },
+      { campo: "endereco1Complemento", id: "clienteEndereco1Complemento", rotulo: "Complemento" },
+      { campo: "endereco1Bairro", id: "clienteEndereco1Bairro", rotulo: "Bairro" },
+      { campo: "endereco1Cidade", id: "clienteEndereco1Cidade", rotulo: "Cidade" },
+      { campo: "endereco1Uf", id: "clienteEndereco1Uf", rotulo: "UF" }
+    ]
+  },
+  {
+    titulo: "Endereço 2",
+    campos: [
+      { campo: "endereco2Cep", id: "clienteEndereco2Cep", rotulo: "CEP" },
+      { campo: "endereco2Logradouro", id: "clienteEndereco2Logradouro", rotulo: "Logradouro" },
+      { campo: "endereco2Numero", id: "clienteEndereco2Numero", rotulo: "Número" },
+      { campo: "endereco2Complemento", id: "clienteEndereco2Complemento", rotulo: "Complemento" },
+      { campo: "endereco2Bairro", id: "clienteEndereco2Bairro", rotulo: "Bairro" },
+      { campo: "endereco2Cidade", id: "clienteEndereco2Cidade", rotulo: "Cidade" },
+      { campo: "endereco2Uf", id: "clienteEndereco2Uf", rotulo: "UF" }
+    ]
+  }
+];
+
 let imoveis = [];
 let imovelAtual = null;
 let imovelEditandoId = null;
@@ -430,18 +464,64 @@ function renderizarProcessosDoCliente(processos){
   }).join("");
 }
 
+function renderizarGrupoDetalhesCliente(titulo, campos, cliente){
+  const preenchidos = campos.filter(campo =>
+    String(cliente[campo.campo] ?? "").trim()
+  );
+  if(!preenchidos.length) return "";
+
+  return `
+    <div class="cliente-detalhe-grupo">
+      <h3>${escapeHtml(titulo)}</h3>
+      <div class="detail-grid">
+        ${preenchidos.map(campo => `
+          <div class="detail">
+            <span class="muted">${escapeHtml(campo.rotulo)}</span>
+            <strong>${escapeHtml(String(cliente[campo.campo]).trim())}</strong>
+          </div>`).join("")}
+      </div>
+    </div>`;
+}
+
+function renderizarDadosCliente(cliente, totalProcessos){
+  const dadosPrincipais = [
+    { campo: "nome", rotulo: "Nome" },
+    { campo: "documento", rotulo: "Documento" }
+  ].filter(campo => String(cliente[campo.campo] ?? "").trim());
+
+  return `
+    <h2>Dados do cliente</h2>
+    <div class="detail-grid">
+      ${dadosPrincipais.map(campo => `
+        <div class="detail">
+          <span class="muted">${campo.rotulo}</span>
+          <strong>${escapeHtml(String(cliente[campo.campo]).trim())}</strong>
+        </div>`).join("")}
+      <div class="detail">
+        <span class="muted">Processos cadastrados</span>
+        <strong>${totalProcessos}</strong>
+      </div>
+    </div>
+    ${renderizarGrupoDetalhesCliente(
+      "Contatos",
+      CAMPOS_CONTATO_CLIENTE_UI,
+      cliente
+    )}
+    ${ENDERECOS_CLIENTE_UI.map(grupo =>
+      renderizarGrupoDetalhesCliente(grupo.titulo, grupo.campos, cliente)
+    ).join("")}`;
+}
+
 async function abrirCliente(id){
   try{
     const dados = await api("/clientes/" + encodeURIComponent(id));
     clienteAtual = dados.cliente;
     const processos = Array.isArray(dados.investigacoes) ? dados.investigacoes : [];
     $("clienteDetalheTitulo").textContent = clienteAtual.nome || "Cliente";
-    $("clienteDetalheInfo").innerHTML = `
-      <div class="detail-grid">
-        <div class="detail"><span class="muted">Cliente</span><strong>${escapeHtml(clienteAtual.nome || "-")}</strong></div>
-        <div class="detail"><span class="muted">Documento</span><strong>${escapeHtml(clienteAtual.documento || "-")}</strong></div>
-        <div class="detail"><span class="muted">Processos cadastrados</span><strong>${processos.length}</strong></div>
-      </div>`;
+    $("clienteDetalheInfo").innerHTML = renderizarDadosCliente(
+      clienteAtual,
+      processos.length
+    );
     renderizarProcessosDoCliente(processos);
     mostrarSomente("clienteDetalheScreen");
   }catch(e){
@@ -475,6 +555,14 @@ function editarClienteAtual(){
   $("clienteFormTitulo").textContent = "Editar cliente";
   $("clienteNome").value = clienteAtual.nome || "";
   $("clienteDocumento").value = clienteAtual.documento || "";
+  CAMPOS_CONTATO_CLIENTE_UI.forEach(campo => {
+    $(campo.id).value = clienteAtual[campo.campo] || "";
+  });
+  ENDERECOS_CLIENTE_UI.forEach(grupo => {
+    grupo.campos.forEach(campo => {
+      $(campo.id).value = clienteAtual[campo.campo] || "";
+    });
+  });
   retornoProcessoClienteId = Number(clienteAtual.id);
   mostrarSomente("clientesScreen");
   mostrar($("clienteFormCard"));
@@ -491,7 +579,12 @@ $("clienteForm").addEventListener("submit", async function(e){
         method: editando ? "PUT" : "POST",
         body: JSON.stringify({
           nome: $("clienteNome").value.trim(),
-          documento: $("clienteDocumento").value.trim()
+          documento: $("clienteDocumento").value.trim(),
+          ...Object.fromEntries(
+            CAMPOS_CONTATO_CLIENTE_UI
+              .concat(ENDERECOS_CLIENTE_UI.flatMap(grupo => grupo.campos))
+              .map(campo => [campo.campo, $(campo.id).value.trim()])
+          )
         })
       }
     );

@@ -511,6 +511,27 @@ function validarDadosPessoa(dados) {
   };
 }
 
+const CAMPOS_CONTATO_ENDERECO_CLIENTE = [
+  { campo: "celular1", coluna: "celular1", limite: 40 },
+  { campo: "celular2", coluna: "celular2", limite: 40 },
+  { campo: "email1", coluna: "email1", limite: 254 },
+  { campo: "email2", coluna: "email2", limite: 254 },
+  { campo: "endereco1Cep", coluna: "endereco1_cep", limite: 20 },
+  { campo: "endereco1Logradouro", coluna: "endereco1_logradouro", limite: 200 },
+  { campo: "endereco1Numero", coluna: "endereco1_numero", limite: 30 },
+  { campo: "endereco1Complemento", coluna: "endereco1_complemento", limite: 120 },
+  { campo: "endereco1Bairro", coluna: "endereco1_bairro", limite: 120 },
+  { campo: "endereco1Cidade", coluna: "endereco1_cidade", limite: 120 },
+  { campo: "endereco1Uf", coluna: "endereco1_uf", limite: 2, uf: true },
+  { campo: "endereco2Cep", coluna: "endereco2_cep", limite: 20 },
+  { campo: "endereco2Logradouro", coluna: "endereco2_logradouro", limite: 200 },
+  { campo: "endereco2Numero", coluna: "endereco2_numero", limite: 30 },
+  { campo: "endereco2Complemento", coluna: "endereco2_complemento", limite: 120 },
+  { campo: "endereco2Bairro", coluna: "endereco2_bairro", limite: 120 },
+  { campo: "endereco2Cidade", coluna: "endereco2_cidade", limite: 120 },
+  { campo: "endereco2Uf", coluna: "endereco2_uf", limite: 2, uf: true }
+];
+
 function validarDadosCliente(dados) {
   if (
     !dados ||
@@ -540,12 +561,33 @@ function validarDadosCliente(dados) {
     return { erro: "Os dados do cliente excedem o tamanho permitido." };
   }
 
-  return {
-    cliente: {
-      nome,
-      documento: documento.trim()
-    }
+  const cliente = {
+    nome,
+    documento: documento.trim()
   };
+
+  for (const campo of CAMPOS_CONTATO_ENDERECO_CLIENTE) {
+    const valor = dados[campo.campo] == null
+      ? ""
+      : dados[campo.campo];
+
+    if (typeof valor !== "string") {
+      return { erro: "Os dados de contato e endereço devem ser texto." };
+    }
+
+    const texto = valor.trim();
+    if (texto.length > campo.limite) {
+      return { erro: "Os dados de contato e endereço excedem o tamanho permitido." };
+    }
+
+    if (campo.uf && texto && !/^[A-Za-z]{2}$/.test(texto)) {
+      return { erro: "A UF deve conter duas letras." };
+    }
+
+    cliente[campo.campo] = campo.uf ? texto.toUpperCase() : texto;
+  }
+
+  return { cliente };
 }
 
 function normalizarDocumentoCliente(valor) {
@@ -867,23 +909,19 @@ export default {
       }
 
       try {
+        const camposContato = CAMPOS_CONTATO_ENDERECO_CLIENTE
+          .map(campo => "c." + campo.coluna + " AS " + campo.campo)
+          .join(", ");
         const resultado = await env.DB
-          .prepare(`
-            SELECT
-              c.id,
-              c.nome,
-              c.documento,
-              c.data_criacao AS dataCriacao,
-              c.data_atualizacao AS dataAtualizacao,
-              COUNT(i.id) AS totalProcessos
-            FROM clientes c
-            LEFT JOIN investigacoes i
-              ON i.cliente_id = c.id
-              AND i.usuario_id = c.usuario_id
-            WHERE c.usuario_id = ?
-            GROUP BY c.id
-            ORDER BY c.nome COLLATE NOCASE, c.id
-          `)
+          .prepare(
+            "SELECT c.id, c.nome, c.documento, " + camposContato +
+            ", c.data_criacao AS dataCriacao, " +
+            "c.data_atualizacao AS dataAtualizacao, COUNT(i.id) AS totalProcessos " +
+            "FROM clientes c LEFT JOIN investigacoes i " +
+            "ON i.cliente_id = c.id AND i.usuario_id = c.usuario_id " +
+            "WHERE c.usuario_id = ? GROUP BY c.id " +
+            "ORDER BY c.nome COLLATE NOCASE, c.id"
+          )
           .bind(usuario.id)
           .all();
 
@@ -912,15 +950,16 @@ export default {
           return respostaJSON({ ok: false, erro: "Cliente inválido." }, 400);
         }
 
+        const camposContato = CAMPOS_CONTATO_ENDERECO_CLIENTE
+          .map(campo => campo.coluna + " AS " + campo.campo)
+          .join(", ");
         const cliente = await env.DB
-          .prepare(`
-            SELECT id, nome, documento,
-              data_criacao AS dataCriacao,
-              data_atualizacao AS dataAtualizacao
-            FROM clientes
-            WHERE id = ? AND usuario_id = ?
-            LIMIT 1
-          `)
+          .prepare(
+            "SELECT id, nome, documento, " + camposContato +
+            ", data_criacao AS dataCriacao, " +
+            "data_atualizacao AS dataAtualizacao " +
+            "FROM clientes WHERE id = ? AND usuario_id = ? LIMIT 1"
+          )
           .bind(id, usuario.id)
           .first();
 
@@ -995,6 +1034,28 @@ export default {
         );
 
         if (existente) {
+          const camposInformados = CAMPOS_CONTATO_ENDERECO_CLIENTE.filter(campo =>
+            Object.prototype.hasOwnProperty.call(dados, campo.campo)
+          );
+
+          if (camposInformados.length) {
+            const atribuicoes = camposInformados
+              .map(campo => campo.coluna + " = ?")
+              .join(", ");
+            await env.DB
+              .prepare(
+                "UPDATE clientes SET " + atribuicoes +
+                ", data_atualizacao = datetime('now') " +
+                "WHERE id = ? AND usuario_id = ?"
+              )
+              .bind(
+                ...camposInformados.map(campo => validacao.cliente[campo.campo]),
+                existente.id,
+                usuario.id
+              )
+              .run();
+          }
+
           return respostaJSON({
             ok: true,
             id: existente.id,
@@ -1003,15 +1064,24 @@ export default {
           });
         }
 
+        const colunasContato = CAMPOS_CONTATO_ENDERECO_CLIENTE
+          .map(campo => campo.coluna)
+          .join(", ");
+        const parametrosContato = CAMPOS_CONTATO_ENDERECO_CLIENTE
+          .map(() => "?")
+          .join(", ");
         const resultado = await env.DB
-          .prepare(`
-            INSERT INTO clientes (usuario_id, nome, documento)
-            VALUES (?, ?, ?)
-          `)
+          .prepare(
+            "INSERT INTO clientes (usuario_id, nome, documento, " + colunasContato +
+            ") VALUES (?, ?, ?, " + parametrosContato + ")"
+          )
           .bind(
             usuario.id,
             validacao.cliente.nome,
-            validacao.cliente.documento
+            validacao.cliente.documento,
+            ...CAMPOS_CONTATO_ENDERECO_CLIENTE.map(campo =>
+              validacao.cliente[campo.campo]
+            )
           )
           .run();
 
@@ -1056,15 +1126,20 @@ export default {
           return respostaJSON({ ok: false, erro: validacao.erro }, 400);
         }
 
+        const atribuicoesContato = CAMPOS_CONTATO_ENDERECO_CLIENTE
+          .map(campo => campo.coluna + " = ?")
+          .join(", ");
         const resultado = await env.DB
-          .prepare(`
-            UPDATE clientes
-            SET nome = ?, documento = ?, data_atualizacao = datetime('now')
-            WHERE id = ? AND usuario_id = ?
-          `)
+          .prepare(
+            "UPDATE clientes SET nome = ?, documento = ?, " + atribuicoesContato +
+            ", data_atualizacao = datetime('now') WHERE id = ? AND usuario_id = ?"
+          )
           .bind(
             validacao.cliente.nome,
             validacao.cliente.documento,
+            ...CAMPOS_CONTATO_ENDERECO_CLIENTE.map(campo =>
+              validacao.cliente[campo.campo]
+            ),
             id,
             usuario.id
           )
