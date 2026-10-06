@@ -702,6 +702,13 @@ textarea{
 
       <a
         href="#"
+        onclick="abrirClientes(); return false;"
+      >
+        👤 &nbsp; Clientes
+      </a>
+
+      <a
+        href="#"
         onclick='mostrarSomente("homeScreen"); mostrarNovaInvestigacao(); return false;'
       >
         ＋ &nbsp; Nova investigação
@@ -866,6 +873,68 @@ textarea{
 
 
     <!-- =========================
+         CLIENTES
+    ========================= -->
+
+    <section id="clientesScreen" class="hidden">
+      <div class="card">
+        <div class="relatorio-header">
+          <div>
+            <h1>Clientes</h1>
+            <p class="muted">Cadastre cada cliente uma vez e acompanhe os processos vinculados.</p>
+          </div>
+          <button class="btn btn-primary" onclick="abrirCadastroCliente()">＋ Novo cliente</button>
+        </div>
+        <div id="clienteMsg"></div>
+      </div>
+
+      <div id="clienteFormCard" class="card hidden">
+        <h2 id="clienteFormTitulo">Cadastrar cliente</h2>
+        <form id="clienteForm">
+          <div class="grid">
+            <div class="field">
+              <label for="clienteNome">Nome do cliente *</label>
+              <input id="clienteNome" maxlength="200" required>
+            </div>
+            <div class="field">
+              <label for="clienteDocumento">Documento</label>
+              <input id="clienteDocumento" maxlength="40">
+            </div>
+          </div>
+          <div class="actions">
+            <button class="btn btn-primary" type="submit">Salvar cliente</button>
+            <button class="btn btn-secondary" type="button" onclick="fecharCadastroCliente()">Cancelar</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2>Clientes cadastrados</h2>
+        <div id="listaClientes" class="loading">Carregando...</div>
+      </div>
+    </section>
+
+    <section id="clienteDetalheScreen" class="hidden">
+      <div class="card">
+        <div class="actions" style="margin-top:0">
+          <button class="btn btn-secondary" onclick="abrirClientes()">← Voltar para clientes</button>
+        </div>
+        <h1 id="clienteDetalheTitulo">Cliente</h1>
+        <div id="clienteDetalheInfo"></div>
+        <div id="clienteDetalheMensagem"></div>
+        <div class="actions">
+          <button class="btn btn-primary" onclick="editarClienteAtual()">Editar cliente</button>
+          <button class="btn btn-success" onclick="mostrarNovaInvestigacao(clienteAtual && clienteAtual.id)">＋ Novo processo para este cliente</button>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Processos deste cliente</h2>
+        <div id="clienteInvestigacoes" class="loading">Carregando...</div>
+      </div>
+    </section>
+
+
+    <!-- =========================
          INVESTIGAÇÕES
     ========================= -->
 
@@ -902,45 +971,26 @@ textarea{
         class="card hidden"
       >
 
-        <h2>
-          Nova investigação
-        </h2>
+        <h2 id="investigacaoFormTitulo">Novo processo</h2>
 
         <form id="investigacaoForm">
 
           <div class="grid">
 
-            <div class="field">
-
-              <label>
-                Nome da investigação *
-              </label>
-
-              <input
-                id="invNome"
-                required
-              >
-
+            <div class="field full">
+              <label for="invClienteId">Cliente *</label>
+              <select id="invClienteId" required>
+                <option value="">Carregando clientes...</option>
+              </select>
+              <small class="muted">O cadastro do cliente é compartilhado pelos processos vinculados.</small>
+              <button class="btn btn-secondary" type="button" onclick="abrirCadastroClienteParaProcesso()">＋ Cadastrar cliente</button>
             </div>
 
 
             <div class="field">
 
               <label>
-                Documento
-              </label>
-
-              <input
-                id="invDocumento"
-              >
-
-            </div>
-
-
-            <div class="field">
-
-              <label>
-                Processo
+                Número do processo
               </label>
 
               <input
@@ -983,9 +1033,10 @@ textarea{
 
             <button
               class="btn btn-primary"
+              id="investigacaoSalvar"
               type="submit"
             >
-              Salvar investigação
+              Salvar processo
             </button>
 
             <button
@@ -1039,7 +1090,7 @@ textarea{
 
           <button
             class="btn btn-secondary"
-            onclick="voltarInicio()"
+            onclick="voltarDaInvestigacao()"
           >
             ← Voltar
           </button>
@@ -1080,6 +1131,20 @@ textarea{
             onclick="abrirRelatorio()"
           >
             📄 Relatório
+          </button>
+
+          <button
+            class="btn btn-secondary"
+            onclick="editarInvestigacao(investigacaoAtual && investigacaoAtual.id)"
+          >
+            ✏️ Editar processo
+          </button>
+
+          <button
+            class="btn btn-danger"
+            onclick="excluirInvestigacao(investigacaoAtual && investigacaoAtual.id)"
+          >
+            🗑️ Excluir processo
           </button>
 
         </div>
@@ -2074,7 +2139,7 @@ textarea{
 
 
 <script
-  src="./script.js?v=11.0"
+  src="./script.js?v=12.0"
   defer
 ></script>
 

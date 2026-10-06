@@ -511,6 +511,90 @@ function validarDadosPessoa(dados) {
   };
 }
 
+function validarDadosCliente(dados) {
+  if (
+    !dados ||
+    typeof dados !== "object" ||
+    Array.isArray(dados)
+  ) {
+    return { erro: "Dados do cliente inválidos." };
+  }
+
+  if (
+    typeof dados.nome !== "string" ||
+    !dados.nome.trim()
+  ) {
+    return { erro: "Informe o nome do cliente." };
+  }
+
+  const nome = dados.nome.trim();
+  const documento = dados.documento == null
+    ? ""
+    : dados.documento;
+
+  if (
+    nome.length > 200 ||
+    typeof documento !== "string" ||
+    documento.trim().length > 40
+  ) {
+    return { erro: "Os dados do cliente excedem o tamanho permitido." };
+  }
+
+  return {
+    cliente: {
+      nome,
+      documento: documento.trim()
+    }
+  };
+}
+
+function normalizarDocumentoCliente(valor) {
+  return String(valor || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[.\-/\s]/g, "");
+}
+
+async function encontrarClientePorIdentidade(
+  env,
+  usuarioId,
+  nome,
+  documento
+) {
+  const documentoNormalizado =
+    normalizarDocumentoCliente(documento);
+
+  if (documentoNormalizado) {
+    const porDocumento = await env.DB
+      .prepare(`
+        SELECT id, nome, documento
+        FROM clientes
+        WHERE usuario_id = ?
+          AND LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(TRIM(documento), '.', ''), '-', ''), '/', ''), ' ', ''), char(9), '')) = ?
+        ORDER BY id
+        LIMIT 1
+      `)
+      .bind(usuarioId, documentoNormalizado)
+      .first();
+
+    if (porDocumento) return porDocumento;
+  }
+
+  return env.DB
+    .prepare(`
+      SELECT id, nome, documento
+      FROM clientes
+      WHERE usuario_id = ?
+        AND LOWER(TRIM(nome)) = LOWER(TRIM(?))
+        AND LOWER(TRIM(COALESCE(documento, ''))) =
+          LOWER(TRIM(COALESCE(?, '')))
+      ORDER BY id
+      LIMIT 1
+    `)
+    .bind(usuarioId, nome, documento)
+    .first();
+}
+
 // =================================================
 // WORKER
 // =================================================
@@ -771,6 +855,239 @@ export default {
       );
 
     // =================================================
+    // CLIENTES - LISTAR
+    // =================================================
+
+    if (
+      request.method === "GET" &&
+      url.pathname === "/clientes"
+    ) {
+      if (!usuario) {
+        return respostaJSON({ ok: false, erro: "Não autenticado." }, 401);
+      }
+
+      try {
+        const resultado = await env.DB
+          .prepare(`
+            SELECT
+              c.id,
+              c.nome,
+              c.documento,
+              c.data_criacao AS dataCriacao,
+              c.data_atualizacao AS dataAtualizacao,
+              COUNT(i.id) AS totalProcessos
+            FROM clientes c
+            LEFT JOIN investigacoes i
+              ON i.cliente_id = c.id
+              AND i.usuario_id = c.usuario_id
+            WHERE c.usuario_id = ?
+            GROUP BY c.id
+            ORDER BY c.nome COLLATE NOCASE, c.id
+          `)
+          .bind(usuario.id)
+          .all();
+
+        return respostaJSON(resultado.results || []);
+      } catch (erro) {
+        console.error("Erro ao carregar clientes:", erro);
+        return respostaJSON({ ok: false, erro: "Erro ao carregar clientes." }, 500);
+      }
+    }
+
+    // =================================================
+    // CLIENTES - DETALHAR
+    // =================================================
+
+    if (
+      request.method === "GET" &&
+      /^\/clientes\/\d+$/.test(url.pathname)
+    ) {
+      if (!usuario) {
+        return respostaJSON({ ok: false, erro: "Não autenticado." }, 401);
+      }
+
+      try {
+        const id = Number(url.pathname.split("/").pop());
+        if (!Number.isInteger(id) || id <= 0) {
+          return respostaJSON({ ok: false, erro: "Cliente inválido." }, 400);
+        }
+
+        const cliente = await env.DB
+          .prepare(`
+            SELECT id, nome, documento,
+              data_criacao AS dataCriacao,
+              data_atualizacao AS dataAtualizacao
+            FROM clientes
+            WHERE id = ? AND usuario_id = ?
+            LIMIT 1
+          `)
+          .bind(id, usuario.id)
+          .first();
+
+        if (!cliente) {
+          return respostaJSON({ ok: false, erro: "Cliente não encontrado." }, 404);
+        }
+
+        const processos = await env.DB
+          .prepare(`
+            SELECT
+              i.id,
+              i.cliente_id AS clienteId,
+              c.nome AS nome,
+              c.documento AS documento,
+              i.processo,
+              i.advogado,
+              i.fontes,
+              i.data_criacao,
+              i.usuario_id
+            FROM investigacoes i
+            INNER JOIN clientes c
+              ON c.id = i.cliente_id
+              AND c.usuario_id = i.usuario_id
+            WHERE i.cliente_id = ?
+              AND i.usuario_id = ?
+            ORDER BY i.id DESC
+          `)
+          .bind(id, usuario.id)
+          .all();
+
+        return respostaJSON({
+          ok: true,
+          cliente,
+          investigacoes: processos.results || []
+        });
+      } catch (erro) {
+        console.error("Erro ao carregar cliente:", erro);
+        return respostaJSON({ ok: false, erro: "Erro ao carregar cliente." }, 500);
+      }
+    }
+
+    // =================================================
+    // CLIENTES - CRIAR
+    // =================================================
+
+    if (
+      request.method === "POST" &&
+      url.pathname === "/clientes"
+    ) {
+      if (!usuario) {
+        return respostaJSON({ ok: false, erro: "Não autenticado." }, 401);
+      }
+
+      try {
+        let dados;
+        try {
+          dados = await request.json();
+        } catch (erro) {
+          return respostaJSON({ ok: false, erro: "JSON inválido." }, 400);
+        }
+
+        const validacao = validarDadosCliente(dados);
+        if (validacao.erro) {
+          return respostaJSON({ ok: false, erro: validacao.erro }, 400);
+        }
+
+        const existente = await encontrarClientePorIdentidade(
+          env,
+          usuario.id,
+          validacao.cliente.nome,
+          validacao.cliente.documento
+        );
+
+        if (existente) {
+          return respostaJSON({
+            ok: true,
+            id: existente.id,
+            existente: true,
+            mensagem: "Este cliente já está cadastrado."
+          });
+        }
+
+        const resultado = await env.DB
+          .prepare(`
+            INSERT INTO clientes (usuario_id, nome, documento)
+            VALUES (?, ?, ?)
+          `)
+          .bind(
+            usuario.id,
+            validacao.cliente.nome,
+            validacao.cliente.documento
+          )
+          .run();
+
+        return respostaJSON({
+          ok: true,
+          id: resultado.meta.last_row_id,
+          mensagem: "Cliente cadastrado com sucesso."
+        });
+      } catch (erro) {
+        console.error("Erro ao cadastrar cliente:", erro);
+        return respostaJSON({ ok: false, erro: "Erro ao cadastrar cliente." }, 500);
+      }
+    }
+
+    // =================================================
+    // CLIENTES - EDITAR
+    // =================================================
+
+    if (
+      request.method === "PUT" &&
+      /^\/clientes\/\d+$/.test(url.pathname)
+    ) {
+      if (!usuario) {
+        return respostaJSON({ ok: false, erro: "Não autenticado." }, 401);
+      }
+
+      try {
+        const id = Number(url.pathname.split("/").pop());
+        if (!Number.isInteger(id) || id <= 0) {
+          return respostaJSON({ ok: false, erro: "Cliente inválido." }, 400);
+        }
+
+        let dados;
+        try {
+          dados = await request.json();
+        } catch (erro) {
+          return respostaJSON({ ok: false, erro: "JSON inválido." }, 400);
+        }
+
+        const validacao = validarDadosCliente(dados);
+        if (validacao.erro) {
+          return respostaJSON({ ok: false, erro: validacao.erro }, 400);
+        }
+
+        const resultado = await env.DB
+          .prepare(`
+            UPDATE clientes
+            SET nome = ?, documento = ?, data_atualizacao = datetime('now')
+            WHERE id = ? AND usuario_id = ?
+          `)
+          .bind(
+            validacao.cliente.nome,
+            validacao.cliente.documento,
+            id,
+            usuario.id
+          )
+          .run();
+
+        if (!resultado.meta || !resultado.meta.changes) {
+          const existente = await env.DB
+            .prepare("SELECT id FROM clientes WHERE id = ? AND usuario_id = ?")
+            .bind(id, usuario.id)
+            .first();
+          if (!existente) {
+            return respostaJSON({ ok: false, erro: "Cliente não encontrado." }, 404);
+          }
+        }
+
+        return respostaJSON({ ok: true, mensagem: "Cliente atualizado com sucesso." });
+      } catch (erro) {
+        console.error("Erro ao atualizar cliente:", erro);
+        return respostaJSON({ ok: false, erro: "Erro ao atualizar cliente." }, 500);
+      }
+    }
+
+    // =================================================
     // INVESTIGAÇÕES - LISTAR
     // =================================================
 
@@ -792,17 +1109,21 @@ export default {
           await env.DB
             .prepare(`
               SELECT
-                id,
-                nome,
-                documento,
-                processo,
-                advogado,
-                fontes,
-                data_criacao,
-                usuario_id
-              FROM investigacoes
-              WHERE usuario_id = ?
-              ORDER BY id DESC
+                i.id,
+                COALESCE(c.nome, i.nome) AS nome,
+                COALESCE(c.documento, i.documento) AS documento,
+                i.cliente_id AS clienteId,
+                i.processo,
+                i.advogado,
+                i.fontes,
+                i.data_criacao,
+                i.usuario_id
+              FROM investigacoes i
+              LEFT JOIN clientes c
+                ON c.id = i.cliente_id
+                AND c.usuario_id = i.usuario_id
+              WHERE i.usuario_id = ?
+              ORDER BY i.id DESC
             `)
             .bind(usuario.id)
             .all();
@@ -840,79 +1161,90 @@ export default {
 
       try {
 
-        const dados =
-          await request.json();
-
-        const nome =
-          String(
-            dados.nome || ""
-          ).trim();
-
-        if (!nome) {
-          return respostaJSON({
-            ok: false,
-            erro:
-              "Informe o nome da investigação."
-          }, 400);
+        let dados;
+        try {
+          dados = await request.json();
+        } catch (erro) {
+          return respostaJSON({ ok: false, erro: "JSON inválido." }, 400);
         }
 
-        const documento =
-          String(
-            dados.documento || ""
-          ).trim();
+        if (!dados || typeof dados !== "object" || Array.isArray(dados)) {
+          return respostaJSON({ ok: false, erro: "Dados da investigação inválidos." }, 400);
+        }
 
-        const processo =
-          String(
-            dados.processo || ""
-          ).trim();
-
-        const advogado =
-          String(
-            dados.advogado || ""
-          ).trim();
-
-        let fontes =
-          dados.fontes || "";
-
-        if (Array.isArray(fontes)) {
-          fontes =
-            JSON.stringify(fontes);
+        let cliente;
+        if (dados.clienteId !== undefined && dados.clienteId !== null && dados.clienteId !== "") {
+          if (typeof dados.clienteId !== "number" && typeof dados.clienteId !== "string") {
+            return respostaJSON({ ok: false, erro: "Cliente inválido." }, 400);
+          }
+          const clienteId = Number(dados.clienteId);
+          if (!Number.isInteger(clienteId) || clienteId <= 0) {
+            return respostaJSON({ ok: false, erro: "Cliente inválido." }, 400);
+          }
+          cliente = await env.DB
+            .prepare("SELECT id, nome, documento FROM clientes WHERE id = ? AND usuario_id = ? LIMIT 1")
+            .bind(clienteId, usuario.id)
+            .first();
+          if (!cliente) {
+            return respostaJSON({ ok: false, erro: "Cliente não encontrado." }, 404);
+          }
         } else {
-          fontes =
-            String(fontes);
+          const validacaoCliente = validarDadosCliente({
+            nome: String(dados.nome || "").trim(),
+            documento: String(dados.documento || "").trim()
+          });
+          if (validacaoCliente.erro) {
+            return respostaJSON({ ok: false, erro: validacaoCliente.erro }, 400);
+          }
+          cliente = await encontrarClientePorIdentidade(
+            env,
+            usuario.id,
+            validacaoCliente.cliente.nome,
+            validacaoCliente.cliente.documento
+          );
+          if (!cliente) {
+            const novoCliente = await env.DB
+              .prepare("INSERT INTO clientes (usuario_id, nome, documento) VALUES (?, ?, ?)")
+              .bind(
+                usuario.id,
+                validacaoCliente.cliente.nome,
+                validacaoCliente.cliente.documento
+              )
+              .run();
+            cliente = {
+              id: novoCliente.meta.last_row_id,
+              nome: validacaoCliente.cliente.nome,
+              documento: validacaoCliente.cliente.documento
+            };
+          }
         }
 
-        const resultado =
-          await env.DB
-            .prepare(`
-              INSERT INTO investigacoes (
-                nome,
-                documento,
-                processo,
-                advogado,
-                fontes,
-                data_criacao,
-                usuario_id
-              )
-              VALUES (
-                ?,
-                ?,
-                ?,
-                ?,
-                ?,
-                datetime('now'),
-                ?
-              )
-            `)
-            .bind(
-              nome,
-              documento,
-              processo,
-              advogado,
-              fontes,
-              usuario.id
+        const valores = {
+          processo: String(dados.processo || "").trim(),
+          advogado: String(dados.advogado || "").trim(),
+          fontes: Array.isArray(dados.fontes)
+            ? JSON.stringify(dados.fontes)
+            : String(dados.fontes || "")
+        };
+
+        const resultado = await env.DB
+          .prepare(`
+            INSERT INTO investigacoes (
+              nome, documento, processo, advogado, fontes,
+              data_criacao, usuario_id, cliente_id
             )
-            .run();
+            VALUES (?, ?, ?, ?, ?, datetime('now'), ?, ?)
+          `)
+          .bind(
+            cliente.nome,
+            cliente.documento || "",
+            valores.processo,
+            valores.advogado,
+            valores.fontes,
+            usuario.id,
+            cliente.id
+          )
+          .run();
 
         return respostaJSON({
           ok: true,
@@ -930,6 +1262,68 @@ export default {
           erro:
             "Erro ao criar investigação."
         }, 500);
+      }
+    }
+
+    // =================================================
+    // INVESTIGAÇÕES - EDITAR DADOS DO PROCESSO
+    // =================================================
+
+    if (
+      request.method === "PUT" &&
+      /^\/investigacoes\/\d+$/.test(url.pathname)
+    ) {
+      if (!usuario) {
+        return respostaJSON({ ok: false, erro: "Não autenticado." }, 401);
+      }
+
+      try {
+        const id = Number(url.pathname.split("/").pop());
+        if (!Number.isInteger(id) || id <= 0) {
+          return respostaJSON({ ok: false, erro: "Investigação inválida." }, 400);
+        }
+
+        let dados;
+        try {
+          dados = await request.json();
+        } catch (erro) {
+          return respostaJSON({ ok: false, erro: "JSON inválido." }, 400);
+        }
+        if (!dados || typeof dados !== "object" || Array.isArray(dados)) {
+          return respostaJSON({ ok: false, erro: "Dados da investigação inválidos." }, 400);
+        }
+
+        const valores = {
+          processo: String(dados.processo || "").trim(),
+          advogado: String(dados.advogado || "").trim(),
+          fontes: Array.isArray(dados.fontes)
+            ? JSON.stringify(dados.fontes)
+            : String(dados.fontes || "")
+        };
+
+        const resultado = await env.DB
+          .prepare(`
+            UPDATE investigacoes
+            SET processo = ?, advogado = ?, fontes = ?
+            WHERE id = ? AND usuario_id = ?
+          `)
+          .bind(valores.processo, valores.advogado, valores.fontes, id, usuario.id)
+          .run();
+
+        if (!resultado.meta || !resultado.meta.changes) {
+          const existente = await env.DB
+            .prepare("SELECT id FROM investigacoes WHERE id = ? AND usuario_id = ?")
+            .bind(id, usuario.id)
+            .first();
+          if (!existente) {
+            return respostaJSON({ ok: false, erro: "Investigação não encontrada." }, 404);
+          }
+        }
+
+        return respostaJSON({ ok: true, mensagem: "Processo atualizado com sucesso." });
+      } catch (erro) {
+        console.error("Erro ao atualizar investigação:", erro);
+        return respostaJSON({ ok: false, erro: "Erro ao atualizar investigação." }, 500);
       }
     }
 
@@ -1013,6 +1407,15 @@ export default {
             id,
             usuario.id
           )
+          .run();
+
+        await env.DB
+          .prepare(`
+            DELETE FROM pessoas
+            WHERE investigacao_id = ?
+              AND usuario_id = ?
+          `)
+          .bind(id, usuario.id)
           .run();
 
         // Exclui investigação

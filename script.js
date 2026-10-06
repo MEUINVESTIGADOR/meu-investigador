@@ -4,6 +4,11 @@ let usuarioAtual = null;
 
 let investigacoes = [];
 let investigacaoAtual = null;
+let clientes = [];
+let clienteAtual = null;
+let clienteEditandoId = null;
+let investigacaoEditandoId = null;
+let retornoProcessoClienteId = null;
 
 let imoveis = [];
 let imovelAtual = null;
@@ -143,6 +148,8 @@ function mostrarSomente(id){
   const telas = [
 
     "dashboardScreen",
+    "clientesScreen",
+    "clienteDetalheScreen",
     "homeScreen",
     "investigacaoScreen",
     "imoveisScreen",
@@ -333,6 +340,184 @@ async function logout(){
 
 
 /* =========================
+   CLIENTES
+========================= */
+
+async function carregarClientes(){
+  const dados = await api("/clientes");
+  clientes = Array.isArray(dados) ? dados : (dados.results || []);
+  renderizarClientes();
+  preencherSelecaoClientes();
+  return clientes;
+}
+
+function preencherSelecaoClientes(selecionadoId){
+  const select = $("invClienteId");
+  if(!select) return;
+
+  const atual = selecionadoId ?? select.value;
+  select.innerHTML = '<option value="">Selecione um cliente</option>' +
+    clientes.map(function(cliente){
+      return '<option value="' + Number(cliente.id) + '">' +
+        escapeHtml(cliente.nome) +
+        (cliente.documento ? ' — ' + escapeHtml(cliente.documento) : '') +
+        '</option>';
+    }).join("");
+  if(atual) select.value = String(atual);
+}
+
+function renderizarClientes(){
+  const lista = $("listaClientes");
+  if(!lista) return;
+
+  if(!clientes.length){
+    lista.innerHTML = '<div class="empty">Nenhum cliente cadastrado.</div>';
+    return;
+  }
+
+  lista.innerHTML = clientes.map(function(cliente){
+    return `
+      <div class="item">
+        <div class="item-head">
+          <div>
+            <div class="item-title">${escapeHtml(cliente.nome)}</div>
+            <div class="muted">Documento: ${escapeHtml(cliente.documento || "-")}</div>
+            <div class="muted">Processos: ${Number(cliente.totalProcessos) || 0}</div>
+          </div>
+          <div class="actions" style="margin-top:0">
+            <button class="btn btn-primary" onclick="abrirCliente(${Number(cliente.id)})">Abrir cliente</button>
+          </div>
+        </div>
+      </div>`;
+  }).join("");
+}
+
+async function abrirClientes(){
+  mostrarSomente("clientesScreen");
+  esconder($("clienteFormCard"));
+  try{
+    await carregarClientes();
+  }catch(e){
+    $("listaClientes").innerHTML = '<div class="error">Erro ao carregar clientes: ' +
+      escapeHtml(e.message) + '</div>';
+  }
+}
+
+function renderizarProcessosDoCliente(processos){
+  const lista = $("clienteInvestigacoes");
+  if(!lista) return;
+  if(!processos.length){
+    lista.innerHTML = '<div class="empty">Este cliente ainda não tem processos cadastrados.</div>';
+    return;
+  }
+
+  lista.innerHTML = processos.map(function(inv){
+    return `
+      <div class="item">
+        <div class="item-head">
+          <div>
+            <div class="item-title">Processo: ${escapeHtml(inv.processo || "Não informado")}</div>
+            <div class="muted">Advogado: ${escapeHtml(inv.advogado || "-")}</div>
+            <div class="muted">Criado em: ${escapeHtml(formatarData(inv.data_criacao))}</div>
+          </div>
+          <div class="actions" style="margin-top:0">
+            <button class="btn btn-primary" onclick="abrirInvestigacao(${Number(inv.id)}, ${Number(clienteAtual && clienteAtual.id)})">Abrir processo</button>
+            <button class="btn btn-secondary" onclick="editarInvestigacao(${Number(inv.id)})">Editar</button>
+            <button class="btn btn-danger" onclick="excluirInvestigacao(${Number(inv.id)})">Excluir</button>
+          </div>
+        </div>
+      </div>`;
+  }).join("");
+}
+
+async function abrirCliente(id){
+  try{
+    const dados = await api("/clientes/" + encodeURIComponent(id));
+    clienteAtual = dados.cliente;
+    const processos = Array.isArray(dados.investigacoes) ? dados.investigacoes : [];
+    $("clienteDetalheTitulo").textContent = clienteAtual.nome || "Cliente";
+    $("clienteDetalheInfo").innerHTML = `
+      <div class="detail-grid">
+        <div class="detail"><span class="muted">Cliente</span><strong>${escapeHtml(clienteAtual.nome || "-")}</strong></div>
+        <div class="detail"><span class="muted">Documento</span><strong>${escapeHtml(clienteAtual.documento || "-")}</strong></div>
+        <div class="detail"><span class="muted">Processos cadastrados</span><strong>${processos.length}</strong></div>
+      </div>`;
+    renderizarProcessosDoCliente(processos);
+    mostrarSomente("clienteDetalheScreen");
+  }catch(e){
+    alert("Não foi possível abrir o cliente: " + e.message);
+  }
+}
+
+function abrirCadastroCliente(preservarRetorno){
+  if(!preservarRetorno) retornoProcessoClienteId = null;
+  clienteEditandoId = null;
+  $("clienteForm").reset();
+  $("clienteFormTitulo").textContent = "Cadastrar cliente";
+  $("clienteNome").value = "";
+  $("clienteDocumento").value = "";
+  mostrarSomente("clientesScreen");
+  mostrar($("clienteFormCard"));
+  $("clienteNome").focus();
+}
+
+function fecharCadastroCliente(){
+  esconder($("clienteFormCard"));
+  $("clienteForm").reset();
+  clienteEditandoId = null;
+  retornoProcessoClienteId = null;
+}
+
+function editarClienteAtual(){
+  if(!clienteAtual) return;
+  clienteEditandoId = Number(clienteAtual.id);
+  $("clienteForm").reset();
+  $("clienteFormTitulo").textContent = "Editar cliente";
+  $("clienteNome").value = clienteAtual.nome || "";
+  $("clienteDocumento").value = clienteAtual.documento || "";
+  retornoProcessoClienteId = Number(clienteAtual.id);
+  mostrarSomente("clientesScreen");
+  mostrar($("clienteFormCard"));
+  $("clienteNome").focus();
+}
+
+$("clienteForm").addEventListener("submit", async function(e){
+  e.preventDefault();
+  const editando = clienteEditandoId;
+  try{
+    const dados = await api(
+      editando ? "/clientes/" + editando : "/clientes",
+      {
+        method: editando ? "PUT" : "POST",
+        body: JSON.stringify({
+          nome: $("clienteNome").value.trim(),
+          documento: $("clienteDocumento").value.trim()
+        })
+      }
+    );
+    const id = dados.id || editando || retornoProcessoClienteId;
+    clienteEditandoId = null;
+    esconder($("clienteFormCard"));
+    await carregarClientes();
+    if(editando) await carregarInvestigacoes();
+    if(retornoProcessoClienteId){
+      const clienteId = Number(retornoProcessoClienteId);
+      retornoProcessoClienteId = null;
+      if(editando){
+        await abrirCliente(clienteId);
+      }else{
+        await mostrarNovaInvestigacao(clienteId);
+      }
+      return;
+    }
+    if(id) await abrirCliente(id);
+  }catch(e){
+    mostrarMsg("clienteMsg", e.message, "error");
+  }
+});
+
+
+/* =========================
    INVESTIGAÇÕES
 ========================= */
 
@@ -425,9 +610,7 @@ function renderizarInvestigacoes(){
                 <div>
 
                   <div class="item-title">
-                    ${escapeHtml(
-                      inv.nome
-                    )}
+                    Cliente: ${escapeHtml(inv.nome || "-")}
                   </div>
 
                   <div class="muted">
@@ -461,6 +644,13 @@ function renderizarInvestigacoes(){
                     Abrir
                   </button>
 
+                  <button
+                    class="btn btn-secondary"
+                    onclick="editarInvestigacao(${Number(inv.id)})"
+                  >
+                    Editar processo
+                  </button>
+
 
                   <button
                     class="btn btn-danger"
@@ -484,27 +674,39 @@ function renderizarInvestigacoes(){
 }
 
 
-function mostrarNovaInvestigacao(){
-
-  mostrar(
-    $("novaInvestigacaoCard")
-  );
-
-
-  $("invNome").focus();
-
+async function mostrarNovaInvestigacao(clienteId){
+  investigacaoEditandoId = null;
+  if(clienteId == null) retornoProcessoClienteId = null;
+  $("investigacaoForm").reset();
+  $("investigacaoFormTitulo").textContent = "Novo processo";
+  $("investigacaoSalvar").textContent = "Salvar processo";
+  $("invClienteId").disabled = false;
+  if(clienteId != null){
+    retornoProcessoClienteId = Number(clienteId);
+  }
+  mostrarSomente("homeScreen");
+  mostrar($("novaInvestigacaoCard"));
+  try{
+    await carregarClientes();
+  }catch(e){
+    mostrarMsg("homeMsg", "Não foi possível carregar os clientes: " + e.message, "error");
+  }
+  if(clienteId != null) $("invClienteId").value = String(clienteId);
+  $("invClienteId").focus();
 }
 
+function abrirCadastroClienteParaProcesso(){
+  retornoProcessoClienteId = -1;
+  abrirCadastroCliente(true);
+}
 
 function fecharNovaInvestigacao(){
-
-  esconder(
-    $("novaInvestigacaoCard")
-  );
-
-
+  const clienteId = retornoProcessoClienteId;
+  retornoProcessoClienteId = null;
+  esconder($("novaInvestigacaoCard"));
   $("investigacaoForm").reset();
-
+  investigacaoEditandoId = null;
+  if(clienteId && clienteId > 0) abrirCliente(clienteId);
 }
 
 
@@ -517,61 +719,37 @@ $("investigacaoForm").addEventListener(
 
     try{
 
-      const dados =
-        await api(
-          "/investigacoes",
-          {
-
-            method:"POST",
-
-            body:JSON.stringify({
-
-              nome:
-                $("invNome")
-                  .value
-                  .trim(),
-
-              documento:
-                $("invDocumento")
-                  .value
-                  .trim(),
-
-              processo:
-                $("invProcesso")
-                  .value
-                  .trim(),
-
-              advogado:
-                $("invAdvogado")
-                  .value
-                  .trim(),
-
-              fontes:
-                $("invFontes")
-                  .value
-                  .trim()
-
-            })
-
-          }
-        );
-
-
-      fecharNovaInvestigacao();
-
-
-      await carregarInvestigacoes();
-
-
-      mostrarMsg(
-        "homeMsg",
-        dados.mensagem ||
-        "Investigação criada com sucesso.",
-        "success"
+      const editando = investigacaoEditandoId;
+      const clienteId = Number($("invClienteId").value);
+      if(!editando && (!Number.isInteger(clienteId) || clienteId <= 0)){
+        throw new Error("Selecione um cliente para o processo.");
+      }
+      const dados = await api(
+        editando ? "/investigacoes/" + editando : "/investigacoes",
+        {
+          method: editando ? "PUT" : "POST",
+          body: JSON.stringify({
+            ...(editando ? {} : { clienteId }),
+            processo: $("invProcesso").value.trim(),
+            advogado: $("invAdvogado").value.trim(),
+            fontes: $("invFontes").value.trim()
+          })
+        }
       );
 
-
+      const retornoCliente = retornoProcessoClienteId;
+      retornoProcessoClienteId = null;
+      esconder($("novaInvestigacaoCard"));
+      $("investigacaoForm").reset();
+      investigacaoEditandoId = null;
+      await carregarInvestigacoes();
       await carregarDashboard();
+      if(retornoCliente && retornoCliente > 0){
+        await abrirCliente(retornoCliente);
+      }else{
+        mostrarSomente("homeScreen");
+        mostrarMsg("homeMsg", dados.mensagem || "Processo salvo com sucesso.", "success");
+      }
 
     }catch(e){
 
@@ -587,12 +765,42 @@ $("investigacaoForm").addEventListener(
 );
 
 
+async function editarInvestigacao(id){
+  const inv = investigacoes.find(function(item){
+    return Number(item.id) === Number(id);
+  });
+  if(!inv) return;
+  investigacaoEditandoId = Number(inv.id);
+  retornoProcessoClienteId = Number(inv.clienteId) || null;
+  $("investigacaoForm").reset();
+  $("investigacaoFormTitulo").textContent = "Editar processo";
+  $("investigacaoSalvar").textContent = "Salvar alterações";
+  mostrarSomente("homeScreen");
+  mostrar($("novaInvestigacaoCard"));
+  try{
+    await carregarClientes();
+    $("invClienteId").value = String(inv.clienteId || "");
+  }catch(e){
+    mostrarMsg("homeMsg", "Não foi possível carregar o cliente do processo: " + e.message, "error");
+  }
+  $("invClienteId").disabled = true;
+  $("invProcesso").value = inv.processo || "";
+  $("invAdvogado").value = inv.advogado || "";
+  $("invFontes").value = inv.fontes || "";
+}
+
+
 async function excluirInvestigacao(id){
+
+  const investigacaoExcluida = investigacoes.find(function(item){
+    return Number(item.id) === Number(id);
+  });
+  const clienteId = Number(investigacaoExcluida && investigacaoExcluida.clienteId) || null;
 
   if(
     !confirm(
-      "Excluir esta investigação? " +
-      "Os imóveis vinculados também serão excluídos."
+      "Excluir este processo? Os imóveis, veículos e Pessoas vinculados serão excluídos. " +
+      "O cadastro do cliente será mantido."
     )
   ){
 
@@ -631,12 +839,13 @@ async function excluirInvestigacao(id){
     await carregarDashboard();
 
 
-    mostrarMsg(
-      "homeMsg",
-      dados.mensagem ||
-      "Investigação excluída com sucesso.",
-      "success"
-    );
+    if(clienteId && clienteAtual && Number(clienteAtual.id) === clienteId){
+      await abrirCliente(clienteId);
+      mostrarMsg("clienteDetalheMensagem", dados.mensagem || "Processo excluído. O cliente foi mantido.", "success");
+    }else{
+      mostrarSomente("homeScreen");
+      mostrarMsg("homeMsg", dados.mensagem || "Processo excluído. O cliente foi mantido.", "success");
+    }
 
   }catch(e){
 
@@ -651,7 +860,7 @@ async function excluirInvestigacao(id){
 }
 
 
-function abrirInvestigacao(id){
+function abrirInvestigacao(id, clienteContextoId){
 
   investigacaoAtual =
     investigacoes.find(
@@ -668,10 +877,13 @@ function abrirInvestigacao(id){
     return;
   }
 
+  retornoProcessoClienteId = Number(clienteContextoId) || null;
+
 
   $("investigacaoTitulo").textContent =
-    investigacaoAtual.nome ||
-    "Investigação";
+    investigacaoAtual.processo
+      ? "Processo " + investigacaoAtual.processo
+      : "Investigação";
 
 
   $("investigacaoInfo").innerHTML = `
@@ -681,7 +893,20 @@ function abrirInvestigacao(id){
       <div class="detail">
 
         <span class="muted">
-          Documento
+          Cliente
+        </span>
+
+        <strong>
+          ${escapeHtml(investigacaoAtual.nome || "-")}
+        </strong>
+
+      </div>
+
+
+      <div class="detail">
+
+        <span class="muted">
+          Documento do cliente
         </span>
 
         <strong>
@@ -778,6 +1003,7 @@ function abrirInvestigacao(id){
 async function abrirDashboard(){
 
   investigacaoAtual = null;
+  retornoProcessoClienteId = null;
   imovelAtual = null;
   veiculoAtual = null;
 
@@ -921,9 +1147,7 @@ async function carregarDashboard(){
               <div>
 
                 <div class="item-title">
-                  ${escapeHtml(
-                    inv.nome
-                  )}
+                  Cliente: ${escapeHtml(inv.nome || "-")}
                 </div>
 
                 <div class="muted">
@@ -1110,6 +1334,8 @@ async function carregarDashboard(){
 
 function voltarInicio(){
 
+  retornoProcessoClienteId = null;
+
   mostrarSomente(
     "homeScreen"
   );
@@ -1133,7 +1359,8 @@ function voltarDaTelaPatrimonial(){
 
 
   abrirInvestigacao(
-    investigacaoAtual.id
+    investigacaoAtual.id,
+    retornoProcessoClienteId
   );
 
 }
@@ -2526,7 +2753,6 @@ async function excluirVeiculoAtual(){
 
 }
 
-
 /* =========================
    PESSOAS
 ========================= */
@@ -2895,6 +3121,17 @@ function abrirDetalhePessoa(id){
 }
 
 
+function voltarDaInvestigacao(){
+  const clienteId = retornoProcessoClienteId;
+  retornoProcessoClienteId = null;
+  if(clienteId && clienteId > 0){
+    abrirCliente(clienteId);
+  }else{
+    voltarInicio();
+  }
+}
+
+
 function renderizarDetalhePessoa(){
 
   const pessoa =
@@ -3175,9 +3412,7 @@ async function abrirRelatorio(){
                         <div>
 
                           <div class="item-title">
-                            ${escapeHtml(
-                              inv.nome
-                            )}
+                            Cliente: ${escapeHtml(inv.nome || "-")}
                           </div>
 
                           <div class="muted">
@@ -4044,8 +4279,11 @@ function voltarDaTelaRelatorio(){
     investigacaoAtual
   ){
 
+    const clienteId = retornoProcessoClienteId;
+
     abrirInvestigacao(
-      investigacaoAtual.id
+      investigacaoAtual.id,
+      clienteId
     );
 
   }else{
