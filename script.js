@@ -3817,7 +3817,7 @@ function renderizarRelatorio(){
         <div class="detail">
 
           <span class="muted">
-            Investigado
+            Cliente
           </span>
 
           <strong>
