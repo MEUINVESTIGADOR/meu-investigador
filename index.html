@@ -711,14 +711,14 @@ textarea{
         href="#"
         onclick='mostrarSomente("homeScreen"); mostrarNovaInvestigacao(); return false;'
       >
-        ＋ &nbsp; Nova investigação
+        ＋ &nbsp; Novo processo
       </a>
 
       <a
         href="#"
         onclick="voltarInicio(); return false;"
       >
-        ◷ &nbsp; Investigações
+      ◷ &nbsp; Processos
       </a>
 
       <a
@@ -773,7 +773,7 @@ textarea{
             </h1>
 
             <p class="muted">
-              Central de investigações.
+              Central de clientes e processos.
             </p>
 
           </div>
@@ -784,7 +784,7 @@ textarea{
               class="btn btn-primary"
               onclick='mostrarSomente("homeScreen"); mostrarNovaInvestigacao();'
             >
-              ＋ Nova investigação
+              ＋ Novo processo
             </button>
 
             <button
@@ -794,58 +794,6 @@ textarea{
               📄 Relatórios
             </button>
 
-          </div>
-
-        </div>
-
-      </div>
-
-
-      <div class="dashboard-grid">
-
-        <div class="card dashboard-stat">
-
-          <div class="stat-label">
-            INVESTIGAÇÕES
-          </div>
-
-          <div
-            id="dashboardTotalInvestigacoes"
-            class="stat-number"
-          >
-            0
-          </div>
-
-        </div>
-
-
-        <div class="card dashboard-stat">
-
-          <div class="stat-label">
-            IMÓVEIS
-          </div>
-
-          <div
-            id="dashboardTotalImoveis"
-            class="stat-number"
-          >
-            0
-          </div>
-
-        </div>
-
-
-        <div class="card dashboard-stat">
-
-          <div class="stat-label">
-            VEÍCULOS
-          </div>
-
-          <div
-            id="dashboardTotalVeiculos"
-            class="stat-number"
-          >
-            0
           </div>
 
         </div>
@@ -935,7 +883,7 @@ textarea{
 
 
     <!-- =========================
-         INVESTIGAÇÕES
+         PROCESSOS
     ========================= -->
 
     <section id="homeScreen">
@@ -943,11 +891,11 @@ textarea{
       <div class="card">
 
         <h1>
-          Investigações
+          Processos
         </h1>
 
         <p class="muted">
-          Gerencie suas investigações e os dados patrimoniais encontrados.
+          Gerencie os processos dos clientes e os dados patrimoniais vinculados.
         </p>
 
         <div id="homeMsg"></div>
@@ -958,7 +906,7 @@ textarea{
             class="btn btn-primary"
             onclick="mostrarNovaInvestigacao()"
           >
-            ＋ Nova investigação
+          ＋ Novo processo
           </button>
 
         </div>
@@ -1021,7 +969,7 @@ textarea{
 
               <textarea
                 id="invFontes"
-                placeholder="Fontes utilizadas na investigação"
+                placeholder="Fontes consultadas no processo"
               ></textarea>
 
             </div>
@@ -1073,7 +1021,7 @@ textarea{
 
 
     <!-- =========================
-         DETALHE DA INVESTIGAÇÃO
+         DETALHE DO PROCESSO
     ========================= -->
 
     <section
@@ -1098,7 +1046,7 @@ textarea{
         </div>
 
         <h1 id="investigacaoTitulo">
-          Investigação
+          Processo
         </h1>
 
         <div id="investigacaoInfo"></div>
@@ -1174,7 +1122,7 @@ textarea{
             class="btn btn-secondary"
             onclick="voltarDaTelaPatrimonial()"
           >
-            ← Voltar para investigação
+            ← Voltar para processo
           </button>
 
         </div>
@@ -1366,7 +1314,7 @@ textarea{
         </h1>
 
         <p class="muted">
-          Informações do imóvel encontrado durante a investigação.
+          Informações do imóvel vinculadas ao processo.
         </p>
 
         <div id="imovelDetalhe"></div>
@@ -1414,7 +1362,7 @@ textarea{
             class="btn btn-secondary"
             onclick="voltarDaTelaPatrimonial()"
           >
-            ← Voltar para investigação
+            ← Voltar para processo
           </button>
 
         </div>
@@ -1685,7 +1633,7 @@ textarea{
         </h1>
 
         <p class="muted">
-          Informações do veículo encontrado durante a investigação.
+          Informações do veículo vinculadas ao processo.
         </p>
 
         <div id="veiculoDetalhe"></div>
@@ -1733,7 +1681,7 @@ textarea{
             class="btn btn-secondary"
             onclick="voltarDaTelaPatrimonial()"
           >
-            ← Voltar para investigação
+            ← Voltar para processo
           </button>
 
         </div>
@@ -2051,7 +1999,7 @@ textarea{
         </h1>
 
         <p class="muted">
-          Informações da pessoa vinculada à investigação.
+          Informações da pessoa vinculada ao processo.
         </p>
 
         <div id="pessoaDetalhe"></div>
@@ -2139,7 +2087,7 @@ textarea{
 
 
 <script
-  src="./script.js?v=13.0"
+  src="./script.js?v=14.0"
   defer
 ></script>
 

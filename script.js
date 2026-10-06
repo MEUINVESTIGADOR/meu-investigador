@@ -588,7 +588,7 @@ function renderizarInvestigacoes(){
 
     el.innerHTML =
       '<div class="empty">' +
-      'Nenhuma investigação cadastrada.' +
+      'Nenhum processo cadastrado.' +
       '</div>';
 
     return;
@@ -893,7 +893,7 @@ function abrirInvestigacao(id, clienteContextoId){
   $("investigacaoTitulo").textContent =
     investigacaoAtual.processo
       ? "Processo " + investigacaoAtual.processo
-      : "Investigação";
+      : "Processo";
 
 
   $("investigacaoInfo").innerHTML = `
@@ -1023,21 +1023,6 @@ async function abrirDashboard(){
   );
 
 
-  $("dashboardTotalInvestigacoes")
-    .textContent =
-    investigacoes.length;
-
-
-  $("dashboardTotalImoveis")
-    .textContent =
-    "…";
-
-
-  $("dashboardTotalVeiculos")
-    .textContent =
-    "…";
-
-
   $("dashboardRecentes")
     .innerHTML =
     '<div class="loading">' +
@@ -1065,11 +1050,6 @@ async function carregarDashboard(){
   }
 
 
-  $("dashboardTotalInvestigacoes")
-    .textContent =
-    investigacoes.length;
-
-
   const recentes =
     agruparInvestigacoesPorCliente(investigacoes)
       .slice(0, 5);
@@ -1087,16 +1067,6 @@ async function carregarDashboard(){
         </div>
 
       `;
-
-
-    $("dashboardTotalImoveis")
-      .textContent =
-      "0";
-
-
-    $("dashboardTotalVeiculos")
-      .textContent =
-      "0";
 
 
     return;
@@ -1166,141 +1136,6 @@ async function carregarDashboard(){
     .join("");
 
 
-  try{
-
-    const resultados =
-      await Promise.all(
-
-        investigacoes.map(
-          async function(inv){
-
-            try{
-
-              const [
-                imoveisDados,
-                veiculosDados
-              ] =
-                await Promise.all([
-
-                  api(
-                    "/imoveis?investigacao_id=" +
-                    encodeURIComponent(
-                      inv.id
-                    )
-                  ),
-
-                  api(
-                    "/veiculos?investigacao_id=" +
-                    encodeURIComponent(
-                      inv.id
-                    )
-                  )
-
-                ]);
-
-
-              const listaImoveis =
-                Array.isArray(
-                  imoveisDados
-                )
-                  ? imoveisDados
-                  : (
-                      imoveisDados.results ||
-                      []
-                    );
-
-
-              const listaVeiculos =
-                Array.isArray(
-                  veiculosDados
-                )
-                  ? veiculosDados
-                  : (
-                      veiculosDados.results ||
-                      []
-                    );
-
-
-              return {
-
-                imoveis:
-                  listaImoveis.length,
-
-                veiculos:
-                  listaVeiculos.length
-
-              };
-
-            }catch(e){
-
-              return {
-
-                imoveis:0,
-
-                veiculos:0
-
-              };
-
-            }
-
-          }
-        )
-
-      );
-
-
-    const totalImoveis =
-      resultados.reduce(
-        function(
-          total,
-          item
-        ){
-
-          return total +
-            item.imoveis;
-
-        },
-        0
-      );
-
-
-    const totalVeiculos =
-      resultados.reduce(
-        function(
-          total,
-          item
-        ){
-
-          return total +
-            item.veiculos;
-
-        },
-        0
-      );
-
-
-    $("dashboardTotalImoveis")
-      .textContent =
-      totalImoveis;
-
-
-    $("dashboardTotalVeiculos")
-      .textContent =
-      totalVeiculos;
-
-  }catch(e){
-
-    $("dashboardTotalImoveis")
-      .textContent =
-      "0";
-
-
-    $("dashboardTotalVeiculos")
-      .textContent =
-      "0";
-
-  }
-
 }
 
 
@@ -1355,11 +1190,7 @@ async function abrirImoveis(){
 
   $("imoveisSubtitulo")
     .textContent =
-    "Investigação: " +
-    (
-      investigacaoAtual.nome ||
-      ""
-    );
+    "Processo: " + (investigacaoAtual.processo || "Sem número");
 
 
   mostrarSomente(
@@ -2047,11 +1878,7 @@ async function abrirVeiculos(){
 
   $("veiculosSubtitulo")
     .textContent =
-    "Investigação: " +
-    (
-      investigacaoAtual.nome ||
-      ""
-    );
+    "Processo: " + (investigacaoAtual.processo || "Sem número");
 
 
   mostrarSomente(
@@ -2737,11 +2564,7 @@ async function abrirPessoas(){
 
   $("pessoasSubtitulo")
     .textContent =
-    "Investigação: " +
-    (
-      investigacaoAtual.nome ||
-      ""
-    );
+    "Processo: " + (investigacaoAtual.processo || "Sem número");
 
   mostrarSomente(
     "pessoasScreen"
@@ -2841,7 +2664,7 @@ function renderizarPessoas(){
       (
         pessoas.length
           ? "Nenhuma pessoa corresponde à pesquisa."
-          : "Nenhuma pessoa cadastrada nesta investigação."
+          : "Nenhuma pessoa cadastrada neste processo."
       ) +
       '</div>';
 
@@ -3000,7 +2823,7 @@ $("pessoaForm").addEventListener(
     e.preventDefault();
 
     if(!investigacaoAtual){
-      alert("Abra uma investigação antes de cadastrar pessoas.");
+      alert("Abra um processo antes de cadastrar pessoas.");
       return;
     }
 
@@ -3281,7 +3104,7 @@ async function abrirRelatorio(){
   $("relatorioConteudo")
     .innerHTML =
     '<div class="loading">' +
-    'Carregando investigações...' +
+    'Carregando processos...' +
     '</div>';
 
 
@@ -3305,7 +3128,7 @@ async function abrirRelatorio(){
 
           <div class="empty">
 
-            Nenhuma investigação cadastrada.
+            Nenhum processo cadastrado.
 
             <div
               class="actions"
@@ -3316,7 +3139,7 @@ async function abrirRelatorio(){
                 class="btn btn-primary"
                 onclick='mostrarSomente("homeScreen"); mostrarNovaInvestigacao();'
               >
-                ＋ Nova investigação
+                ＋ Novo processo
               </button>
 
             </div>
@@ -3349,7 +3172,7 @@ async function abrirRelatorio(){
         <div class="relatorio-capa">
 
           <div class="badge">
-            RELATÓRIOS DE INVESTIGAÇÃO
+            RELATÓRIOS DE PROCESSOS
           </div>
 
           <h1>
@@ -3357,7 +3180,7 @@ async function abrirRelatorio(){
           </h1>
 
           <p class="muted">
-            Selecione a investigação
+            Selecione o processo
             que deseja consultar.
           </p>
 
@@ -3437,7 +3260,7 @@ async function gerarRelatorioDaInvestigacao(
   if(!encontrada){
 
     alert(
-      "Investigação não encontrada."
+      "Processo não encontrado."
     );
 
     return;
@@ -3702,7 +3525,7 @@ function renderizarRelatorio(){
 
         <div class="empty">
           Nenhum imóvel cadastrado
-          nesta investigação.
+          neste processo.
         </div>
 
       `;
@@ -3857,7 +3680,7 @@ function renderizarRelatorio(){
 
         <div class="empty">
           Nenhum veículo cadastrado
-          nesta investigação.
+          neste processo.
         </div>
 
       `;
@@ -3964,7 +3787,7 @@ function renderizarRelatorio(){
           })
           .join("")
       : '<div class="empty">' +
-          'Nenhuma pessoa cadastrada nesta investigação.' +
+          'Nenhuma pessoa cadastrada neste processo.' +
         '</div>';
 
 
@@ -4094,7 +3917,7 @@ function renderizarRelatorio(){
           <div class="relatorio-count">
 
             <span class="muted">
-              Investigações
+              Processos
             </span>
 
             <strong>
