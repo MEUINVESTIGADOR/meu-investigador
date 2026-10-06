@@ -377,7 +377,31 @@ function validarDadosPessoa(dados) {
     ["dataNascimento", 10, "Data de nascimento"],
     ["dataObtencao", 10, "Data de obtenção"],
     ["referencia", 2000, "Referência da fonte"],
-    ["cpf", 14, "CPF"]
+    ["cpf", 14, "CPF"],
+    ["telefone", 40, "Telefone"],
+    ["email", 254, "E-mail"],
+    ["redeSocial", 500, "Rede social"],
+    ["endereco1Cep", 20, "CEP do endereço 1"],
+    ["endereco1Logradouro", 300, "Endereço do endereço 1"],
+    ["endereco1Numero", 50, "Número do endereço 1"],
+    ["endereco1Complemento", 200, "Complemento do endereço 1"],
+    ["endereco1Bairro", 150, "Bairro do endereço 1"],
+    ["endereco1Cidade", 150, "Cidade do endereço 1"],
+    ["endereco1Uf", 2, "UF do endereço 1"],
+    ["endereco2Cep", 20, "CEP do endereço 2"],
+    ["endereco2Logradouro", 300, "Endereço do endereço 2"],
+    ["endereco2Numero", 50, "Número do endereço 2"],
+    ["endereco2Complemento", 200, "Complemento do endereço 2"],
+    ["endereco2Bairro", 150, "Bairro do endereço 2"],
+    ["endereco2Cidade", 150, "Cidade do endereço 2"],
+    ["endereco2Uf", 2, "UF do endereço 2"],
+    ["endereco3Cep", 20, "CEP do endereço 3"],
+    ["endereco3Logradouro", 300, "Endereço do endereço 3"],
+    ["endereco3Numero", 50, "Número do endereço 3"],
+    ["endereco3Complemento", 200, "Complemento do endereço 3"],
+    ["endereco3Bairro", 150, "Bairro do endereço 3"],
+    ["endereco3Cidade", 150, "Cidade do endereço 3"],
+    ["endereco3Uf", 2, "UF do endereço 3"]
   ];
 
   const pessoa = {};
@@ -404,6 +428,16 @@ function validarDadosPessoa(dados) {
     }
 
     pessoa[chave] = valor;
+  }
+
+  for (const chave of ["endereco1Uf", "endereco2Uf", "endereco3Uf"]) {
+    if (pessoa[chave] && !/^[a-z]{2}$/i.test(pessoa[chave])) {
+      return {
+        erro: "UF inválida. Informe duas letras ou deixe o campo vazio."
+      };
+    }
+
+    pessoa[chave] = pessoa[chave].toUpperCase();
   }
 
   if (!pessoa.nome) {
@@ -2122,7 +2156,31 @@ export default {
                 observacoes,
                 fonte_informacao AS fonte,
                 data_obtencao AS dataObtencao,
-                referencia_fonte AS referencia
+                referencia_fonte AS referencia,
+                telefone,
+                email,
+                rede_social AS redeSocial,
+                endereco1_cep AS endereco1Cep,
+                endereco1_logradouro AS endereco1Logradouro,
+                endereco1_numero AS endereco1Numero,
+                endereco1_complemento AS endereco1Complemento,
+                endereco1_bairro AS endereco1Bairro,
+                endereco1_cidade AS endereco1Cidade,
+                endereco1_uf AS endereco1Uf,
+                endereco2_cep AS endereco2Cep,
+                endereco2_logradouro AS endereco2Logradouro,
+                endereco2_numero AS endereco2Numero,
+                endereco2_complemento AS endereco2Complemento,
+                endereco2_bairro AS endereco2Bairro,
+                endereco2_cidade AS endereco2Cidade,
+                endereco2_uf AS endereco2Uf,
+                endereco3_cep AS endereco3Cep,
+                endereco3_logradouro AS endereco3Logradouro,
+                endereco3_numero AS endereco3Numero,
+                endereco3_complemento AS endereco3Complemento,
+                endereco3_bairro AS endereco3Bairro,
+                endereco3_cidade AS endereco3Cidade,
+                endereco3_uf AS endereco3Uf
               FROM pessoas
               WHERE investigacao_id = ?
                 AND usuario_id = ?
@@ -2251,9 +2309,33 @@ export default {
                 observacoes,
                 fonte_informacao,
                 data_obtencao,
-                referencia_fonte
+                referencia_fonte,
+                telefone,
+                email,
+                rede_social,
+                endereco1_cep,
+                endereco1_logradouro,
+                endereco1_numero,
+                endereco1_complemento,
+                endereco1_bairro,
+                endereco1_cidade,
+                endereco1_uf,
+                endereco2_cep,
+                endereco2_logradouro,
+                endereco2_numero,
+                endereco2_complemento,
+                endereco2_bairro,
+                endereco2_cidade,
+                endereco2_uf,
+                endereco3_cep,
+                endereco3_logradouro,
+                endereco3_numero,
+                endereco3_complemento,
+                endereco3_bairro,
+                endereco3_cidade,
+                endereco3_uf
               )
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             `)
             .bind(
               investigacaoId,
@@ -2268,7 +2350,31 @@ export default {
               pessoa.observacoes,
               pessoa.fonte,
               pessoa.dataObtencao,
-              pessoa.referencia
+              pessoa.referencia,
+              pessoa.telefone,
+              pessoa.email,
+              pessoa.redeSocial,
+              pessoa.endereco1Cep,
+              pessoa.endereco1Logradouro,
+              pessoa.endereco1Numero,
+              pessoa.endereco1Complemento,
+              pessoa.endereco1Bairro,
+              pessoa.endereco1Cidade,
+              pessoa.endereco1Uf,
+              pessoa.endereco2Cep,
+              pessoa.endereco2Logradouro,
+              pessoa.endereco2Numero,
+              pessoa.endereco2Complemento,
+              pessoa.endereco2Bairro,
+              pessoa.endereco2Cidade,
+              pessoa.endereco2Uf,
+              pessoa.endereco3Cep,
+              pessoa.endereco3Logradouro,
+              pessoa.endereco3Numero,
+              pessoa.endereco3Complemento,
+              pessoa.endereco3Bairro,
+              pessoa.endereco3Cidade,
+              pessoa.endereco3Uf
             )
             .run();
 
@@ -2366,6 +2472,30 @@ export default {
                 fonte_informacao = ?,
                 data_obtencao = ?,
                 referencia_fonte = ?,
+                telefone = ?,
+                email = ?,
+                rede_social = ?,
+                endereco1_cep = ?,
+                endereco1_logradouro = ?,
+                endereco1_numero = ?,
+                endereco1_complemento = ?,
+                endereco1_bairro = ?,
+                endereco1_cidade = ?,
+                endereco1_uf = ?,
+                endereco2_cep = ?,
+                endereco2_logradouro = ?,
+                endereco2_numero = ?,
+                endereco2_complemento = ?,
+                endereco2_bairro = ?,
+                endereco2_cidade = ?,
+                endereco2_uf = ?,
+                endereco3_cep = ?,
+                endereco3_logradouro = ?,
+                endereco3_numero = ?,
+                endereco3_complemento = ?,
+                endereco3_bairro = ?,
+                endereco3_cidade = ?,
+                endereco3_uf = ?,
                 data_atualizacao = datetime('now')
               WHERE id = ?
                 AND usuario_id = ?
@@ -2388,6 +2518,30 @@ export default {
               pessoa.fonte,
               pessoa.dataObtencao,
               pessoa.referencia,
+              pessoa.telefone,
+              pessoa.email,
+              pessoa.redeSocial,
+              pessoa.endereco1Cep,
+              pessoa.endereco1Logradouro,
+              pessoa.endereco1Numero,
+              pessoa.endereco1Complemento,
+              pessoa.endereco1Bairro,
+              pessoa.endereco1Cidade,
+              pessoa.endereco1Uf,
+              pessoa.endereco2Cep,
+              pessoa.endereco2Logradouro,
+              pessoa.endereco2Numero,
+              pessoa.endereco2Complemento,
+              pessoa.endereco2Bairro,
+              pessoa.endereco2Cidade,
+              pessoa.endereco2Uf,
+              pessoa.endereco3Cep,
+              pessoa.endereco3Logradouro,
+              pessoa.endereco3Numero,
+              pessoa.endereco3Complemento,
+              pessoa.endereco3Bairro,
+              pessoa.endereco3Cidade,
+              pessoa.endereco3Uf,
               id,
               usuario.id,
               usuario.id
