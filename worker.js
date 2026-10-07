@@ -132,7 +132,46 @@ async function criarHashSenha(senha) {
     salt
   );
 
-  return base64(salt) + ":" + hash;
+  return [
+    "PBKDF2",
+    "100000",
+    base64(salt),
+    hash
+  ].join(":");
+}
+
+function validarDadosCadastro(dados) {
+  if (!dados || typeof dados !== "object" || Array.isArray(dados)) {
+    return { erro: "Dados do cadastro inválidos." };
+  }
+
+  const nome = typeof dados.nome === "string" ? dados.nome.trim() : "";
+  const email = typeof dados.email === "string"
+    ? dados.email.trim().toLowerCase()
+    : "";
+  const senha = typeof dados.senha === "string" ? dados.senha : "";
+  const confirmarSenha = typeof dados.confirmarSenha === "string"
+    ? dados.confirmarSenha
+    : "";
+
+  if (!nome || nome.length > 200) {
+    return { erro: "Informe um nome válido." };
+  }
+  if (
+    !email ||
+    email.length > 254 ||
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+  ) {
+    return { erro: "Informe um e-mail válido." };
+  }
+  if (senha.length < 8 || senha.length > 256) {
+    return { erro: "A senha deve ter entre 8 e 256 caracteres." };
+  }
+  if (senha !== confirmarSenha) {
+    return { erro: "A confirmação de senha não corresponde." };
+  }
+
+  return { cadastro: { nome, email, senha } };
 }
 
 // =================================================
@@ -801,6 +840,78 @@ export default {
         return respostaJSON({
           ok: false,
           erro: "Erro ao realizar login."
+        }, 500);
+      }
+    }
+
+    // =================================================
+    // CADASTRO PÚBLICO DE USUÁRIO
+    // =================================================
+
+    if (
+      request.method === "POST" &&
+      url.pathname === "/cadastro"
+    ) {
+      let dados;
+      try {
+        dados = await request.json();
+      } catch (erro) {
+        return respostaJSON({ ok: false, erro: "JSON inválido." }, 400);
+      }
+
+      const validacao = validarDadosCadastro(dados);
+      if (validacao.erro) {
+        return respostaJSON({ ok: false, erro: validacao.erro }, 400);
+      }
+
+      try {
+        const existente = await env.DB
+          .prepare("SELECT id FROM usuarios WHERE LOWER(email) = ? LIMIT 1")
+          .bind(validacao.cadastro.email)
+          .first();
+
+        if (existente) {
+          return respostaJSON({
+            ok: false,
+            erro: "Este e-mail já está cadastrado."
+          }, 409);
+        }
+
+        const senhaHash = await criarHashSenha(validacao.cadastro.senha);
+        await env.DB
+          .prepare(`
+            INSERT INTO usuarios (
+              nome,
+              email,
+              senha_hash,
+              ativo,
+              data_criacao
+            )
+            VALUES (?, ?, ?, 1, datetime('now'))
+          `)
+          .bind(
+            validacao.cadastro.nome,
+            validacao.cadastro.email,
+            senhaHash
+          )
+          .run();
+
+        return respostaJSON({
+          ok: true,
+          mensagem: "Conta criada com sucesso. Faça login para continuar."
+        }, 201);
+      } catch (erro) {
+        if (/UNIQUE constraint failed:\s*usuarios\.email/i.test(String(erro?.message || erro))) {
+          return respostaJSON({
+            ok: false,
+            erro: "Este e-mail já está cadastrado."
+          }, 409);
+        }
+
+        console.error("Erro ao cadastrar usuário:", erro);
+        return respostaJSON({
+          ok: false,
+          erro: "Não foi possível criar a conta. Tente novamente."
         }, 500);
       }
     }

@@ -180,6 +180,15 @@ textarea{
   color:var(--success);
 }
 
+.link-button{
+  border:0;
+  padding:0;
+  background:transparent;
+  color:var(--primary);
+  font-weight:700;
+  text-decoration:underline;
+}
+
 .actions{
   display:flex;
   flex-wrap:wrap;
@@ -664,8 +673,49 @@ textarea{
 
     </form>
 
+    <p class="muted" style="margin-bottom:0">
+      Primeiro acesso?
+      <button class="link-button" type="button" onclick="mostrarCadastro()">Criar conta</button>
+    </p>
+
   </div>
 
+</div>
+
+<div id="cadastroScreen" class="login-wrap hidden">
+  <div class="card login-card">
+    <h1>Criar conta</h1>
+    <p class="muted">Cadastre seus dados para acessar o Meu Investigador.</p>
+    <div id="cadastroMsg"></div>
+
+    <form id="cadastroForm">
+      <div class="field" style="margin-bottom:12px">
+        <label for="cadastroNome">Nome</label>
+        <input id="cadastroNome" type="text" maxlength="200" required autocomplete="name">
+      </div>
+
+      <div class="field" style="margin-bottom:12px">
+        <label for="cadastroEmail">E-mail</label>
+        <input id="cadastroEmail" type="email" maxlength="254" required autocomplete="email">
+      </div>
+
+      <div class="field" style="margin-bottom:12px">
+        <label for="cadastroSenha">Senha</label>
+        <input id="cadastroSenha" type="password" minlength="8" maxlength="256" required autocomplete="new-password">
+        <small class="muted">Use pelo menos 8 caracteres.</small>
+      </div>
+
+      <div class="field">
+        <label for="cadastroConfirmarSenha">Confirmar senha</label>
+        <input id="cadastroConfirmarSenha" type="password" minlength="8" maxlength="256" required autocomplete="new-password">
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-primary" type="submit">Criar conta</button>
+        <button class="btn btn-secondary" type="button" onclick="mostrarLogin()">Voltar para login</button>
+      </div>
+    </form>
+  </div>
 </div>
 
 
@@ -2165,7 +2215,7 @@ textarea{
 
 
 <script
-  src="./script.js?v=15.0"
+  src="./script.js?v=16.0"
   defer
 ></script>
 

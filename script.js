@@ -219,6 +219,56 @@ function mostrarSomente(id){
    INICIALIZAÇÃO / SESSÃO
 ========================= */
 
+function mostrarCadastro(){
+  esconder($("loginScreen"));
+  esconder($("appScreen"));
+  mostrar($("cadastroScreen"));
+  $("cadastroNome").focus();
+}
+
+function mostrarLogin(){
+  esconder($("cadastroScreen"));
+  mostrar($("loginScreen"));
+  $("loginEmail").focus();
+}
+
+$("cadastroForm").addEventListener(
+  "submit",
+  async function(e){
+    e.preventDefault();
+
+    const nome = $("cadastroNome").value.trim();
+    const email = $("cadastroEmail").value.trim();
+    const senha = $("cadastroSenha").value;
+    const confirmarSenha = $("cadastroConfirmarSenha").value;
+
+    if(senha !== confirmarSenha){
+      mostrarMsg("cadastroMsg", "A confirmação de senha não corresponde.", "error");
+      return;
+    }
+
+    try{
+      mostrarMsg("cadastroMsg", "Criando conta...", "notice");
+      const dados = await api("/cadastro", {
+        method: "POST",
+        body: JSON.stringify({ nome, email, senha, confirmarSenha })
+      });
+
+      $("cadastroForm").reset();
+      mostrarLogin();
+      $("loginEmail").value = email;
+      $("loginSenha").value = "";
+      mostrarMsg(
+        "loginMsg",
+        dados.mensagem || "Conta criada. Faça login para continuar.",
+        "success"
+      );
+    }catch(erro){
+      mostrarMsg("cadastroMsg", erro.message, "error");
+    }
+  }
+);
+
 async function iniciar(){
 
   try{
